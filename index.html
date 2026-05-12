@@ -336,9 +336,24 @@ async function loadFromGitHub(isManual = false) {
         const cloudData = JSON.parse(jsonString);
         
         if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
+            // M. BAYSAL temizliği (Buluttan gelen eski veriyi kalıcı olarak düzelt)
+            let needsCloudUpdate = false;
+            cloudData.forEach(item => {
+                if(item.tekniker === "M. BAYSAL") {
+                    item.tekniker = "MUSTAFA BAYSAL";
+                    needsCloudUpdate = true;
+                }
+            });
+
             data = cloudData;
             saveToLocal();
             renderTable();
+            
+            // Eğer bulutta hatalı isim varsa, onu da kalıcı olarak düzelt ve tekrar buluta yolla
+            if (needsCloudUpdate) {
+                setTimeout(saveToGitHub, 2000); 
+            }
+
             if (isManual) showToast("Veriler buluttan başarıyla yüklendi!", "success");
             return true;
         }
