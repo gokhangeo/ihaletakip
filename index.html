@@ -543,12 +543,22 @@ function calculateStats() {
             // Mühendis hesaplaması
             if (!targetRegion.muhendis[item.muhendis]) targetRegion.muhendis[item.muhendis] = { total: 0, details: {} };
             targetRegion.muhendis[item.muhendis].total += p;
-            targetRegion.muhendis[item.muhendis].details[ilce] = (targetRegion.muhendis[item.muhendis].details[ilce] || 0) + p;
+            
+            if (!targetRegion.muhendis[item.muhendis].details[ilce]) {
+                targetRegion.muhendis[item.muhendis].details[ilce] = { parsel: 0, count: 0 };
+            }
+            targetRegion.muhendis[item.muhendis].details[ilce].parsel += p;
+            targetRegion.muhendis[item.muhendis].details[ilce].count += 1;
             
             // Tekniker hesaplaması
             if (!targetRegion.tekniker[item.tekniker]) targetRegion.tekniker[item.tekniker] = { total: 0, details: {} };
             targetRegion.tekniker[item.tekniker].total += p;
-            targetRegion.tekniker[item.tekniker].details[ilce] = (targetRegion.tekniker[item.tekniker].details[ilce] || 0) + p;
+            
+            if (!targetRegion.tekniker[item.tekniker].details[ilce]) {
+                targetRegion.tekniker[item.tekniker].details[ilce] = { parsel: 0, count: 0 };
+            }
+            targetRegion.tekniker[item.tekniker].details[ilce].parsel += p;
+            targetRegion.tekniker[item.tekniker].details[ilce].count += 1;
         }
     });
 
@@ -558,13 +568,13 @@ function calculateStats() {
         const activeClass = isActive ? `active-filter-${colorStr}` : '';
         const checkIcon = isActive ? `<i class="fas fa-check-circle text-${colorStr}-500 absolute top-2 right-2 z-10"></i>` : '';
         
-        // İlçe detaylarını (Kırılımları) listele
+        // İlçe detaylarını (Kırılımları) listele ve birim sayısını ekle
         const detailBreakdown = Object.entries(dataObj.details)
-            .sort((a,b) => b[1] - a[1]) // Çoktan aza sırala
-            .map(([dName, dTotal]) => `
+            .sort((a,b) => b[1].parsel - a[1].parsel) // Çoktan aza sırala
+            .map(([dName, dData]) => `
                 <div class="flex justify-between items-center text-[10px] text-slate-600 border-t border-slate-200/60 py-1 first:border-t-0">
-                    <span class="font-semibold text-slate-500">${dName}</span>
-                    <span class="font-bold bg-${colorStr}-100 text-${colorStr}-700 px-1.5 py-[1px] rounded-md">${dTotal.toLocaleString('tr-TR')}</span>
+                    <span class="font-semibold text-slate-500">${dName} <span class="text-slate-400 font-normal ml-0.5" title="${dData.count} adet mahalle/iş birimi">(${dData.count} Birim)</span></span>
+                    <span class="font-bold bg-${colorStr}-100 text-${colorStr}-700 px-1.5 py-[1px] rounded-md">${dData.parsel.toLocaleString('tr-TR')}</span>
                 </div>
             `).join('');
             
