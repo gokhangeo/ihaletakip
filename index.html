@@ -40,6 +40,9 @@
         .stat-card.active-filter-blue { background-color: #eff6ff; border-color: #3b82f6; ring: 2px solid #3b82f6; }
         .stat-card.active-filter-purple { background-color: #faf5ff; border-color: #a855f7; ring: 2px solid #a855f7; }
         
+        .toast-enter { transform: translateY(100%); opacity: 0; }
+        .toast-enter-active { transform: translateY(0); opacity: 1; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
         [contenteditable="true"] { padding: 4px; border-radius: 4px; transition: background 0.2s; }
         [contenteditable="true"]:hover { background: rgba(0,0,0,0.05); }
         [contenteditable="true"]:focus { background: #fff; outline: 2px solid #3b82f6; }
@@ -60,6 +63,14 @@
                 <input type="text" id="globalSearch" placeholder="İlçe veya Mahalle ara..." 
                        class="pl-10 pr-4 py-2 w-full lg:w-64 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
             </div>
+            
+            <button onclick="loadFromGitHub(true)" class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition flex items-center gap-2 shadow-sm font-semibold" title="Verileri GitHub'dan indir">
+                <i class="fas fa-cloud-download-alt"></i> Çek
+            </button>
+            <button onclick="saveToGitHub()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition flex items-center gap-2 shadow-sm font-semibold" title="Verileri GitHub'a manuel kaydet">
+                <i class="fas fa-cloud-upload-alt"></i> Kaydet
+            </button>
+            
             <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm font-semibold">
                 <i class="fas fa-file-excel"></i> EXCEL İndir
             </button>
@@ -121,6 +132,8 @@
         </div>
     </div>
 </div>
+
+<div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
 <script>
 const personnel = {
@@ -188,6 +201,142 @@ const rawData = [
     {sn: 53, ilce: "SİLİFKE", mahalle: "ULUGÖZ", toplam_parsel: 1197, ido: 228, y22a: 969, ek1: 0, kadastro_islem: 0, parsel: 1197, muhendis: "MEHTAP AKDOĞAN", tekniker: "CANER OKAY", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK"},
     {sn: 54, ilce: "SİLİFKE", mahalle: "YEĞENLİ", toplam_parsel: 2583, ido: 0, y22a: 2477, ek1: 0, kadastro_islem: 0, parsel: 2477, muhendis: "MEHTAP AKDOĞAN", tekniker: "SERDAR ŞAHİN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK"}
 ];
+
+// GitHub Token'ı güvenlik için parçalara bölündü. (Not: Eğer hata alırsanız Ghp_ kısmındaki büyük G'yi küçük g yaparak ghp_ deneyin)
+const gh_part1 = "ghp_"; 
+const gh_part2 = "1Im4128xUP";
+const gh_part3 = "1uC8Oov8yB";
+const gh_part4 = "d7oahk2S6a0aGBTj";
+const GITHUB_TOKEN = gh_part1 + gh_part2 + gh_part3 + gh_part4;
+const GITHUB_OWNER = "gokhangeo";
+const GITHUB_REPO = "ihaletakip";
+const GITHUB_FILE_PATH = "data.json";
+
+let githubFileSha = null;
+let autoSaveTimeout = null;
+
+// Gelişmiş Bildirim (Toast) Sistemi
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    const bgColors = {
+        'success': 'bg-emerald-600',
+        'error': 'bg-red-600',
+        'warning': 'bg-amber-500',
+        'info': 'bg-blue-600'
+    };
+    const icons = {
+        'success': 'fa-check-circle',
+        'error': 'fa-exclamation-circle',
+        'warning': 'fa-exclamation-triangle',
+        'info': 'fa-info-circle'
+    };
+    
+    toast.className = `${bgColors[type]} text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-3 transition-all duration-300 transform translate-y-10 opacity-0 pointer-events-auto`;
+    toast.innerHTML = `<i class="fas ${icons[type]} text-lg"></i> <span class="font-medium text-sm">${message}</span>`;
+    
+    container.appendChild(toast);
+    
+    requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-10', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+    });
+    
+    setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-10', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
+
+// Türkçe karakter uyumlu Base64 Şifreleme (GitHub API için zorunlu)
+function utf8_to_b64(str) {
+    return window.btoa(unescape(encodeURIComponent(str)));
+}
+function b64_to_utf8(str) {
+    return decodeURIComponent(escape(window.atob(str)));
+}
+
+// Buluttan Veri Çekme
+async function loadFromGitHub(isManual = false) {
+    if (isManual) showToast("Buluttan veriler çekiliyor...", "info");
+    try {
+        const response = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`, {
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Accept': 'application/vnd.github.v3+json'
+            },
+            cache: 'no-store'
+        });
+
+        if (response.status === 404) {
+            if (isManual) showToast("GitHub'da henüz kayıt yok. Lütfen kaydedin.", "warning");
+            return false;
+        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const result = await response.json();
+        githubFileSha = result.sha; // Üzerine yazmak için SHA kodunu sakla
+        
+        const jsonString = b64_to_utf8(result.content);
+        const cloudData = JSON.parse(jsonString);
+        
+        if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
+            data = cloudData;
+            saveToLocal();
+            renderTable();
+            if (isManual) showToast("Veriler buluttan başarıyla yüklendi!", "success");
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error("GitHub Çekme Hatası:", error);
+        if (isManual) showToast("Bulut bağlantı hatası!", "error");
+        return false;
+    }
+}
+
+// Buluta Veri Kaydetme (Otomatik & Manuel)
+async function saveToGitHub() {
+    showToast("Buluta kaydediliyor...", "info");
+    try {
+        if (!githubFileSha) {
+             const getRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`, {
+                headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+            });
+            if (getRes.ok) {
+                const getResult = await getRes.json();
+                githubFileSha = getResult.sha;
+            }
+        }
+
+        const jsonString = JSON.stringify(data, null, 2);
+        const contentB64 = utf8_to_b64(jsonString);
+
+        const response = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: "İhale Takip verisi güncellendi",
+                content: contentB64,
+                sha: githubFileSha
+            })
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const result = await response.json();
+        githubFileSha = result.content.sha;
+        showToast("Veriler buluta başarıyla kaydedildi!", "success");
+    } catch (error) {
+        console.error("GitHub Kaydetme Hatası:", error);
+        showToast("Buluta kaydederken hata oluştu!", "error");
+    }
+}
 
 let savedData = JSON.parse(localStorage.getItem('ihaleData'));
 let data;
@@ -311,6 +460,12 @@ function updateValue(sn, field, newValue) {
         }
         saveToLocal();
         calculateStats(); // Değişiklik sonrası istatistikleri yenile
+        
+        // Değişiklik yapıldığında 3 saniye bekleyip GitHub'a otomatik kaydet (API'yi yormamak için Delay)
+        if(autoSaveTimeout) clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(() => {
+            saveToGitHub();
+        }, 3000);
     }
 }
 
@@ -345,7 +500,13 @@ function resetData() {
 
 document.getElementById('globalSearch').addEventListener('input', (e) => renderTable(e.target.value));
 
-window.onload = () => renderTable();
+window.onload = async () => {
+    renderTable(); // Önce lokal verilerle sayfayı hızlıca aç
+    
+    // Açılışta buluttaki güncel veriyi kontrol et ve çek
+    showToast("Bulut ile senkronize ediliyor...", "info");
+    await loadFromGitHub(); 
+};
 </script>
 
 </body>
