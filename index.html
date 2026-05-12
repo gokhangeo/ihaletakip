@@ -187,7 +187,7 @@
 <script>
 const personnel = {
     muhendis: ["TEVFİK YILDIZ", "HİLMİ MÜFTÜOĞLU", "HİKMET GÜLCAN", "MEHTAP AKDOĞAN", "VOLKAN İZCİ"],
-    tekniker: ["MUSTAFA BAYSAL", "SÜLEYMAN YILMAZ", "HÜSEYİN BÜYÜK", "BARIŞ YAYLAGÜL", "M. BAYSAL", "KAYHAN KARTPAK", "ÖMER ÇEVİK", "SERDAR ŞAHİN", "CANER OKAY"],
+    tekniker: ["MUSTAFA BAYSAL", "SÜLEYMAN YILMAZ", "HÜSEYİN BÜYÜK", "BARIŞ YAYLAGÜL", "KAYHAN KARTPAK", "ÖMER ÇEVİK", "SERDAR ŞAHİN", "CANER OKAY"],
     kadastro: ["MEHMET AKDENİZ"],
     fen: ["MAHMUT GÖK", "MÜMİN AKDOĞAN"],
     tas: ["MUSTAFA BICAK"]
@@ -205,7 +205,7 @@ const rawData = [
     {sn: 8, ilce: "ANAMUR", mahalle: "DEMİRÖREN", toplam_parsel: 2790, ido: 140, y22a: 2650, ek1: 0, kadastro_islem: 0, parsel: 2790, muhendis: "HİKMET GÜLCAN", tekniker: "BARIŞ YAYLAGÜL", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK"},
     {sn: 9, ilce: "ANAMUR", mahalle: "GÜNGÖREN", toplam_parsel: 1241, ido: 35, y22a: 668, ek1: 0, kadastro_islem: 0, parsel: 703, muhendis: "HİLMİ MÜFTÜOĞLU", tekniker: "HÜSEYİN BÜYÜK", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK"},
     {sn: 10, ilce: "ANAMUR", mahalle: "KALINÖREN", toplam_parsel: 1061, ido: 66, y22a: 671, ek1: 0, kadastro_islem: 0, parsel: 737, muhendis: "HİKMET GÜLCAN", tekniker: "HÜSEYİN BÜYÜK", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK"},
-    {sn: 11, ilce: "ANAMUR", mahalle: "KARAÇUKUR", toplam_parsel: 1479, ido: 67, y22a: 1263, ek1: 0, kadastro_islem: 0, parsel: 1330, muhendis: "TEVFİK YILDIZ", tekniker: "M. BAYSAL", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK"},
+    {sn: 11, ilce: "ANAMUR", mahalle: "KARAÇUKUR", toplam_parsel: 1479, ido: 67, y22a: 1263, ek1: 0, kadastro_islem: 0, parsel: 1330, muhendis: "TEVFİK YILDIZ", tekniker: "MUSTAFA BAYSAL", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK"},
     {sn: 12, ilce: "ANAMUR", mahalle: "KARALARBAHŞİŞ", toplam_parsel: 601, ido: 0, y22a: 495, ek1: 0, kadastro_islem: 0, parsel: 495, muhendis: "HİKMET GÜLCAN", tekniker: "HÜSEYİN BÜYÜK", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK"},
     {sn: 13, ilce: "ANAMUR", mahalle: "KARAAĞA", toplam_parsel: 614, ido: 31, y22a: 583, ek1: 0, kadastro_islem: 0, parsel: 614, muhendis: "HİLMİ MÜFTÜOĞLU", tekniker: "BARIŞ YAYLAGÜL", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK"},
     {sn: 14, ilce: "ANAMUR", mahalle: "KORUCUK", toplam_parsel: 624, ido: 31, y22a: 593, ek1: 0, kadastro_islem: 0, parsel: 624, muhendis: "HİLMİ MÜFTÜOĞLU", tekniker: "BARIŞ YAYLAGÜL", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK"},
@@ -398,6 +398,15 @@ let data;
 // Yeni sütunların varlığını kontrol et, yoksa varsayılan veriyi yükle (güncelleme koruması)
 if (savedData && savedData.length > 0 && savedData[0].toplam_parsel !== undefined) {
     data = savedData;
+    // M. BAYSAL temizliği (Önceden tarayıcıya veya buluta kaydedilmişse düzelt)
+    let needsSave = false;
+    data.forEach(item => {
+        if(item.tekniker === "M. BAYSAL") {
+            item.tekniker = "MUSTAFA BAYSAL";
+            needsSave = true;
+        }
+    });
+    if(needsSave) saveToLocal();
 } else {
     data = [...rawData];
     localStorage.setItem('ihaleData', JSON.stringify(data));
