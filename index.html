@@ -53,8 +53,11 @@
 <div class="max-w-[1400px] mx-auto">
     <header class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div>
-            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">İhale Takip Sistemi</h1>
-            <p class="text-slate-500 text-sm">Personel görev dağılımı, iş yükü ve detaylı parsel analiz paneli</p>
+            <div class="flex items-center gap-3">
+                <h1 id="mainTitle" class="text-2xl font-extrabold text-slate-900 tracking-tight cursor-pointer select-none" title="Admin Modu İçin 5 Kez Tıklayın">İhale Takip Sistemi</h1>
+                <span id="adminBadge" class="hidden bg-red-100 text-red-700 text-[10px] font-bold px-2 py-1 rounded-md border border-red-200 shadow-sm animate-pulse">ADMIN MODU</span>
+            </div>
+            <p class="text-slate-500 text-sm mt-1">Personel görev dağılımı, iş yükü ve detaylı parsel analiz paneli</p>
         </div>
         
         <div class="flex flex-wrap gap-3 w-full lg:w-auto">
@@ -64,41 +67,79 @@
                        class="pl-10 pr-4 py-2 w-full lg:w-64 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
             </div>
             
-            <button onclick="loadFromGitHub(true)" class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition flex items-center gap-2 shadow-sm font-semibold" title="Verileri GitHub'dan indir">
+            <button id="btnPull" onclick="loadFromGitHub(true)" class="hidden bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition flex items-center gap-2 shadow-sm font-semibold" title="Verileri GitHub'dan indir">
                 <i class="fas fa-cloud-download-alt"></i> Çek
             </button>
-            <button onclick="saveToGitHub()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition flex items-center gap-2 shadow-sm font-semibold" title="Verileri GitHub'a manuel kaydet">
+            <button id="btnPush" onclick="saveToGitHub()" class="hidden bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition flex items-center gap-2 shadow-sm font-semibold" title="Verileri GitHub'a manuel kaydet">
                 <i class="fas fa-cloud-upload-alt"></i> Kaydet
             </button>
             
             <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm font-semibold">
                 <i class="fas fa-file-excel"></i> EXCEL İndir
             </button>
-            <button onclick="resetData()" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl hover:bg-red-50 hover:text-red-600 transition flex items-center gap-2 font-medium" title="Varsayılan verilere dön">
+            <button id="btnReset" onclick="resetData()" class="hidden bg-slate-100 text-slate-600 px-4 py-2 rounded-xl hover:bg-red-50 hover:text-red-600 transition flex items-center gap-2 font-medium" title="Varsayılan verilere dön">
                 <i class="fas fa-undo"></i> Sıfırla
             </button>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
-        <!-- Mühendis Yükü -->
-        <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
-            <h2 class="text-sm font-bold text-blue-800 mb-4 flex items-center justify-between uppercase tracking-wider">
-                <span><i class="fas fa-user-tie mr-2"></i> Mühendis İş Yükü</span>
-                <span class="text-xs text-blue-500 font-normal normal-case">Filtrelemek için karta tıklayın</span>
-            </h2>
-            <div id="engStats" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+    <!-- BÖLGESEL İŞ YÜKÜ PANELLERİ BAŞLANGICI -->
+    <div class="space-y-4 mb-8">
+        
+        <!-- BÖLGE 1: ANAMUR - BOZYAZI -->
+        <div class="bg-white rounded-2xl border border-indigo-100 shadow-sm overflow-hidden transition-all duration-300">
+            <button onclick="toggleRegion('region1')" class="w-full p-4 md:p-6 flex justify-between items-center bg-indigo-50/40 hover:bg-indigo-100/50 transition-colors focus:outline-none">
+                <h2 class="text-lg font-black text-indigo-900 flex items-center gap-2">
+                    <i class="fas fa-map-marker-alt text-indigo-500"></i> ANAMUR - BOZYAZI BÖLGESİ İŞ YÜKÜ
+                </h2>
+                <i id="icon-region1" class="fas fa-chevron-down text-indigo-500 transition-transform duration-300"></i>
+            </button>
+            <div id="content-region1" class="hidden p-4 md:p-6 border-t border-indigo-100">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xs font-bold text-indigo-800 mb-3 flex items-center justify-between uppercase tracking-wider">
+                            <span><i class="fas fa-user-tie mr-1"></i> Mühendis İş Yükü</span>
+                        </h3>
+                        <div id="engStatsBolge1" class="grid grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-indigo-800 mb-3 flex items-center justify-between uppercase tracking-wider">
+                            <span><i class="fas fa-tools mr-1"></i> Tekniker İş Yükü</span>
+                        </h3>
+                        <div id="techStatsBolge1" class="grid grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Tekniker Yükü -->
-        <div class="bg-purple-50/50 p-4 rounded-2xl border border-purple-100">
-            <h2 class="text-sm font-bold text-purple-800 mb-4 flex items-center justify-between uppercase tracking-wider">
-                <span><i class="fas fa-tools mr-2"></i> Tekniker İş Yükü</span>
-                <span class="text-xs text-purple-500 font-normal normal-case">Filtrelemek için karta tıklayın</span>
-            </h2>
-            <div id="techStats" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+        <!-- BÖLGE 2: SİLİFKE - GÜLNAR - AYDINCIK -->
+        <div class="bg-white rounded-2xl border border-orange-100 shadow-sm overflow-hidden transition-all duration-300">
+            <button onclick="toggleRegion('region2')" class="w-full p-4 md:p-6 flex justify-between items-center bg-orange-50/40 hover:bg-orange-100/50 transition-colors focus:outline-none">
+                <h2 class="text-lg font-black text-orange-900 flex items-center gap-2">
+                    <i class="fas fa-map-marker-alt text-orange-500"></i> SİLİFKE - GÜLNAR - AYDINCIK BÖLGESİ İŞ YÜKÜ
+                </h2>
+                <i id="icon-region2" class="fas fa-chevron-down text-orange-500 transition-transform duration-300"></i>
+            </button>
+            <div id="content-region2" class="hidden p-4 md:p-6 border-t border-orange-100">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xs font-bold text-orange-800 mb-3 flex items-center justify-between uppercase tracking-wider">
+                            <span><i class="fas fa-user-tie mr-1"></i> Mühendis İş Yükü</span>
+                        </h3>
+                        <div id="engStatsBolge2" class="grid grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-orange-800 mb-3 flex items-center justify-between uppercase tracking-wider">
+                            <span><i class="fas fa-tools mr-1"></i> Tekniker İş Yükü</span>
+                        </h3>
+                        <div id="techStatsBolge2" class="grid grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </div>
+    <!-- BÖLGESEL İŞ YÜKÜ PANELLERİ BİTİŞİ -->
 
     <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden relative">
         <!-- Aktif Filtre Uyarı Barı -->
@@ -214,6 +255,11 @@ const GITHUB_FILE_PATH = "data.json";
 
 let githubFileSha = null;
 let autoSaveTimeout = null;
+
+// --- Admin Paneli Değişkenleri ---
+let isAdmin = false;
+let clickCount = 0;
+let clickTimer = null;
 
 // Gelişmiş Bildirim (Toast) Sistemi
 function showToast(message, type = 'info') {
@@ -351,6 +397,19 @@ if (savedData && savedData.length > 0 && savedData[0].toplam_parsel !== undefine
 
 let activePersonFilter = null; 
 
+function toggleRegion(regionId) {
+    const content = document.getElementById(`content-${regionId}`);
+    const icon = document.getElementById(`icon-${regionId}`);
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+    }
+}
+
 function saveToLocal() {
     localStorage.setItem('ihaleData', JSON.stringify(data));
 }
@@ -371,8 +430,9 @@ function togglePersonFilter(personName, role) {
 }
 
 function createSelect(currentValue, list, sn, field) {
+    if (!isAdmin) return currentValue; // Düzenleme kapalıysa sadece metin göster
     let options = list.map(name => `<option value="${name}" ${name === currentValue ? 'selected' : ''}>${name}</option>`).join('');
-    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full truncate">${options}</select>`;
+    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full min-w-max font-semibold py-1 outline-none bg-transparent">${options}</select>`;
 }
 
 function renderTable(searchText = "") {
@@ -394,19 +454,23 @@ function renderTable(searchText = "") {
         const row = document.createElement('tr');
         row.className = `district-row district-${item.ilce} hover:bg-slate-50 transition-colors`;
         
+        // Admin yetkilerine göre düzenleme özelliklerini ekle/çıkar
+        const editableAttr = isAdmin ? 'contenteditable="true"' : '';
+        const editableClass = isAdmin ? 'hover:bg-slate-200 cursor-text' : '';
+
         // Yeni sütunlar (toplam_parsel, ido, y22a, vb.) içeriği eklendi
         row.innerHTML = `
-            <td class="p-4 text-slate-400 font-medium">${item.sn}</td>
+            <td class="p-4 text-slate-400 font-medium whitespace-nowrap">${item.sn}</td>
             <td class="p-4 font-bold text-slate-700 whitespace-nowrap">${item.ilce}</td>
             <td class="p-4 font-semibold text-blue-600 whitespace-nowrap">${item.mahalle}</td>
-            <td class="p-3 text-center text-slate-600 font-medium" contenteditable="true" onblur="updateValue(${item.sn}, 'toplam_parsel', this.innerText)">${item.toplam_parsel}</td>
-            <td class="p-3 text-center text-slate-600 font-medium" contenteditable="true" onblur="updateValue(${item.sn}, 'ido', this.innerText)">${item.ido}</td>
-            <td class="p-3 text-center text-slate-600 font-medium" contenteditable="true" onblur="updateValue(${item.sn}, 'y22a', this.innerText)">${item.y22a}</td>
-            <td class="p-3 text-center text-slate-600 font-medium" contenteditable="true" onblur="updateValue(${item.sn}, 'ek1', this.innerText)">${item.ek1}</td>
-            <td class="p-3 text-center text-slate-600 font-medium" contenteditable="true" onblur="updateValue(${item.sn}, 'kadastro_islem', this.innerText)">${item.kadastro_islem}</td>
-            <td class="p-4 text-center font-black text-slate-800 bg-emerald-50" contenteditable="true" onblur="updateValue(${item.sn}, 'parsel', this.innerText)">${item.parsel.toLocaleString('tr-TR')}</td>
-            <td class="p-4 font-medium bg-blue-50/20">${createSelect(item.muhendis, personnel.muhendis, item.sn, 'muhendis')}</td>
-            <td class="p-4 font-medium bg-purple-50/20">${createSelect(item.tekniker, personnel.tekniker, item.sn, 'tekniker')}</td>
+            <td class="p-3 text-center text-slate-600 font-medium ${editableClass} whitespace-nowrap" ${editableAttr} onblur="updateValue(${item.sn}, 'toplam_parsel', this.innerText)">${item.toplam_parsel}</td>
+            <td class="p-3 text-center text-slate-600 font-medium ${editableClass} whitespace-nowrap" ${editableAttr} onblur="updateValue(${item.sn}, 'ido', this.innerText)">${item.ido}</td>
+            <td class="p-3 text-center text-slate-600 font-medium ${editableClass} whitespace-nowrap" ${editableAttr} onblur="updateValue(${item.sn}, 'y22a', this.innerText)">${item.y22a}</td>
+            <td class="p-3 text-center text-slate-600 font-medium ${editableClass} whitespace-nowrap" ${editableAttr} onblur="updateValue(${item.sn}, 'ek1', this.innerText)">${item.ek1}</td>
+            <td class="p-3 text-center text-slate-600 font-medium ${editableClass} whitespace-nowrap" ${editableAttr} onblur="updateValue(${item.sn}, 'kadastro_islem', this.innerText)">${item.kadastro_islem}</td>
+            <td class="p-4 text-center font-black text-slate-800 bg-emerald-50 ${editableClass} whitespace-nowrap" ${editableAttr} onblur="updateValue(${item.sn}, 'parsel', this.innerText)">${item.parsel.toLocaleString('tr-TR')}</td>
+            <td class="p-4 font-medium bg-blue-50/20 whitespace-nowrap">${createSelect(item.muhendis, personnel.muhendis, item.sn, 'muhendis')}</td>
+            <td class="p-4 font-medium bg-purple-50/20 whitespace-nowrap">${createSelect(item.tekniker, personnel.tekniker, item.sn, 'tekniker')}</td>
             <td class="p-4 text-slate-600 whitespace-nowrap">${createSelect(item.kadastro, personnel.kadastro, item.sn, 'kadastro')}</td>
             <td class="p-4 text-slate-600 whitespace-nowrap">${createSelect(item.fen, personnel.fen, item.sn, 'fen')}</td>
             <td class="p-4 text-slate-600 whitespace-nowrap">${createSelect(item.tas, personnel.tas, item.sn, 'tas')}</td>
@@ -418,38 +482,87 @@ function renderTable(searchText = "") {
 }
 
 function calculateStats() {
-    const engStats = document.getElementById('engStats');
-    const techStats = document.getElementById('techStats');
-    const eMap = {}, tMap = {};
+    // 4 Farklı container hedefleniyor
+    const engStatsB1 = document.getElementById('engStatsBolge1');
+    const techStatsB1 = document.getElementById('techStatsBolge1');
+    const engStatsB2 = document.getElementById('engStatsBolge2');
+    const techStatsB2 = document.getElementById('techStatsBolge2');
+    
+    // Verileri tutacağımız yapılar (Bölge 1 ve Bölge 2 için ayrı)
+    const stats = {
+        b1: { muhendis: {}, tekniker: {} }, // Anamur - Bozyazı
+        b2: { muhendis: {}, tekniker: {} }  // Silifke - Gülnar - Aydıncık
+    };
 
-    // Sadece "İhale Parsel" sayısını topla
+    // Tüm veriyi dönüp ait olduğu bölgeye göre parsel sayılarını topluyoruz
     data.forEach(item => {
         const p = parseInt(item.parsel) || 0;
-        eMap[item.muhendis] = (eMap[item.muhendis] || 0) + p;
-        tMap[item.tekniker] = (tMap[item.tekniker] || 0) + p;
+        const ilce = item.ilce || "";
+        
+        let targetRegion = null;
+        
+        if (ilce === "ANAMUR" || ilce === "BOZYAZI") {
+            targetRegion = stats.b1;
+        } else if (ilce === "SİLİFKE" || ilce === "GÜLNAR" || ilce === "AYDINCIK") {
+            targetRegion = stats.b2;
+        }
+
+        if(targetRegion) {
+            // Mühendis hesaplaması
+            if (!targetRegion.muhendis[item.muhendis]) targetRegion.muhendis[item.muhendis] = { total: 0, details: {} };
+            targetRegion.muhendis[item.muhendis].total += p;
+            targetRegion.muhendis[item.muhendis].details[ilce] = (targetRegion.muhendis[item.muhendis].details[ilce] || 0) + p;
+            
+            // Tekniker hesaplaması
+            if (!targetRegion.tekniker[item.tekniker]) targetRegion.tekniker[item.tekniker] = { total: 0, details: {} };
+            targetRegion.tekniker[item.tekniker].total += p;
+            targetRegion.tekniker[item.tekniker].details[ilce] = (targetRegion.tekniker[item.tekniker].details[ilce] || 0) + p;
+        }
     });
 
-    const createCard = (name, total, colorStr, role) => {
+    // Kart HTML'ini üreten ortak fonksiyon
+    const createCard = (name, dataObj, colorStr, role) => {
         const isActive = activePersonFilter === name;
         const activeClass = isActive ? `active-filter-${colorStr}` : '';
-        const iconColor = isActive ? `text-${colorStr}-600` : `text-slate-400`;
-        const checkIcon = isActive ? `<i class="fas fa-check-circle text-${colorStr}-500 absolute top-2 right-2"></i>` : '';
+        const checkIcon = isActive ? `<i class="fas fa-check-circle text-${colorStr}-500 absolute top-2 right-2 z-10"></i>` : '';
         
+        // İlçe detaylarını (Kırılımları) listele
+        const detailBreakdown = Object.entries(dataObj.details)
+            .sort((a,b) => b[1] - a[1]) // Çoktan aza sırala
+            .map(([dName, dTotal]) => `
+                <div class="flex justify-between items-center text-[10px] text-slate-600 border-t border-slate-200/60 py-1 first:border-t-0">
+                    <span class="font-semibold text-slate-500">${dName}</span>
+                    <span class="font-bold bg-${colorStr}-100 text-${colorStr}-700 px-1.5 py-[1px] rounded-md">${dTotal.toLocaleString('tr-TR')}</span>
+                </div>
+            `).join('');
+            
         return `
-        <div class="stat-card relative shadow-sm ${activeClass}" onclick="togglePersonFilter('${name}', '${role}')">
+        <div class="stat-card relative shadow-sm flex flex-col h-full ${activeClass}" onclick="togglePersonFilter('${name}', '${role}')">
             ${checkIcon}
-            <div class="text-[10px] font-bold text-slate-500 uppercase mb-1 flex items-center justify-between">
-                <span>${name}</span>
+            <div class="flex-grow mb-2">
+                <div class="text-[10px] font-bold text-slate-500 uppercase mb-1 pr-5 truncate" title="${name}">
+                    ${name}
+                </div>
+                <div class="text-lg font-black text-slate-800 leading-tight">${dataObj.total.toLocaleString('tr-TR')} <span class="text-[10px] font-normal text-slate-400 italic">parsel</span></div>
             </div>
-            <div class="text-lg font-black text-slate-800">${total.toLocaleString('tr-TR')} <span class="text-[10px] font-normal text-slate-400 italic">parsel</span></div>
+            <div class="bg-slate-50/80 rounded-lg px-2 py-1 mt-auto border border-slate-100 shadow-inner">
+                ${detailBreakdown}
+            </div>
         </div>`;
     };
 
-    engStats.innerHTML = Object.entries(eMap).sort((a,b)=>b[1]-a[1]).map(([n, t]) => createCard(n, t, 'blue', 'muhendis')).join('');
-    techStats.innerHTML = Object.entries(tMap).sort((a,b)=>b[1]-a[1]).map(([n, t]) => createCard(n, t, 'purple', 'tekniker')).join('');
+    // Bölge 1 Kartlarını Çiz
+    engStatsB1.innerHTML = Object.entries(stats.b1.muhendis).sort((a,b)=>b[1].total-a[1].total).map(([n, d]) => createCard(n, d, 'indigo', 'muhendis')).join('');
+    techStatsB1.innerHTML = Object.entries(stats.b1.tekniker).sort((a,b)=>b[1].total-a[1].total).map(([n, d]) => createCard(n, d, 'indigo', 'tekniker')).join('');
+
+    // Bölge 2 Kartlarını Çiz
+    engStatsB2.innerHTML = Object.entries(stats.b2.muhendis).sort((a,b)=>b[1].total-a[1].total).map(([n, d]) => createCard(n, d, 'orange', 'muhendis')).join('');
+    techStatsB2.innerHTML = Object.entries(stats.b2.tekniker).sort((a,b)=>b[1].total-a[1].total).map(([n, d]) => createCard(n, d, 'orange', 'tekniker')).join('');
 }
 
 function updateValue(sn, field, newValue) {
+    if (!isAdmin) return; // Güvenlik katmanı: Sadece admin modunda veri güncellenebilir
+
     const item = data.find(d => d.sn === sn);
     if (item) {
         // Rakam girilmesi gereken alanlar için sadece sayı kabul et
@@ -499,6 +612,46 @@ function resetData() {
 }
 
 document.getElementById('globalSearch').addEventListener('input', (e) => renderTable(e.target.value));
+
+// --- Admin Modu Giriş Mantığı ---
+document.getElementById('mainTitle').addEventListener('click', () => {
+    clickCount++;
+    clearTimeout(clickTimer);
+    
+    if (clickCount >= 5) {
+        clickCount = 0;
+        if (!isAdmin) {
+            const password = prompt("Lütfen Admin Şifresini Giriniz:");
+            if (password === "5034") {
+                isAdmin = true;
+                // Gizli elementleri göster
+                document.getElementById('adminBadge').classList.remove('hidden');
+                document.getElementById('btnPull').classList.remove('hidden');
+                document.getElementById('btnPush').classList.remove('hidden');
+                document.getElementById('btnReset').classList.remove('hidden');
+                showToast("Admin Modu Aktif. Verileri düzenleyebilirsiniz.", "success");
+                renderTable(document.getElementById('globalSearch').value); 
+            } else if (password !== null) {
+                showToast("Hatalı Şifre!", "error");
+            }
+        } else {
+            // Zaten adminse tıklayıp moddan çıkılabilir
+            if(confirm("Admin modundan çıkmak istiyor musunuz?")) {
+                isAdmin = false;
+                document.getElementById('adminBadge').classList.add('hidden');
+                document.getElementById('btnPull').classList.add('hidden');
+                document.getElementById('btnPush').classList.add('hidden');
+                document.getElementById('btnReset').classList.add('hidden');
+                showToast("Admin Modundan Çıkıldı. Sadece İzleme Modu.", "info");
+                renderTable(document.getElementById('globalSearch').value);
+            }
+        }
+    } else {
+        clickTimer = setTimeout(() => {
+            clickCount = 0;
+        }, 1500); // 1.5 saniye içinde art arda 5 kere tıklanmazsa sayacı sıfırla
+    }
+});
 
 window.onload = async () => {
     renderTable(); // Önce lokal verilerle sayfayı hızlıca aç
