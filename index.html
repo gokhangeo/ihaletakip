@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .table-container { max-height: 65vh; overflow-y: auto; overflow-x: auto; scrollbar-width: thin; }
+        .table-container { max-height: 65vh; overflow-y: auto; overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
         .sticky-header { position: sticky; top: 0; z-index: 20; }
         .district-row { border-left: 4px solid transparent; transition: all 0.2s; }
         .district-ANAMUR { border-left-color: #3b82f6; }
@@ -25,6 +25,7 @@
             width: 100%;
             font-weight: 500;
             padding: 2px;
+            font-size: 16px; /* Mobil cihazlarda otomatik yakınlaştırmayı engeller */
         }
         select:focus { outline: none; background: #fff; border-radius: 4px; box-shadow: 0 0 0 2px #3b82f6; }
         
@@ -46,40 +47,47 @@
         [contenteditable="true"] { padding: 4px; border-radius: 4px; transition: background 0.2s; }
         [contenteditable="true"]:hover { background: rgba(0,0,0,0.05); }
         [contenteditable="true"]:focus { background: #fff; outline: 2px solid #3b82f6; }
+        
+        /* Mobil Tablo Gizli Kaydırma Çubuğu Belirginleştirme */
+        .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="p-4 md:p-6">
 
 <div class="max-w-[1400px] mx-auto">
-    <header class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <div>
+    <header class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="w-full md:w-auto">
             <div class="flex items-center gap-3">
-                <h1 id="mainTitle" class="text-2xl font-extrabold text-slate-900 tracking-tight cursor-pointer select-none" title="Admin Modu İçin 5 Kez Tıklayın">İhale Takip Sistemi</h1>
-                <span id="adminBadge" class="hidden bg-red-100 text-red-700 text-[10px] font-bold px-2 py-1 rounded-md border border-red-200 shadow-sm animate-pulse">ADMIN MODU</span>
+                <h1 id="mainTitle" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight cursor-pointer select-none" title="Admin Modu İçin 5 Kez Tıklayın">İhale Takip Sistemi</h1>
+                <span id="adminBadge" class="hidden bg-red-100 text-red-700 text-[10px] font-bold px-2 py-1 rounded-md border border-red-200 shadow-sm animate-pulse whitespace-nowrap">ADMIN MODU</span>
             </div>
-            <p class="text-slate-500 text-sm mt-1">Personel görev dağılımı, iş yükü ve detaylı parsel analiz paneli</p>
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">Personel görev dağılımı, iş yükü ve detaylı parsel analiz paneli</p>
         </div>
         
-        <div class="flex flex-wrap gap-3 w-full lg:w-auto">
-            <div class="relative flex-grow lg:flex-grow-0">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
+            <div class="relative w-full sm:w-auto sm:flex-grow md:flex-grow-0">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
                 <input type="text" id="globalSearch" placeholder="İlçe veya Mahalle ara..." 
-                       class="pl-10 pr-4 py-2 w-full lg:w-64 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                       class="text-base sm:text-sm pl-10 pr-4 py-2 w-full sm:w-64 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
             </div>
             
-            <button id="btnPull" onclick="loadFromGitHub(true)" class="hidden bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition flex items-center gap-2 shadow-sm font-semibold" title="Verileri GitHub'dan indir">
-                <i class="fas fa-cloud-download-alt"></i> Çek
-            </button>
-            <button id="btnPush" onclick="saveToGitHub()" class="hidden bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition flex items-center gap-2 shadow-sm font-semibold" title="Verileri GitHub'a manuel kaydet">
-                <i class="fas fa-cloud-upload-alt"></i> Kaydet
-            </button>
-            
-            <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm font-semibold">
-                <i class="fas fa-file-excel"></i> EXCEL İndir
-            </button>
-            <button id="btnReset" onclick="resetData()" class="hidden bg-slate-100 text-slate-600 px-4 py-2 rounded-xl hover:bg-red-50 hover:text-red-600 transition flex items-center gap-2 font-medium" title="Varsayılan verilere dön">
-                <i class="fas fa-undo"></i> Sıfırla
-            </button>
+            <div class="grid grid-cols-2 sm:flex gap-2 sm:gap-3 w-full sm:w-auto">
+                <button id="btnPull" onclick="loadFromGitHub(true)" class="hidden bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-sm font-semibold text-sm sm:text-base" title="Verileri GitHub'dan indir">
+                    <i class="fas fa-cloud-download-alt"></i> Çek
+                </button>
+                <button id="btnPush" onclick="saveToGitHub()" class="hidden bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition flex items-center justify-center gap-2 shadow-sm font-semibold text-sm sm:text-base" title="Verileri GitHub'a manuel kaydet">
+                    <i class="fas fa-cloud-upload-alt"></i> Kaydet
+                </button>
+                <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-3 sm:px-4 py-2 rounded-xl hover:bg-emerald-700 transition flex items-center justify-center gap-2 shadow-sm font-semibold text-sm sm:text-base col-span-2 sm:col-span-1">
+                    <i class="fas fa-file-excel"></i> EXCEL İndir
+                </button>
+                <button id="btnReset" onclick="resetData()" class="hidden bg-slate-100 text-slate-600 px-4 py-2 rounded-xl hover:bg-red-50 hover:text-red-600 transition flex items-center justify-center gap-2 font-medium text-sm sm:text-base col-span-2 sm:col-span-1" title="Varsayılan verilere dön">
+                    <i class="fas fa-undo"></i> Sıfırla
+                </button>
+            </div>
         </div>
     </header>
 
@@ -100,13 +108,13 @@
                         <h3 class="text-xs font-bold text-indigo-800 mb-3 flex items-center justify-between uppercase tracking-wider">
                             <span><i class="fas fa-user-tie mr-1"></i> Mühendis İş Yükü</span>
                         </h3>
-                        <div id="engStatsBolge1" class="grid grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                        <div id="engStatsBolge1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
                     </div>
                     <div>
                         <h3 class="text-xs font-bold text-indigo-800 mb-3 flex items-center justify-between uppercase tracking-wider">
                             <span><i class="fas fa-tools mr-1"></i> Tekniker İş Yükü</span>
                         </h3>
-                        <div id="techStatsBolge1" class="grid grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                        <div id="techStatsBolge1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
                     </div>
                 </div>
             </div>
@@ -126,13 +134,13 @@
                         <h3 class="text-xs font-bold text-orange-800 mb-3 flex items-center justify-between uppercase tracking-wider">
                             <span><i class="fas fa-user-tie mr-1"></i> Mühendis İş Yükü</span>
                         </h3>
-                        <div id="engStatsBolge2" class="grid grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                        <div id="engStatsBolge2" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
                     </div>
                     <div>
                         <h3 class="text-xs font-bold text-orange-800 mb-3 flex items-center justify-between uppercase tracking-wider">
                             <span><i class="fas fa-tools mr-1"></i> Tekniker İş Yükü</span>
                         </h3>
-                        <div id="techStatsBolge2" class="grid grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                        <div id="techStatsBolge2" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
                     </div>
                 </div>
             </div>
@@ -174,7 +182,7 @@
     </div>
 </div>
 
-<div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+<div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
 <script>
 const personnel = {
