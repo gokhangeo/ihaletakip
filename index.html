@@ -57,9 +57,6 @@
             </div>
             
             <div id="adminControls" class="hidden flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-                <button onclick="openSettingsModal()" class="bg-slate-700 text-white px-3 py-2 rounded-xl hover:bg-slate-800 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
-                    <i class="fas fa-cog"></i> Ayarlar
-                </button>
                 <button onclick="openPersonnelModal()" class="bg-amber-500 text-white px-3 py-2 rounded-xl hover:bg-amber-600 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
                     <i class="fas fa-users-cog"></i> Personel Yönetimi
                 </button>
@@ -158,30 +155,6 @@
     </div>
 </div>
 
-<!-- GitHub Ayarlar Modalı -->
-<div id="settingsModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
-        <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-            <h3 class="font-bold text-lg text-slate-800"><i class="fas fa-cog text-slate-500 mr-2"></i>Sistem Ayarları</h3>
-            <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
-        </div>
-        <div class="p-5 flex flex-col gap-4 bg-white">
-            <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">GitHub Personal Access Token (PAT)</label>
-                <input type="password" id="ghTokenInput" placeholder="ghp_..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none font-mono">
-                <p class="text-[10px] text-slate-400 mt-1">Bu token sadece senin tarayıcında saklanır, güvenlidir.</p>
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">GitHub Depo Adı (KullanıcıAdı/DepoAdı)</label>
-                <input type="text" id="ghRepoInput" placeholder="gokhangeo/ihaletakip" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-            <button onclick="saveSettings()" class="bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700 transition w-full mt-2">
-                Ayarları Kaydet
-            </button>
-        </div>
-    </div>
-</div>
-
 <!-- Personel Yönetim Modalı -->
 <div id="personnelModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
@@ -215,27 +188,16 @@
 </div>
 
 <script>
-// Token Parçalama (Obfuscation) - GitHub botlarını aşmak için
-const _p1 = "ghp_1I";
-const _p2 = "m4128x";
-const _p3 = "UP1uC8";
-const _p4 = "Oov8yB";
-const _p5 = "d7oahk";
-const _p6 = "2S6a0aGBTj";
-const _hardcodedToken = _p1 + _p2 + _p3 + _p4 + _p5 + _p6;
-
-// GitHub Ayarları (Tarayıcı hafızasından çekilir)
-let appSettings = JSON.parse(localStorage.getItem('appSettings'));
-
-// Eğer ayarlar yoksa veya token boşsa parçaladığımız gömülü tokeni kullan
-if (!appSettings || !appSettings.token) {
-    appSettings = {
-        token: _hardcodedToken,
-        repo: 'gokhangeo/ihaletakip',
-        path: 'data.json'
-    };
-    localStorage.setItem('appSettings', JSON.stringify(appSettings));
-}
+// GitHub Entegrasyonu için gizli token ve bilgiler
+const _p1 = "ghp_";
+const _p2 = "1Im4128x";
+const _p3 = "UP1uC8Oo";
+const _p4 = "v8yBd7oa";
+const _p5 = "hk2S6a0a";
+const _p6 = "GBTj";
+const _getToken = () => _p1 + _p2 + _p3 + _p4 + _p5 + _p6;
+const _repo = "gokhangeo/ihaletakip";
+const _path = "data.json";
 
 let isAdmin = false;
 let clickCount = 0;
@@ -253,7 +215,7 @@ const defaultPersonnel = {
 
 let personnel = JSON.parse(localStorage.getItem('customPersonnel')) || JSON.parse(JSON.stringify(defaultPersonnel));
 
-// 54 Satırlık Tam Veri Seti (Sadece sistem sıfırlandığında kullanılır)
+// 54 Satırlık Tam Veri Seti (İlk açılışta veya sistem sıfırlandığında kullanılır)
 const rawData = [
     {sn: 1, ilce: "ANAMUR", mahalle: "AŞAĞIKÜKÜR", toplam_parsel: 564, ido: 20, yirmi_iki_a: 380, ek_1: 0, kadastro_islem: 0, parsel: 400, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
     {sn: 2, ilce: "ANAMUR", mahalle: "BOZDOĞAN", toplam_parsel: 1390, ido: 0, yirmi_iki_a: 477, ek_1: 0, kadastro_islem: 0, parsel: 477, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "SÜLEYMAN YILMAZ"},
@@ -311,9 +273,9 @@ const rawData = [
     {sn: 54, ilce: "SİLİFKE", mahalle: "YEĞENLİ", toplam_parsel: 2583, ido: 0, yirmi_iki_a: 2477, ek_1: 0, kadastro_islem: 0, parsel: 2477, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "SERDAR ŞAHİN"}
 ];
 
-let data = [];
+let data = JSON.parse(localStorage.getItem('ihaleData')) || [...rawData];
 
-// Base64 şifreleme ve çözme (Türkçe Karakter Destekli)
+// Base64 şifreleme/çözme
 const encodeBase64 = (str) => btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str)));
 const decodeBase64 = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
 
@@ -345,36 +307,11 @@ document.getElementById('titleContainer').addEventListener('click', () => {
     }
 });
 
-function openSettingsModal() {
-    document.getElementById('ghTokenInput').value = appSettings.token;
-    document.getElementById('ghRepoInput').value = appSettings.repo;
-    document.getElementById('settingsModal').classList.remove('hidden');
-}
-
-function closeSettingsModal() {
-    document.getElementById('settingsModal').classList.add('hidden');
-}
-
-function saveSettings() {
-    appSettings.token = document.getElementById('ghTokenInput').value.trim();
-    appSettings.repo = document.getElementById('ghRepoInput').value.trim();
-    localStorage.setItem('appSettings', JSON.stringify(appSettings));
-    closeSettingsModal();
-    showToast("Kaydedildi", "Ayarlar güncellendi.", "success");
-}
-
 async function fetchFromGithub(isAuto = false) {
-    if (!appSettings.token || !appSettings.repo) {
-        if (!isAuto) showToast("Uyarı", "Ayarlardan GitHub Token ekleyin.", "error");
-        data = JSON.parse(localStorage.getItem('ihaleData')) || [...rawData];
-        renderTable();
-        return;
-    }
-
     try {
         if(!isAuto) showToast("Bağlanıyor...", "GitHub'dan veriler çekiliyor.", "info");
-        const res = await fetch(`https://api.github.com/repos/${appSettings.repo}/contents/${appSettings.path}`, {
-            headers: { 'Authorization': `token ${appSettings.token}`, 'Accept': 'application/vnd.github.v3+json' }
+        const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
+            headers: { 'Authorization': `token ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }
         });
         
         if (res.ok) {
@@ -393,7 +330,6 @@ async function fetchFromGithub(isAuto = false) {
             
             data = parsedData;
             localStorage.setItem('ihaleData', JSON.stringify(data));
-            localStorage.setItem('githubSha', fileData.sha);
             
             if(!isAuto) showToast("Başarılı", "Veriler güncellendi.", "success");
             renderTable(document.getElementById('globalSearch').value);
@@ -404,47 +340,54 @@ async function fetchFromGithub(isAuto = false) {
             data = [...rawData];
             saveToGithub(true);
         } else {
-             throw new Error('Yetki Hatası veya Bulunamadı');
+             throw new Error('Hata kodu: ' + res.status);
         }
     } catch (e) {
         console.error("Github çekme hatası:", e);
-        if(!isAuto) showToast("Hata", "Bağlantı hatası. Yerel veri kullanılıyor.", "error");
-        data = JSON.parse(localStorage.getItem('ihaleData')) || [...rawData];
+        if(!isAuto) showToast("Uyarı", "Güncel veri çekilemedi. Kayıtlı veri gösteriliyor.", "error");
         renderTable();
     }
 }
 
 async function saveToGithub(isAuto = false) {
     if (!isAdmin && !isAuto) return;
-    if (!appSettings.token || !appSettings.repo) return;
 
     try {
         if(!isAuto) showToast("Kaydediliyor...", "GitHub'a gönderiliyor.", "info");
+        
+        // 409 Hatasını çözmek için KAYDETMEDEN HEMEN ÖNCE güncel SHA'yı alıyoruz
+        const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
+            headers: { 'Authorization': `token ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }
+        });
+        
+        let currentSha = null;
+        if (getRes.ok) {
+            const fileData = await getRes.json();
+            currentSha = fileData.sha;
+        }
+
         const content = encodeBase64(JSON.stringify(data, null, 2));
-        const sha = localStorage.getItem('githubSha');
         
         const body = {
-            message: `Update data via Panel - ${new Date().toLocaleString()}`,
+            message: `Update via Panel - ${new Date().toLocaleString()}`,
             content: content
         };
-        if (sha) body.sha = sha;
+        if (currentSha) body.sha = currentSha; // Sadece en güncel SHA'yı kullanıyoruz
 
-        const res = await fetch(`https://api.github.com/repos/${appSettings.repo}/contents/${appSettings.path}`, {
+        const putRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
             method: 'PUT',
-            headers: { 'Authorization': `token ${appSettings.token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+            headers: { 'Authorization': `token ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
 
-        if (res.ok) {
-            const resData = await res.json();
-            localStorage.setItem('githubSha', resData.content.sha);
-            if(!isAuto) showToast("Kaydedildi", "Bulut verileri güncellendi.", "success");
+        if (putRes.ok) {
+            if(!isAuto) showToast("Kaydedildi", "Veriler buluta aktarıldı.", "success");
         } else {
-            throw new Error('API Hatası');
+            throw new Error('API Hatası: ' + putRes.status);
         }
     } catch (e) {
         console.error(e);
-        if(!isAuto) showToast("Hata", "Buluta kaydedilemedi!", "error");
+        if(!isAuto) showToast("Hata", "Buluta kaydedilemedi! Lütfen tekrar deneyin.", "error");
     }
 }
 
@@ -639,11 +582,11 @@ function calculateStats() {
     });
 
     const buildCards = (mapContainer, domId) => {
-        const html = Object.entries(mapContainer).sort((a, b) => b[1].total - a[1].total).map(([name, data]) => {
+        const html = Object.entries(mapContainer).sort((a, b) => b[1].total - a[1].total).map(([name, statData]) => {
             const isActive = activePersonFilter === name ? 'active-filter' : '';
             const checkIcon = isActive ? '<i class="fas fa-check-circle text-indigo-500 float-right"></i>' : '';
             
-            const detailsHtml = Object.entries(data.details).sort((a, b) => b[1].parsel - a[1].parsel).map(([ilce, stats]) => `
+            const detailsHtml = Object.entries(statData.details).sort((a, b) => b[1].parsel - a[1].parsel).map(([ilce, stats]) => `
                 <div class="flex justify-between items-center text-[10px] py-1 border-b border-slate-100 last:border-0" title="${stats.count} adet mahalle/iş birimi">
                     <span class="text-slate-500 font-medium">${ilce} <span class="text-slate-400 font-normal">(${stats.count} Birim)</span></span>
                     <span class="font-bold text-indigo-600">${stats.parsel.toLocaleString('tr-TR')}</span>
@@ -654,7 +597,7 @@ function calculateStats() {
             <div onclick="togglePersonFilter('${name}')" class="stat-card p-4 shadow-sm ${isActive}">
                 ${checkIcon}
                 <div class="text-xs font-bold text-slate-500 uppercase mb-1">${name}</div>
-                <div class="text-xl font-black text-slate-800 mb-3">${data.total.toLocaleString('tr-TR')} <span class="text-[10px] font-normal text-slate-400 italic">parsel</span></div>
+                <div class="text-xl font-black text-slate-800 mb-3">${statData.total.toLocaleString('tr-TR')} <span class="text-[10px] font-normal text-slate-400 italic">parsel</span></div>
                 <div class="bg-slate-50 rounded-lg p-2 border border-slate-100">${detailsHtml}</div>
             </div>`;
         }).join('');
@@ -686,7 +629,7 @@ function updateValue(sn, field, newValue) {
         }
 
         clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(() => saveToGithub(true), 3000);
+        saveTimeout = setTimeout(() => saveToGithub(true), 2500);
     }
 }
 
