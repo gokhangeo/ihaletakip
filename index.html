@@ -20,8 +20,8 @@
         
         .editable-cell:focus { outline: 2px solid #3b82f6; background-color: #fff; border-radius: 4px; }
         
-        select { background: transparent; border: none; cursor: pointer; width: 100%; }
-        select:focus { outline: none; background: #fff; box-shadow: 0 0 0 2px #3b82f6; border-radius: 4px;}
+        select, input[type="date"], input[type="text"] { background: transparent; border: none; width: 100%; }
+        select:focus, input[type="date"]:focus, input[type="text"]:focus { outline: none; background: #fff; box-shadow: 0 0 0 2px #3b82f6; border-radius: 4px;}
         
         .stat-card { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; transition: all 0.2s; cursor: pointer; }
         .stat-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
@@ -147,6 +147,15 @@
                         <th class="p-3 font-bold text-center whitespace-nowrap" title="Kadastro Yönüyle İşleme Tabi Parsel Sayısı">Kad. İşlem</th>
                         <th class="p-4 font-bold text-center bg-emerald-700/40 whitespace-nowrap" title="İhaleye Çıkılacak Toplam Parsel Sayısı">İhale Parsel</th>
                         <th class="p-4 font-bold bg-slate-800/80 whitespace-nowrap text-center">Görevli Personeller</th>
+                        <th class="p-3 font-bold text-center whitespace-nowrap border-l border-slate-700">Altlık Durum</th>
+                        <th class="p-3 font-bold text-center whitespace-nowrap">Arazi Ölçüm Tar.</th>
+                        <th class="p-3 font-bold text-center whitespace-nowrap">Uçuş Tarihi</th>
+                        <th class="p-3 font-bold text-center whitespace-nowrap">Uçuş Kıymetlendirme</th>
+                        <th class="p-3 font-bold text-center whitespace-nowrap">Değerlendirme Dur.</th>
+                        <th class="p-3 font-bold text-center whitespace-nowrap">Bilgilendirme Tar.</th>
+                        <th class="p-3 font-bold text-center whitespace-nowrap">Komisyon Durum</th>
+                        <th class="p-3 font-bold text-center whitespace-nowrap">Kesin Askı Tar.</th>
+                        <th class="p-3 font-bold text-left whitespace-nowrap min-w-[150px]">Not</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
@@ -207,7 +216,7 @@ let saveTimeout;
 
 const defaultPersonnel = {
     muhendis: ["TEVFİK YILDIZ", "HİLMİ MÜFTÜOĞLU", "HİKMET GÜLCAN", "MEHTAP AKDOĞAN", "VOLKAN İZCİ"],
-    tekniker: ["MUSTAFA BAYSAL", "SÜLEYMAN YILMAZ", "HÜSEYİN BÜYÜK", "BARIŞ YAYLAGÜL", "KAYHAN KARTPAK", "ÖMER ÇEVİK", "SERDAR ŞAHİN", "CANER OKAY"],
+    tekniker: ["MUSTAFA BAYSAL", "SÜLEYMAN YILMAZ", "HÜSEYİN BÜYÜK", "BARIŞ YAYLAGÜL", "KAYHAN KARTPAK", "ÖMER ÇEVİK", "SERDAR ŞAHİN", "CANER OKAY", "MUSTAFA GÜRBÜZ"],
     kadastro: ["MEHMET AKDENİZ"],
     fen: ["MAHMUT GÖK", "MÜMİN AKDOĞAN"],
     tas: ["MUSTAFA BICAK"]
@@ -215,65 +224,8 @@ const defaultPersonnel = {
 
 let personnel = JSON.parse(localStorage.getItem('customPersonnel')) || JSON.parse(JSON.stringify(defaultPersonnel));
 
-// 54 Satırlık Tam Veri Seti
-const rawData = [
-    {sn: 1, ilce: "ANAMUR", mahalle: "AŞAĞIKÜKÜR", toplam_parsel: 564, ido: 20, yirmi_iki_a: 380, ek_1: 0, kadastro_islem: 0, parsel: 400, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
-    {sn: 2, ilce: "ANAMUR", mahalle: "BOZDOĞAN", toplam_parsel: 1390, ido: 0, yirmi_iki_a: 477, ek_1: 0, kadastro_islem: 0, parsel: 477, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "SÜLEYMAN YILMAZ"},
-    {sn: 3, ilce: "ANAMUR", mahalle: "BOĞUNTU", toplam_parsel: 974, ido: 20, yirmi_iki_a: 376, ek_1: 0, kadastro_islem: 0, parsel: 396, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 4, ilce: "ANAMUR", mahalle: "ÇAMLIPINAR", toplam_parsel: 686, ido: 33, yirmi_iki_a: 633, ek_1: 0, kadastro_islem: 0, parsel: 666, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "SÜLEYMAN YILMAZ"},
-    {sn: 5, ilce: "ANAMUR", mahalle: "ÇAMLIPINARALANI", toplam_parsel: 388, ido: 19, yirmi_iki_a: 369, ek_1: 0, kadastro_islem: 0, parsel: 388, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "SÜLEYMAN YILMAZ"},
-    {sn: 6, ilce: "ANAMUR", mahalle: "ÇATALOLUK", toplam_parsel: 633, ido: 0, yirmi_iki_a: 374, ek_1: 0, kadastro_islem: 0, parsel: 374, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 7, ilce: "ANAMUR", mahalle: "ÇUKURABANOZ", toplam_parsel: 2977, ido: 149, yirmi_iki_a: 2828, ek_1: 0, kadastro_islem: 0, parsel: 2977, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 8, ilce: "ANAMUR", mahalle: "DEMİRÖREN", toplam_parsel: 2790, ido: 140, yirmi_iki_a: 2650, ek_1: 0, kadastro_islem: 0, parsel: 2790, muhendis: "HİKMET GÜLCAN", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 9, ilce: "ANAMUR", mahalle: "GÜNGÖREN", toplam_parsel: 1241, ido: 35, yirmi_iki_a: 668, ek_1: 0, kadastro_islem: 0, parsel: 703, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 10, ilce: "ANAMUR", mahalle: "KALINÖREN", toplam_parsel: 1061, ido: 66, yirmi_iki_a: 671, ek_1: 0, kadastro_islem: 0, parsel: 737, muhendis: "HİKMET GÜLCAN", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 11, ilce: "ANAMUR", mahalle: "KARAÇUKUR", toplam_parsel: 1479, ido: 67, yirmi_iki_a: 1263, ek_1: 0, kadastro_islem: 0, parsel: 1330, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
-    {sn: 12, ilce: "ANAMUR", mahalle: "KARALARBAHŞİŞ", toplam_parsel: 601, ido: 0, yirmi_iki_a: 495, ek_1: 0, kadastro_islem: 0, parsel: 495, muhendis: "HİKMET GÜLCAN", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 13, ilce: "ANAMUR", mahalle: "KARAAĞA", toplam_parsel: 614, ido: 31, yirmi_iki_a: 583, ek_1: 0, kadastro_islem: 0, parsel: 614, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 14, ilce: "ANAMUR", mahalle: "KORUCUK", toplam_parsel: 624, ido: 31, yirmi_iki_a: 593, ek_1: 0, kadastro_islem: 0, parsel: 624, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 15, ilce: "ANAMUR", mahalle: "MALAKLAR", toplam_parsel: 1112, ido: 490, yirmi_iki_a: 417, ek_1: 0, kadastro_islem: 0, parsel: 907, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 16, ilce: "ANAMUR", mahalle: "NASRADDİN", toplam_parsel: 962, ido: 384, yirmi_iki_a: 577, ek_1: 0, kadastro_islem: 0, parsel: 961, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 17, ilce: "ANAMUR", mahalle: "ORMANCIK", toplam_parsel: 1693, ido: 467, yirmi_iki_a: 58, ek_1: 0, kadastro_islem: 0, parsel: 525, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 18, ilce: "ANAMUR", mahalle: "ORTAKÖY", toplam_parsel: 613, ido: 0, yirmi_iki_a: 605, ek_1: 0, kadastro_islem: 0, parsel: 605, muhendis: "HİKMET GÜLCAN", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 19, ilce: "ANAMUR", mahalle: "SUGÖZÜ", toplam_parsel: 506, ido: 23, yirmi_iki_a: 311, ek_1: 0, kadastro_islem: 0, parsel: 334, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
-    {sn: 20, ilce: "ANAMUR", mahalle: "SARIAĞAÇ", toplam_parsel: 768, ido: 317, yirmi_iki_a: 316, ek_1: 0, kadastro_islem: 0, parsel: 633, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
-    {sn: 21, ilce: "ANAMUR", mahalle: "SARIDANA", toplam_parsel: 350, ido: 17, yirmi_iki_a: 333, ek_1: 0, kadastro_islem: 0, parsel: 350, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
-    {sn: 22, ilce: "ANAMUR", mahalle: "YUKARIKÜKÜR", toplam_parsel: 1214, ido: 44, yirmi_iki_a: 832, ek_1: 0, kadastro_islem: 0, parsel: 876, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
-    {sn: 23, ilce: "AYDINCIK", mahalle: "HACIBAHATTİN", toplam_parsel: 1354, ido: 41, yirmi_iki_a: 1313, ek_1: 0, kadastro_islem: 0, parsel: 1354, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 24, ilce: "BOZYAZI", mahalle: "BAHÇEKOYAĞI", toplam_parsel: 602, ido: 26, yirmi_iki_a: 491, ek_1: 0, kadastro_islem: 0, parsel: 517, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 25, ilce: "BOZYAZI", mahalle: "BEYRELİ", toplam_parsel: 933, ido: 546, yirmi_iki_a: 380, ek_1: 0, kadastro_islem: 200, parsel: 1126, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 26, ilce: "BOZYAZI", mahalle: "ELMAKUZU", toplam_parsel: 2539, ido: 1182, yirmi_iki_a: 1091, ek_1: 0, kadastro_islem: 0, parsel: 2273, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 27, ilce: "BOZYAZI", mahalle: "GÖZCE", toplam_parsel: 1198, ido: 0, yirmi_iki_a: 873, ek_1: 0, kadastro_islem: 0, parsel: 873, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 28, ilce: "BOZYAZI", mahalle: "GÖZSÜZCE", toplam_parsel: 376, ido: 0, yirmi_iki_a: 256, ek_1: 0, kadastro_islem: 200, parsel: 456, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 29, ilce: "BOZYAZI", mahalle: "KÖMÜRLÜ", toplam_parsel: 488, ido: 24, yirmi_iki_a: 464, ek_1: 0, kadastro_islem: 0, parsel: 488, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 30, ilce: "BOZYAZI", mahalle: "LENGER", toplam_parsel: 879, ido: 39, yirmi_iki_a: 732, ek_1: 0, kadastro_islem: 0, parsel: 771, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 31, ilce: "BOZYAZI", mahalle: "KIZILCA", toplam_parsel: 3675, ido: 217, yirmi_iki_a: 1950, ek_1: 0, kadastro_islem: 0, parsel: 2167, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
-    {sn: 32, ilce: "BOZYAZI", mahalle: "TEKEDÜZÜ", toplam_parsel: 99, ido: 0, yirmi_iki_a: 99, ek_1: 0, kadastro_islem: 25, parsel: 124, muhendis: "HİKMET GÜLCAN", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 33, ilce: "BOZYAZI", mahalle: "DEREKÖY", toplam_parsel: 2273, ido: 149, yirmi_iki_a: 1205, ek_1: 0, kadastro_islem: 0, parsel: 1354, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
-    {sn: 34, ilce: "GÜLNAR", mahalle: "BÜYÜKECELİ", toplam_parsel: 2232, ido: 651, yirmi_iki_a: 1448, ek_1: 0, kadastro_islem: 0, parsel: 2099, muhendis: "VOLKAN İZCİ", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "KAYHAN KARTPAK"},
-    {sn: 35, ilce: "GÜLNAR", mahalle: "ŞEYHÖMER", toplam_parsel: 3159, ido: 62, yirmi_iki_a: 3033, ek_1: 0, kadastro_islem: 0, parsel: 3095, muhendis: "VOLKAN İZCİ", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "ÖMER ÇEVİK"},
-    {sn: 36, ilce: "GÜLNAR", mahalle: "ZEYNE(SÜTLÜCE)", toplam_parsel: 3672, ido: 111, yirmi_iki_a: 3561, ek_1: 0, kadastro_islem: 0, parsel: 3672, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "ÖMER ÇEVİK"},
-    {sn: 37, ilce: "SİLİFKE", mahalle: "ALTINKUM", toplam_parsel: 1628, ido: 944, yirmi_iki_a: 684, ek_1: 0, kadastro_islem: 0, parsel: 1628, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "KAYHAN KARTPAK"},
-    {sn: 38, ilce: "SİLİFKE", mahalle: "ARKARASI", toplam_parsel: 641, ido: 0, yirmi_iki_a: 641, ek_1: 0, kadastro_islem: 0, parsel: 641, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "SERDAR ŞAHİN"},
-    {sn: 39, ilce: "SİLİFKE", mahalle: "ATİK", toplam_parsel: 1632, ido: 115, yirmi_iki_a: 1077, ek_1: 440, kadastro_islem: 0, parsel: 1632, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "CANER OKAY"},
-    {sn: 40, ilce: "SİLİFKE", mahalle: "BOYNUİNCELİ", toplam_parsel: 329, ido: 96, yirmi_iki_a: 233, ek_1: 0, kadastro_islem: 200, parsel: 529, muhendis: "VOLKAN İZCİ", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "KAYHAN KARTPAK"},
-    {sn: 41, ilce: "SİLİFKE", mahalle: "BURUNUCU", toplam_parsel: 1207, ido: 262, yirmi_iki_a: 799, ek_1: 131, kadastro_islem: 0, parsel: 1192, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "KAYHAN KARTPAK"},
-    {sn: 42, ilce: "SİLİFKE", mahalle: "ÇELTİKÇİ", toplam_parsel: 334, ido: 0, yirmi_iki_a: 334, ek_1: 0, kadastro_islem: 0, parsel: 334, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "SERDAR ŞAHİN"},
-    {sn: 43, ilce: "SİLİFKE", mahalle: "GÜLÜMPAŞALI", toplam_parsel: 487, ido: 0, yirmi_iki_a: 487, ek_1: 0, kadastro_islem: 0, parsel: 487, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "SERDAR ŞAHİN"},
-    {sn: 44, ilce: "SİLİFKE", mahalle: "HIRMANLI", toplam_parsel: 2828, ido: 181, yirmi_iki_a: 1838, ek_1: 0, kadastro_islem: 0, parsel: 2019, muhendis: "VOLKAN İZCİ", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "KAYHAN KARTPAK"},
-    {sn: 45, ilce: "SİLİFKE", mahalle: "CILBAYIR", toplam_parsel: 1352, ido: 134, yirmi_iki_a: 1081, ek_1: 0, kadastro_islem: 0, parsel: 1215, muhendis: "VOLKAN İZCİ", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "SERDAR ŞAHİN"},
-    {sn: 46, ilce: "SİLİFKE", mahalle: "İMAMUŞAĞI", toplam_parsel: 4398, ido: 812, yirmi_iki_a: 2866, ek_1: 599, kadastro_islem: 750, parsel: 5027, muhendis: "VOLKAN İZCİ", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "CANER OKAY"},
-    {sn: 47, ilce: "SİLİFKE", mahalle: "KAVAK", toplam_parsel: 2746, ido: 0, yirmi_iki_a: 1856, ek_1: 0, kadastro_islem: 0, parsel: 1856, muhendis: "VOLKAN İZCİ", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "SERDAR ŞAHİN"},
-    {sn: 48, ilce: "SİLİFKE", mahalle: "KURTULUŞ", toplam_parsel: 2164, ido: 952, yirmi_iki_a: 1212, ek_1: 0, kadastro_islem: 0, parsel: 2164, muhendis: "VOLKAN İZCİ", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "KAYHAN KARTPAK"},
-    {sn: 49, ilce: "SİLİFKE", mahalle: "MARA", toplam_parsel: 2094, ido: 817, yirmi_iki_a: 1083, ek_1: 0, kadastro_islem: 600, parsel: 2500, muhendis: "VOLKAN İZCİ", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "KAYHAN KARTPAK"},
-    {sn: 50, ilce: "SİLİFKE", mahalle: "NASRULLAH", toplam_parsel: 304, ido: 6, yirmi_iki_a: 281, ek_1: 0, kadastro_islem: 0, parsel: 287, muhendis: "VOLKAN İZCİ", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "CANER OKAY"},
-    {sn: 51, ilce: "SİLİFKE", mahalle: "SEYDİLİ", toplam_parsel: 759, ido: 0, yirmi_iki_a: 728, ek_1: 0, kadastro_islem: 0, parsel: 728, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "KAYHAN KARTPAK"},
-    {sn: 52, ilce: "SİLİFKE", mahalle: "SÖKÜN", toplam_parsel: 1057, ido: 0, yirmi_iki_a: 1057, ek_1: 0, kadastro_islem: 0, parsel: 1057, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "CANER OKAY"},
-    {sn: 53, ilce: "SİLİFKE", mahalle: "ULUGÖZ", toplam_parsel: 1197, ido: 228, yirmi_iki_a: 969, ek_1: 0, kadastro_islem: 0, parsel: 1197, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "CANER OKAY"},
-    {sn: 54, ilce: "SİLİFKE", mahalle: "YEĞENLİ", toplam_parsel: 2583, ido: 0, yirmi_iki_a: 2477, ek_1: 0, kadastro_islem: 0, parsel: 2477, muhendis: "MEHTAP AKDOĞAN", kadastro: "MEHMET AKDENİZ", fen: "MÜMİN AKDOĞAN", tas: "MUSTAFA BICAK", tekniker: "SERDAR ŞAHİN"}
-];
-
-let data = JSON.parse(localStorage.getItem('ihaleData')) || [...rawData];
+// Artık kod içinde sabit veri yok, sadece lokal veya GitHub kullanılıyor.
+let data = JSON.parse(localStorage.getItem('ihaleData')) || [];
 
 // Base64 şifreleme/çözme
 const encodeBase64 = (str) => btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str)));
@@ -314,8 +266,10 @@ async function fetchFromGithub(isAuto = false) {
         const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
             headers: { 
                 'Authorization': `Bearer ${_getToken()}`, 
-                'Accept': 'application/vnd.github.v3+json'
-            }
+                'Accept': 'application/vnd.github.v3+json',
+                'Cache-Control': 'no-cache'
+            },
+            cache: 'no-store'
         });
         
         if (res.ok) {
@@ -323,31 +277,19 @@ async function fetchFromGithub(isAuto = false) {
             const content = decodeBase64(fileData.content);
             let parsedData = JSON.parse(content);
             
-            let dataChanged = false;
-            parsedData = parsedData.map(item => {
-                if(item.tekniker === "M. BAYSAL") {
-                    item.tekniker = "MUSTAFA BAYSAL";
-                    dataChanged = true;
-                }
-                return item;
-            });
-            
             data = parsedData;
             localStorage.setItem('ihaleData', JSON.stringify(data));
             
             if(!isAuto) showToast("Başarılı", "Veriler güncellendi.", "success");
             renderTable(document.getElementById('globalSearch').value);
             
-            if(dataChanged) saveToGithub(true);
-            
         } else if (res.status === 404) {
-            data = [...rawData];
-            saveToGithub(true);
+            showToast("Uyarı", "GitHub'da veri dosyası bulunamadı. Lütfen JSON dosyasını yükleyin.", "info");
+            renderTable();
         } else {
              throw new Error('Bağlantı Hatası veya Geçersiz Token');
         }
     } catch (e) {
-        // Hata durumunda konsolu kirletmemesi için error logu kaldırıldı, sessizce lokal veri yükleniyor.
         if(!isAuto) showToast("Çevrimdışı Mod", "Güncel veriye ulaşılamadı. Yerel veri gösteriliyor.", "info");
         renderTable();
     }
@@ -362,8 +304,10 @@ async function saveToGithub(isAuto = false) {
         const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
             headers: { 
                 'Authorization': `Bearer ${_getToken()}`, 
-                'Accept': 'application/vnd.github.v3+json'
-            }
+                'Accept': 'application/vnd.github.v3+json',
+                'Cache-Control': 'no-cache'
+            },
+            cache: 'no-store'
         });
         
         let currentSha = null;
@@ -516,6 +460,35 @@ function createSelect(currentValue, list, sn, field, roleLabel) {
     </div>`;
 }
 
+function createStatusSelect(val, sn, field) {
+    const opts = ["Yapılmadı", "Devam Ediyor", "Yapıldı"];
+    val = val || "Yapılmadı";
+    
+    let colorClass = "text-slate-500";
+    if(val === "Devam Ediyor") colorClass = "text-amber-600";
+    if(val === "Yapıldı") colorClass = "text-emerald-600";
+
+    if (!isAdmin) return `<span class="text-[11px] font-bold ${colorClass}">${val}</span>`;
+    
+    let options = opts.map(o => `<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
+    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} bg-transparent outline-none cursor-pointer p-1 rounded hover:bg-slate-100 text-center">${options}</select>`;
+}
+
+function createDateInput(val, sn, field) {
+    val = val || "";
+    if (!isAdmin) {
+        const formatted = val ? new Date(val).toLocaleDateString('tr-TR') : '-';
+        return `<span class="text-[11px] font-medium text-slate-700">${formatted}</span>`;
+    }
+    return `<input type="date" value="${val}" onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-medium text-slate-700 bg-transparent outline-none cursor-pointer p-1 rounded hover:bg-slate-100 text-center">`;
+}
+
+function createTextInput(val, sn, field) {
+    val = val || "";
+    if (!isAdmin) return `<span class="text-[11px] font-medium text-slate-700 block min-w-[150px] break-words whitespace-normal">${val || '-'}</span>`;
+    return `<input type="text" value="${val}" placeholder="Not ekle..." onblur="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-medium text-slate-700 bg-transparent outline-none p-1 rounded focus:bg-white hover:bg-slate-100 min-w-[150px]">`;
+}
+
 function renderTable(searchText = "") {
     const tableBody = document.getElementById('tableBody');
     tableBody.innerHTML = "";
@@ -546,8 +519,12 @@ function renderTable(searchText = "") {
             <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'kadastro_islem', this.innerText)">${item.kadastro_islem}</td>
             <td class="p-4 text-center font-black text-slate-800 bg-emerald-50 ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'parsel', this.innerText)">${item.parsel.toLocaleString('tr-TR')}</td>
             
-            <td class="p-1 align-top bg-slate-50/40 min-w-[260px]">
-                <div class="flex flex-col">
+            <td class="p-2 align-top bg-slate-50/40 min-w-[200px]">
+                <button onclick="document.getElementById('pers-${item.sn}').classList.toggle('hidden')" class="w-full text-left px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 rounded flex justify-between items-center text-[10px] font-bold text-slate-600 transition-colors shadow-sm">
+                    <span class="truncate mr-2"><i class="fas fa-users text-blue-500 mr-1.5"></i> ${item.muhendis} & ${item.tekniker}</span>
+                    <i class="fas fa-chevron-down text-slate-400"></i>
+                </button>
+                <div id="pers-${item.sn}" class="hidden flex-col gap-1 mt-2 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
                     ${createSelect(item.muhendis, personnel.muhendis, item.sn, 'muhendis', 'Mühendis')}
                     ${createSelect(item.tekniker, personnel.tekniker, item.sn, 'tekniker', 'Tekniker')}
                     ${createSelect(item.kadastro, personnel.kadastro, item.sn, 'kadastro', 'Kad. Üyesi')}
@@ -555,6 +532,16 @@ function renderTable(searchText = "") {
                     ${createSelect(item.tas, personnel.tas, item.sn, 'tas', 'Tas. Kon.')}
                 </div>
             </td>
+
+            <td class="p-2 border-l border-slate-200 text-center bg-white/50">${createStatusSelect(item.altlik_durum, item.sn, 'altlik_durum')}</td>
+            <td class="p-2 text-center bg-white/50">${createDateInput(item.arazi_olcum_tarihi, item.sn, 'arazi_olcum_tarihi')}</td>
+            <td class="p-2 text-center bg-white/50">${createDateInput(item.ucus_tarihi, item.sn, 'ucus_tarihi')}</td>
+            <td class="p-2 text-center bg-slate-50/50">${createStatusSelect(item.ucus_kiymet_durum, item.sn, 'ucus_kiymet_durum')}</td>
+            <td class="p-2 text-center bg-slate-50/50">${createStatusSelect(item.degerlendirme_durum, item.sn, 'degerlendirme_durum')}</td>
+            <td class="p-2 text-center bg-white/50">${createDateInput(item.bilgilendirme_tarihi, item.sn, 'bilgilendirme_tarihi')}</td>
+            <td class="p-2 text-center bg-slate-50/50">${createStatusSelect(item.komisyon_durum, item.sn, 'komisyon_durum')}</td>
+            <td class="p-2 text-center bg-white/50">${createDateInput(item.kesin_aski_tarihi, item.sn, 'kesin_aski_tarihi')}</td>
+            <td class="p-2 bg-yellow-50/30">${createTextInput(item.notlar, item.sn, 'notlar')}</td>
         `;
         tableBody.appendChild(row);
     });
@@ -624,7 +611,7 @@ function updateValue(sn, field, newValue) {
     const item = data.find(d => d.sn === sn);
     if (item) {
         if (['toplam_parsel', 'ido', 'yirmi_iki_a', 'ek_1', 'kadastro_islem', 'parsel'].includes(field)) {
-            item[field] = parseInt(newValue.replace(/[^0-9]/g, '')) || 0;
+            item[field] = parseInt(newValue.toString().replace(/[^0-9]/g, '')) || 0;
         } else {
             item[field] = newValue.trim();
         }
@@ -632,7 +619,11 @@ function updateValue(sn, field, newValue) {
         localStorage.setItem('ihaleData', JSON.stringify(data));
         
         if (!['toplam_parsel', 'ido', 'yirmi_iki_a', 'ek_1', 'kadastro_islem', 'parsel'].includes(field)) {
-            renderTable(document.getElementById('globalSearch').value);
+            if(field === 'notlar' || field.includes('durum') || field.includes('tarihi')){
+                if(field !== 'notlar') renderTable(document.getElementById('globalSearch').value);
+            } else {
+                renderTable(document.getElementById('globalSearch').value);
+            }
         } else {
             calculateStats();
         }
@@ -643,19 +634,17 @@ function updateValue(sn, field, newValue) {
 }
 
 function resetData() {
-    if (confirm("Tüm değişiklikler silinecek ve orijinal verilere dönülecek. Onaylıyor musunuz?")) {
-        data = [...rawData];
-        localStorage.setItem('ihaleData', JSON.stringify(data));
-        saveToGithub(true);
-        renderTable();
-        showToast("Sıfırlandı", "Orijinal verilere dönüldü.");
+    if (confirm("Tüm yerel değişiklikler silinecek ve GitHub'dan tekrar çekilecek. Onaylıyor musunuz?")) {
+        localStorage.removeItem('ihaleData');
+        fetchFromGithub(false);
     }
 }
 
 function exportToExcel() {
-    let csv = "S.N;İlçe;Mahalle;Toplam Parsel;İDÖ;22-A;EK-1;Kadastro İşlem;İhale Parseli;Mühendis;Tekniker;Kadastro Üyesi;Fen Kontrol;Tas. Kontrol\n";
+    let csv = "S.N;İlçe;Mahalle;Toplam Parsel;İDÖ;22-A;EK-1;Kadastro İşlem;İhale Parseli;Mühendis;Tekniker;Kadastro Üyesi;Fen Kontrol;Tas. Kontrol;Altlık Durum;Arazi Yersel Ölçüm Tarihi;Uçuş Tarihi;Uçuş Kıymetlendirme Durum;Değerlendirme Durum;Bilgilendirme İlanı Tarihi;Komisyon Durum;Kesin Askı Tarihi;Not\n";
     data.forEach(r => {
-        csv += `${r.sn};${r.ilce};${r.mahalle};${r.toplam_parsel};${r.ido};${r.yirmi_iki_a};${r.ek_1};${r.kadastro_islem};${r.parsel};${r.muhendis};${r.tekniker};${r.kadastro};${r.fen};${r.tas}\n`;
+        const trDate = (val) => val ? new Date(val).toLocaleDateString('tr-TR') : '';
+        csv += `${r.sn};${r.ilce};${r.mahalle};${r.toplam_parsel};${r.ido};${r.yirmi_iki_a};${r.ek_1};${r.kadastro_islem};${r.parsel};${r.muhendis};${r.tekniker};${r.kadastro};${r.fen};${r.tas};${r.altlik_durum || 'Yapılmadı'};${trDate(r.arazi_olcum_tarihi)};${trDate(r.ucus_tarihi)};${r.ucus_kiymet_durum || 'Yapılmadı'};${r.degerlendirme_durum || 'Yapılmadı'};${trDate(r.bilgilendirme_tarihi)};${r.komisyon_durum || 'Yapılmadı'};${trDate(r.kesin_aski_tarihi)};${r.notlar || ''}\n`;
     });
     const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
