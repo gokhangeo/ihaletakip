@@ -266,8 +266,7 @@ async function fetchFromGithub(isAuto = false) {
         const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
             headers: { 
                 'Authorization': `Bearer ${_getToken()}`, 
-                'Accept': 'application/vnd.github.v3+json',
-                'Cache-Control': 'no-cache'
+                'Accept': 'application/vnd.github.v3+json'
             },
             cache: 'no-store'
         });
@@ -304,8 +303,7 @@ async function saveToGithub(isAuto = false) {
         const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
             headers: { 
                 'Authorization': `Bearer ${_getToken()}`, 
-                'Accept': 'application/vnd.github.v3+json',
-                'Cache-Control': 'no-cache'
+                'Accept': 'application/vnd.github.v3+json'
             },
             cache: 'no-store'
         });
