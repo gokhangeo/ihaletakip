@@ -30,7 +30,6 @@
         #toast { transition: opacity 0.3s, transform 0.3s; transform: translateY(100%); opacity: 0; }
         #toast.show { transform: translateY(0); opacity: 1; }
         
-        /* Gizli scrollbar için yardımcı */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -57,8 +56,10 @@
                        class="pl-9 pr-3 py-2 w-full xl:w-64 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
             </div>
             
-            <!-- Admin'e Özel Butonlar -->
             <div id="adminControls" class="hidden flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                <button onclick="openSettingsModal()" class="bg-slate-700 text-white px-3 py-2 rounded-xl hover:bg-slate-800 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                    <i class="fas fa-cog"></i> Ayarlar
+                </button>
                 <button onclick="openPersonnelModal()" class="bg-amber-500 text-white px-3 py-2 rounded-xl hover:bg-amber-600 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
                     <i class="fas fa-users-cog"></i> Personel Yönetimi
                 </button>
@@ -157,6 +158,30 @@
     </div>
 </div>
 
+<!-- GitHub Ayarlar Modalı -->
+<div id="settingsModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
+        <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+            <h3 class="font-bold text-lg text-slate-800"><i class="fas fa-cog text-slate-500 mr-2"></i>Sistem Ayarları</h3>
+            <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-5 flex flex-col gap-4 bg-white">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">GitHub Personal Access Token (PAT)</label>
+                <input type="password" id="ghTokenInput" placeholder="ghp_..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none font-mono">
+                <p class="text-[10px] text-slate-400 mt-1">Bu token sadece senin tarayıcında saklanır, güvenlidir.</p>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">GitHub Depo Adı (KullanıcıAdı/DepoAdı)</label>
+                <input type="text" id="ghRepoInput" placeholder="gokhangeo/ihaletakip" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <button onclick="saveSettings()" class="bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700 transition w-full mt-2">
+                Ayarları Kaydet
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Personel Yönetim Modalı -->
 <div id="personnelModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
@@ -177,9 +202,7 @@
                 <button onclick="addPerson()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition">Ekle</button>
             </div>
         </div>
-        <div class="p-4 overflow-y-auto flex-1 bg-slate-50 border-t border-slate-100" id="personnelListContainer">
-            <!-- JS ile dolacak -->
-        </div>
+        <div class="p-4 overflow-y-auto flex-1 bg-slate-50 border-t border-slate-100" id="personnelListContainer"></div>
     </div>
 </div>
 
@@ -192,12 +215,13 @@
 </div>
 
 <script>
-// GitHub Ayarları
-const GITHUB_TOKEN = 'ghp_' + '1Im4128xUP1uC8Oov8yBd7oahk2S6a0aGBTj'; // Parçalanmış Token
-const GITHUB_REPO = 'gokhangeo/ihaletakip';
-const GITHUB_FILE_PATH = 'data.json';
+// GitHub Ayarları (Tarayıcı hafızasından çekilir)
+let appSettings = JSON.parse(localStorage.getItem('appSettings')) || {
+    token: '',
+    repo: 'gokhangeo/ihaletakip',
+    path: 'data.json'
+};
 
-// Admin Ayarları
 let isAdmin = false;
 let clickCount = 0;
 let clickTimer;
@@ -212,10 +236,9 @@ const defaultPersonnel = {
     tas: ["MUSTAFA BICAK"]
 };
 
-// Tarayıcıda kayıtlı özel liste varsa onu al, yoksa varsayılanı kullan
 let personnel = JSON.parse(localStorage.getItem('customPersonnel')) || JSON.parse(JSON.stringify(defaultPersonnel));
 
-// 54 Satırlık Tam Veri Seti
+// 54 Satırlık Tam Veri Seti (Sadece sistem sıfırlandığında kullanılır)
 const rawData = [
     {sn: 1, ilce: "ANAMUR", mahalle: "AŞAĞIKÜKÜR", toplam_parsel: 564, ido: 20, yirmi_iki_a: 380, ek_1: 0, kadastro_islem: 0, parsel: 400, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
     {sn: 2, ilce: "ANAMUR", mahalle: "BOZDOĞAN", toplam_parsel: 1390, ido: 0, yirmi_iki_a: 477, ek_1: 0, kadastro_islem: 0, parsel: 477, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "SÜLEYMAN YILMAZ"},
@@ -227,7 +250,7 @@ const rawData = [
     {sn: 8, ilce: "ANAMUR", mahalle: "DEMİRÖREN", toplam_parsel: 2790, ido: 140, yirmi_iki_a: 2650, ek_1: 0, kadastro_islem: 0, parsel: 2790, muhendis: "HİKMET GÜLCAN", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
     {sn: 9, ilce: "ANAMUR", mahalle: "GÜNGÖREN", toplam_parsel: 1241, ido: 35, yirmi_iki_a: 668, ek_1: 0, kadastro_islem: 0, parsel: 703, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
     {sn: 10, ilce: "ANAMUR", mahalle: "KALINÖREN", toplam_parsel: 1061, ido: 66, yirmi_iki_a: 671, ek_1: 0, kadastro_islem: 0, parsel: 737, muhendis: "HİKMET GÜLCAN", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
-    {sn: 11, ilce: "ANAMUR", mahalle: "KARAÇUKUR", toplam_parsel: 1479, ido: 67, yirmi_iki_a: 1263, ek_1: 0, kadastro_islem: 0, parsel: 1330, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"}, // Düzeltildi
+    {sn: 11, ilce: "ANAMUR", mahalle: "KARAÇUKUR", toplam_parsel: 1479, ido: 67, yirmi_iki_a: 1263, ek_1: 0, kadastro_islem: 0, parsel: 1330, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
     {sn: 12, ilce: "ANAMUR", mahalle: "KARALARBAHŞİŞ", toplam_parsel: 601, ido: 0, yirmi_iki_a: 495, ek_1: 0, kadastro_islem: 0, parsel: 495, muhendis: "HİKMET GÜLCAN", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "HÜSEYİN BÜYÜK"},
     {sn: 13, ilce: "ANAMUR", mahalle: "KARAAĞA", toplam_parsel: 614, ido: 31, yirmi_iki_a: 583, ek_1: 0, kadastro_islem: 0, parsel: 614, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
     {sn: 14, ilce: "ANAMUR", mahalle: "KORUCUK", toplam_parsel: 624, ido: 31, yirmi_iki_a: 593, ek_1: 0, kadastro_islem: 0, parsel: 624, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "BARIŞ YAYLAGÜL"},
@@ -275,6 +298,10 @@ const rawData = [
 
 let data = [];
 
+// Base64 şifreleme ve çözme (Türkçe Karakter Destekli)
+const encodeBase64 = (str) => btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str)));
+const decodeBase64 = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
+
 document.getElementById('titleContainer').addEventListener('click', () => {
     clickCount++;
     clearTimeout(clickTimer);
@@ -303,19 +330,43 @@ document.getElementById('titleContainer').addEventListener('click', () => {
     }
 });
 
+function openSettingsModal() {
+    document.getElementById('ghTokenInput').value = appSettings.token;
+    document.getElementById('ghRepoInput').value = appSettings.repo;
+    document.getElementById('settingsModal').classList.remove('hidden');
+}
+
+function closeSettingsModal() {
+    document.getElementById('settingsModal').classList.add('hidden');
+}
+
+function saveSettings() {
+    appSettings.token = document.getElementById('ghTokenInput').value.trim();
+    appSettings.repo = document.getElementById('ghRepoInput').value.trim();
+    localStorage.setItem('appSettings', JSON.stringify(appSettings));
+    closeSettingsModal();
+    showToast("Kaydedildi", "Ayarlar güncellendi.", "success");
+}
+
 async function fetchFromGithub(isAuto = false) {
+    if (!appSettings.token || !appSettings.repo) {
+        if (!isAuto) showToast("Uyarı", "Ayarlardan GitHub Token ekleyin.", "error");
+        data = JSON.parse(localStorage.getItem('ihaleData')) || [...rawData];
+        renderTable();
+        return;
+    }
+
     try {
         if(!isAuto) showToast("Bağlanıyor...", "GitHub'dan veriler çekiliyor.", "info");
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`, {
-            headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
+        const res = await fetch(`https://api.github.com/repos/${appSettings.repo}/contents/${appSettings.path}`, {
+            headers: { 'Authorization': `token ${appSettings.token}`, 'Accept': 'application/vnd.github.v3+json' }
         });
         
         if (res.ok) {
             const fileData = await res.json();
-            const content = decodeURIComponent(escape(atob(fileData.content)));
+            const content = decodeBase64(fileData.content);
             let parsedData = JSON.parse(content);
             
-            // Veri temizliği (M. BAYSAL -> MUSTAFA BAYSAL)
             let dataChanged = false;
             parsedData = parsedData.map(item => {
                 if(item.tekniker === "M. BAYSAL") {
@@ -332,16 +383,17 @@ async function fetchFromGithub(isAuto = false) {
             if(!isAuto) showToast("Başarılı", "Veriler güncellendi.", "success");
             renderTable(document.getElementById('globalSearch').value);
             
-            // Eğer eski veri düzeltildiyse Github'a geri kaydet
             if(dataChanged) saveToGithub(true);
             
         } else if (res.status === 404) {
             data = [...rawData];
-            saveToGithub(true); // İlk kez oluşturuluyor
+            saveToGithub(true);
+        } else {
+             throw new Error('Yetki Hatası veya Bulunamadı');
         }
     } catch (e) {
         console.error("Github çekme hatası:", e);
-        if(!isAuto) showToast("Hata", "Veri çekilemedi. Yerel veri kullanılıyor.", "error");
+        if(!isAuto) showToast("Hata", "Bağlantı hatası. Yerel veri kullanılıyor.", "error");
         data = JSON.parse(localStorage.getItem('ihaleData')) || [...rawData];
         renderTable();
     }
@@ -349,9 +401,11 @@ async function fetchFromGithub(isAuto = false) {
 
 async function saveToGithub(isAuto = false) {
     if (!isAdmin && !isAuto) return;
+    if (!appSettings.token || !appSettings.repo) return;
+
     try {
         if(!isAuto) showToast("Kaydediliyor...", "GitHub'a gönderiliyor.", "info");
-        const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+        const content = encodeBase64(JSON.stringify(data, null, 2));
         const sha = localStorage.getItem('githubSha');
         
         const body = {
@@ -360,9 +414,9 @@ async function saveToGithub(isAuto = false) {
         };
         if (sha) body.sha = sha;
 
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`, {
+        const res = await fetch(`https://api.github.com/repos/${appSettings.repo}/contents/${appSettings.path}`, {
             method: 'PUT',
-            headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+            headers: { 'Authorization': `token ${appSettings.token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
 
@@ -418,7 +472,6 @@ function togglePersonFilter(personName) {
     renderTable();
 }
 
-// Personel Yönetimi Fonksiyonları
 function openPersonnelModal() {
     renderPersonnelList();
     document.getElementById('personnelModal').classList.remove('hidden');
@@ -611,14 +664,12 @@ function updateValue(sn, field, newValue) {
         
         localStorage.setItem('ihaleData', JSON.stringify(data));
         
-        // Tabloyu yeniden çiz ama odağı kaybetmemek için tüm sayfayı değil
         if (!['toplam_parsel', 'ido', 'yirmi_iki_a', 'ek_1', 'kadastro_islem', 'parsel'].includes(field)) {
             renderTable(document.getElementById('globalSearch').value);
         } else {
             calculateStats();
         }
 
-        // Otomatik kaydetme (Debounce)
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => saveToGithub(true), 3000);
     }
@@ -650,9 +701,7 @@ function exportToExcel() {
 document.getElementById('globalSearch').addEventListener('input', (e) => renderTable(e.target.value));
 
 window.onload = () => {
-    // Sayfa açılışında Github'dan çekmeyi dene
     fetchFromGithub(true).then(() => {
-        // İlk açılışta 1. bölgeyi açık bırakalım örnek olarak
         toggleRegion('region1');
     });
 };
