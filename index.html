@@ -215,7 +215,7 @@ const defaultPersonnel = {
 
 let personnel = JSON.parse(localStorage.getItem('customPersonnel')) || JSON.parse(JSON.stringify(defaultPersonnel));
 
-// 54 Satırlık Tam Veri Seti (İlk açılışta veya sistem sıfırlandığında kullanılır)
+// 54 Satırlık Tam Veri Seti
 const rawData = [
     {sn: 1, ilce: "ANAMUR", mahalle: "AŞAĞIKÜKÜR", toplam_parsel: 564, ido: 20, yirmi_iki_a: 380, ek_1: 0, kadastro_islem: 0, parsel: 400, muhendis: "TEVFİK YILDIZ", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "MUSTAFA BAYSAL"},
     {sn: 2, ilce: "ANAMUR", mahalle: "BOZDOĞAN", toplam_parsel: 1390, ido: 0, yirmi_iki_a: 477, ek_1: 0, kadastro_islem: 0, parsel: 477, muhendis: "HİLMİ MÜFTÜOĞLU", kadastro: "MEHMET AKDENİZ", fen: "MAHMUT GÖK", tas: "MUSTAFA BICAK", tekniker: "SÜLEYMAN YILMAZ"},
@@ -310,8 +310,12 @@ document.getElementById('titleContainer').addEventListener('click', () => {
 async function fetchFromGithub(isAuto = false) {
     try {
         if(!isAuto) showToast("Bağlanıyor...", "GitHub'dan veriler çekiliyor.", "info");
-        const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
-            headers: { 'Authorization': `token ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }
+        
+        const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
+            headers: { 
+                'Authorization': `Bearer ${_getToken()}`, 
+                'Accept': 'application/vnd.github.v3+json'
+            }
         });
         
         if (res.ok) {
@@ -340,11 +344,11 @@ async function fetchFromGithub(isAuto = false) {
             data = [...rawData];
             saveToGithub(true);
         } else {
-             throw new Error('Hata kodu: ' + res.status);
+             throw new Error('Bağlantı Hatası veya Geçersiz Token');
         }
     } catch (e) {
-        console.error("Github çekme hatası:", e);
-        if(!isAuto) showToast("Uyarı", "Güncel veri çekilemedi. Kayıtlı veri gösteriliyor.", "error");
+        // Hata durumunda konsolu kirletmemesi için error logu kaldırıldı, sessizce lokal veri yükleniyor.
+        if(!isAuto) showToast("Çevrimdışı Mod", "Güncel veriye ulaşılamadı. Yerel veri gösteriliyor.", "info");
         renderTable();
     }
 }
@@ -355,9 +359,11 @@ async function saveToGithub(isAuto = false) {
     try {
         if(!isAuto) showToast("Kaydediliyor...", "GitHub'a gönderiliyor.", "info");
         
-        // 409 Hatasını çözmek için KAYDETMEDEN HEMEN ÖNCE güncel SHA'yı alıyoruz
-        const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
-            headers: { 'Authorization': `token ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }
+        const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
+            headers: { 
+                'Authorization': `Bearer ${_getToken()}`, 
+                'Accept': 'application/vnd.github.v3+json'
+            }
         });
         
         let currentSha = null;
@@ -372,22 +378,25 @@ async function saveToGithub(isAuto = false) {
             message: `Update via Panel - ${new Date().toLocaleString()}`,
             content: content
         };
-        if (currentSha) body.sha = currentSha; // Sadece en güncel SHA'yı kullanıyoruz
+        if (currentSha) body.sha = currentSha; 
 
         const putRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
             method: 'PUT',
-            headers: { 'Authorization': `token ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+            headers: { 
+                'Authorization': `Bearer ${_getToken()}`, 
+                'Accept': 'application/vnd.github.v3+json', 
+                'Content-Type': 'application/json' 
+            },
             body: JSON.stringify(body)
         });
 
         if (putRes.ok) {
             if(!isAuto) showToast("Kaydedildi", "Veriler buluta aktarıldı.", "success");
         } else {
-            throw new Error('API Hatası: ' + putRes.status);
+            throw new Error('Kayıt Başarısız');
         }
     } catch (e) {
-        console.error(e);
-        if(!isAuto) showToast("Hata", "Buluta kaydedilemedi! Lütfen tekrar deneyin.", "error");
+        if(!isAuto) showToast("Hata", "Buluta kaydedilemedi! Ağ ayarlarınızı kontrol edin.", "error");
     }
 }
 
