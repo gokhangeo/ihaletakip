@@ -540,24 +540,28 @@ function createSelect(currentValue, list, sn, field, roleLabel) {
 function createStatusSelect(val, sn, field) {
     const opts = ["Yapılmadı", "Devam Ediyor", "Yapıldı"];
     val = val || "Yapılmadı";
-    let colorClass = "text-slate-500";
-    if(val === "Devam Ediyor") colorClass = "text-amber-600";
-    if(val === "Yapıldı") colorClass = "text-emerald-600";
+    
+    let colorClass = "text-slate-600 bg-slate-100";
+    if(val === "Devam Ediyor") colorClass = "text-amber-700 bg-amber-100";
+    if(val === "Yapıldı") colorClass = "text-emerald-700 bg-emerald-100";
 
-    if (!isAdmin) return `<span class="text-[11px] font-bold ${colorClass}">${val}</span>`;
+    if (!isAdmin) return `<div class="flex justify-center"><span class="text-[11px] font-bold px-2 py-1 rounded-md ${colorClass} w-full text-center">${val}</span></div>`;
+    
     let options = opts.map(o => `<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
-    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} bg-transparent outline-none cursor-pointer p-1 rounded hover:bg-slate-100 text-center">${options}</select>`;
+    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">${options}</select>`;
 }
 
 function createGenelDurumSelect(val, sn, field) {
     val = val || "HERHANGİ BİRŞEY YAPILMADI";
-    let colorClass = "text-slate-600";
-    if(val.includes("BİTTİ") || val.includes("YAPILDI")) colorClass = "text-emerald-600";
-    else if(val.includes("DEVAM") || val.includes("AŞAMASINDA") || val.includes("HAZIRLANIYOR") || val.includes("DEĞERLENDİRMEDE")) colorClass = "text-amber-600";
+    
+    let colorClass = "text-slate-600 bg-slate-100";
+    if(val.includes("BİTTİ") || val.includes("YAPILDI")) colorClass = "text-emerald-700 bg-emerald-100";
+    else if(val.includes("DEVAM") || val.includes("AŞAMASINDA") || val.includes("HAZIRLANIYOR") || val.includes("DEĞERLENDİRMEDE")) colorClass = "text-amber-700 bg-amber-100";
 
-    if (!isAdmin) return `<span class="text-[11px] font-bold ${colorClass}">${val}</span>`;
+    if (!isAdmin) return `<div class="flex justify-center"><span class="text-[10px] font-bold px-2 py-1.5 rounded-md ${colorClass} w-full text-center block leading-tight shadow-sm">${val}</span></div>`;
+    
     let options = durumListesi.map(o => `<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
-    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} bg-transparent outline-none cursor-pointer p-1 rounded hover:bg-slate-100 text-center">${options}</select>`;
+    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[10px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors whitespace-normal h-full shadow-sm border-none leading-tight">${options}</select>`;
 }
 
 function createDateInput(val, sn, field) {
@@ -700,10 +704,10 @@ function calculateStats() {
 function calculateProgressStats() {
     const stats = {
         altlik: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Altlık Durumu", icon: "fa-map", field: "altlik_durum" },
-        ucusTarihi: { yapildi: 0, yapilmadi: 0, label: "Uçuş Tarihi", icon: "fa-calendar-alt", field: "ucus_tarihi" },
+        ucusTarihi: { yapildi: 0, yapilmadi: 0, label: "UÇUŞ DURUM", icon: "fa-calendar-alt", field: "ucus_tarihi" },
         ucus: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Uçuş Kıymet.", icon: "fa-plane", field: "ucus_kiymet_durum" },
         degerlendirme: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Değerlendirme", icon: "fa-tasks", field: "degerlendirme_durum" },
-        bilgilendirmeTarihi: { yapildi: 0, yapilmadi: 0, label: "Bilgilendirme Tar.", icon: "fa-bullhorn", field: "bilgilendirme_tarihi" },
+        bilgilendirmeTarihi: { yapildi: 0, yapilmadi: 0, label: "BİLGİLENDİRME DURUM", icon: "fa-bullhorn", field: "bilgilendirme_tarihi" },
         komisyon: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Komisyon", icon: "fa-users", field: "komisyon_durum" }
     };
 
@@ -748,17 +752,17 @@ function calculateProgressStats() {
     };
 
     const summaryHtml = `
-        <div class="progress-card shadow-sm border border-indigo-200 bg-indigo-50/50 flex flex-col justify-center items-center text-center p-3 w-[180px] flex-shrink-0">
-            <i class="fas fa-flag-checkered text-indigo-500 text-2xl mb-2"></i>
-            <h4 class="font-bold text-xs text-indigo-900 uppercase mb-1">Tescili Biten İşler</h4>
-            <div class="text-3xl font-black text-indigo-600">${bitenIsler}<span class="text-sm text-indigo-400 font-normal"> / ${data.length}</span></div>
-        </div>
         ${createCard(stats.altlik.label, stats.altlik.icon, stats.altlik, stats.altlik.field)}
         ${createCard(stats.ucusTarihi.label, stats.ucusTarihi.icon, stats.ucusTarihi, stats.ucusTarihi.field)}
         ${createCard(stats.ucus.label, stats.ucus.icon, stats.ucus, stats.ucus.field)}
         ${createCard(stats.degerlendirme.label, stats.degerlendirme.icon, stats.degerlendirme, stats.degerlendirme.field)}
         ${createCard(stats.bilgilendirmeTarihi.label, stats.bilgilendirmeTarihi.icon, stats.bilgilendirmeTarihi, stats.bilgilendirmeTarihi.field)}
         ${createCard(stats.komisyon.label, stats.komisyon.icon, stats.komisyon, stats.komisyon.field)}
+        <div class="progress-card shadow-sm border border-indigo-200 bg-indigo-50/50 flex flex-col justify-center items-center text-center p-3 w-[180px] flex-shrink-0">
+            <i class="fas fa-flag-checkered text-indigo-500 text-2xl mb-2"></i>
+            <h4 class="font-bold text-xs text-indigo-900 uppercase mb-1">Tescili Biten İşler</h4>
+            <div class="text-3xl font-black text-indigo-600">${bitenIsler}<span class="text-sm text-indigo-400 font-normal"> / ${data.length}</span></div>
+        </div>
     `;
     document.getElementById('progressSummary').innerHTML = summaryHtml;
 }
@@ -774,7 +778,7 @@ function updateValue(sn, field, newValue) {
         }
         
         localStorage.setItem('ihaleData', JSON.stringify(data));
-        setUnsavedState(true); // Değişiklik yapıldığında uyarıyı tetikle
+        setUnsavedState(true);
         
         if (!['toplam_parsel', 'ido', 'yirmi_iki_a', 'ek_1', 'kadastro_islem', 'parsel'].includes(field)) {
             if(field === 'notlar' || field.includes('durum') || field.includes('tarihi')){
