@@ -44,148 +44,207 @@
         .animate-soft-blink { animation: softBlink 1.5s ease-in-out infinite; }
     </style>
 </head>
-<body class="p-2 md:p-6 text-slate-800">
+<body class="text-slate-800 h-screen w-screen overflow-hidden">
 
-<!-- Kaydedilmeyen Değişiklikler Uyarısı -->
-<div id="unsavedAlert" class="fixed bottom-24 right-5 md:right-10 bg-amber-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-xl shadow-lg flex items-center gap-2 z-40 hidden animate-soft-blink pointer-events-none border border-amber-400">
-    <i class="fas fa-save"></i>
-    <span class="text-xs font-bold tracking-wide">Kaydedilmeyen Değişiklikler Var!</span>
-</div>
-
-<div class="max-w-[1600px] mx-auto">
-    <header class="mb-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200">
-        <div class="flex items-center gap-3">
-            <div id="titleContainer" class="cursor-pointer select-none">
-                <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                    İhale Takip Sistemi <span id="adminBadge" class="hidden text-[10px] bg-red-600 text-white px-2 py-1 rounded-md font-bold uppercase tracking-widest">Admin Modu</span>
-                </h1>
-                <p class="text-slate-500 text-xs md:text-sm mt-1">© Gökhan ELGÜL tarafından tasarlanmıştır.</p>
-            </div>
-        </div>
+<!-- Giriş Ekranı -->
+<div id="loginScreen" class="fixed inset-0 bg-slate-100 z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 md:p-10 flex flex-col gap-6 relative overflow-hidden border border-slate-200">
+        <!-- Dekoratif Arka Plan -->
+        <div class="absolute -top-24 -right-24 w-56 h-56 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
+        <div class="absolute -bottom-24 -left-24 w-56 h-56 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
         
-        <div class="flex flex-wrap gap-2 md:gap-3 w-full xl:w-auto">
-            <div class="flex gap-2 w-full xl:w-auto">
-                <div class="relative flex-grow">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="globalSearch" placeholder="İlçe veya Mahalle ara..." 
-                           class="pl-9 pr-3 py-2 w-full xl:w-48 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+        <div class="text-center relative z-10">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-500/30">
+                <i class="fas fa-file-signature text-white text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">İhale Takip Sistemi</h2>
+            <p class="text-slate-500 text-sm mt-1.5 font-medium">Panele erişmek için giriş yapın</p>
+        </div>
+
+        <div class="flex flex-col gap-5 relative z-10 mt-2">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Kullanıcı Adı</label>
+                <div class="relative">
+                    <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="loginUsername" placeholder="Kullanıcı Adı" class="pl-11 pr-4 py-3 w-full border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition bg-slate-50 focus:bg-white text-sm font-semibold text-slate-700 placeholder-slate-400">
                 </div>
-                <div class="relative flex-grow">
-                    <select id="statusFilter" onchange="document.getElementById('globalSearch').dispatchEvent(new Event('input'))" class="pl-3 pr-8 py-2 w-full xl:w-48 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium text-slate-600 bg-slate-50 appearance-none">
-                        <option value="">Tüm Durumlar</option>
-                    </select>
-                    <i class="fas fa-filter absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Şifre</label>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="password" id="loginPassword" placeholder="••••••" class="pl-11 pr-4 py-3 w-full border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition bg-slate-50 focus:bg-white text-sm font-semibold text-slate-700 placeholder-slate-400">
                 </div>
             </div>
             
-            <div id="adminControls" class="hidden flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-                <button onclick="openPersonnelModal()" class="bg-amber-500 text-white px-3 py-2 rounded-xl hover:bg-amber-600 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
-                    <i class="fas fa-users-cog"></i> Personel
-                </button>
-                <button onclick="fetchFromGithub()" class="bg-blue-600 text-white px-3 py-2 rounded-xl hover:bg-blue-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
-                    <i class="fas fa-cloud-download-alt"></i> Çek
-                </button>
-                <button id="saveBtn" onclick="saveToGithub()" class="bg-indigo-600 text-white px-3 py-2 rounded-xl hover:bg-indigo-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
-                    <i class="fas fa-cloud-upload-alt"></i> Kaydet
-                </button>
-                <button onclick="resetData()" class="bg-slate-100 text-slate-600 px-3 py-2 rounded-xl hover:bg-red-50 hover:text-red-600 transition flex items-center gap-1.5 text-sm font-medium whitespace-nowrap">
-                    <i class="fas fa-undo"></i> Sıfırla
-                </button>
+            <div class="flex items-center justify-between mt-1">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                    <input type="checkbox" id="rememberMe" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer">
+                    <span class="text-sm text-slate-600 font-semibold group-hover:text-slate-800 transition">Beni Hatırla</span>
+                </label>
             </div>
-            
-            <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-3 py-2 rounded-xl hover:bg-emerald-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
-                <i class="fas fa-file-excel"></i> İndir
+
+            <div id="loginError" class="hidden text-red-600 text-xs font-bold text-center bg-red-50 py-2.5 px-3 rounded-xl border border-red-100 flex items-center justify-center gap-2">
+                <i class="fas fa-exclamation-circle"></i> Hatalı kullanıcı adı veya şifre!
+            </div>
+
+            <button onclick="handleLogin()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl hover:bg-slate-800 transition-all shadow-md hover:shadow-lg mt-2 flex items-center justify-center gap-2">
+                Sisteme Gir <i class="fas fa-arrow-right text-sm"></i>
             </button>
         </div>
-    </header>
-
-    <div id="activeFilterBanner" class="hidden mb-4 bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-xl flex justify-between items-center shadow-sm">
-        <div class="text-sm font-medium">
-            <i class="fas fa-filter mr-2"></i> Aktif Filtre: <strong id="filterNameDisplay" class="ml-1 text-indigo-900 bg-indigo-200/50 px-2 py-0.5 rounded"></strong>
+        
+        <div class="mt-6 pt-5 border-t border-slate-100 text-center relative z-10">
+            <p class="text-[11px] text-slate-400 font-semibold tracking-wide">© Gökhan ELGÜL tarafından tasarlanmıştır.</p>
         </div>
-        <button onclick="clearAllFilters()" class="text-indigo-600 hover:text-indigo-900 bg-white px-3 py-1 rounded-lg text-xs font-bold shadow-sm border border-indigo-100">
-            Filtreyi Temizle <i class="fas fa-times ml-1"></i>
-        </button>
+    </div>
+</div>
+
+<!-- Ana Uygulama Alanı (Giriş yapılana kadar gizli) -->
+<div id="appContainer" class="hidden h-full overflow-y-auto p-2 md:p-6">
+    <!-- Kaydedilmeyen Değişiklikler Uyarısı -->
+    <div id="unsavedAlert" class="fixed bottom-24 right-5 md:right-10 bg-amber-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-xl shadow-lg flex items-center gap-2 z-40 hidden animate-soft-blink pointer-events-none border border-amber-400">
+        <i class="fas fa-save"></i>
+        <span class="text-xs font-bold tracking-wide">Kaydedilmeyen Değişiklikler Var!</span>
     </div>
 
-    <div class="mb-4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <button onclick="toggleRegion('region1')" class="w-full px-6 py-4 bg-slate-50 flex justify-between items-center hover:bg-slate-100 transition-colors">
+    <div class="max-w-[1600px] mx-auto">
+        <header class="mb-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold"><i class="fas fa-map-marker-alt"></i></div>
-                <h2 class="text-lg font-bold text-slate-800">Anamur - Bozyazı Bölgesi</h2>
-            </div>
-            <i id="icon-region1" class="fas fa-chevron-down text-slate-400 transition-transform"></i>
-        </button>
-        <div id="content-region1" class="p-6 hidden border-t border-slate-200 bg-white">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                    <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-user-tie text-blue-500"></i> Mühendisler</h3>
-                    <div id="reg1-engStats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                <div id="titleContainer" class="cursor-pointer select-none">
+                    <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                        İhale Takip Sistemi <span id="adminBadge" class="hidden text-[10px] bg-red-600 text-white px-2 py-1 rounded-md font-bold uppercase tracking-widest">Admin Modu</span>
+                    </h1>
+                    <p class="text-slate-500 text-xs md:text-sm mt-1">© Gökhan ELGÜL tarafından tasarlanmıştır.</p>
                 </div>
-                <div>
-                    <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-tools text-purple-500"></i> Teknikerler</h3>
-                    <div id="reg1-techStats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 md:gap-3 w-full xl:w-auto">
+                <div class="flex gap-2 w-full xl:w-auto">
+                    <div class="relative flex-grow">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="globalSearch" placeholder="İlçe veya Mahalle ara..." 
+                            class="pl-9 pr-3 py-2 w-full xl:w-48 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    </div>
+                    <div class="relative flex-grow">
+                        <select id="statusFilter" onchange="document.getElementById('globalSearch').dispatchEvent(new Event('input'))" class="pl-3 pr-8 py-2 w-full xl:w-48 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium text-slate-600 bg-slate-50 appearance-none">
+                            <option value="">Tüm Durumlar</option>
+                        </select>
+                        <i class="fas fa-filter absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+                
+                <div id="adminControls" class="hidden flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                    <button onclick="openPersonnelModal()" class="bg-amber-500 text-white px-3 py-2 rounded-xl hover:bg-amber-600 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                        <i class="fas fa-users-cog"></i> Personel
+                    </button>
+                    <button onclick="fetchFromGithub()" class="bg-blue-600 text-white px-3 py-2 rounded-xl hover:bg-blue-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                        <i class="fas fa-cloud-download-alt"></i> Çek
+                    </button>
+                    <button id="saveBtn" onclick="saveToGithub()" class="bg-indigo-600 text-white px-3 py-2 rounded-xl hover:bg-indigo-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                        <i class="fas fa-cloud-upload-alt"></i> Kaydet
+                    </button>
+                    <button onclick="resetData()" class="bg-slate-100 text-slate-600 px-3 py-2 rounded-xl hover:bg-red-50 hover:text-red-600 transition flex items-center gap-1.5 text-sm font-medium whitespace-nowrap">
+                        <i class="fas fa-undo"></i> Sıfırla
+                    </button>
+                </div>
+                
+                <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-3 py-2 rounded-xl hover:bg-emerald-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                    <i class="fas fa-file-excel"></i> İndir
+                </button>
+                <button onclick="logout()" class="bg-red-50 text-red-600 px-3 py-2 rounded-xl hover:bg-red-100 transition flex items-center gap-1.5 text-sm font-bold whitespace-nowrap">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="activeFilterBanner" class="hidden mb-4 bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-xl flex justify-between items-center shadow-sm">
+            <div class="text-sm font-medium">
+                <i class="fas fa-filter mr-2"></i> Aktif Filtre: <strong id="filterNameDisplay" class="ml-1 text-indigo-900 bg-indigo-200/50 px-2 py-0.5 rounded"></strong>
+            </div>
+            <button onclick="clearAllFilters()" class="text-indigo-600 hover:text-indigo-900 bg-white px-3 py-1 rounded-lg text-xs font-bold shadow-sm border border-indigo-100">
+                Filtreyi Temizle <i class="fas fa-times ml-1"></i>
+            </button>
+        </div>
+
+        <div class="mb-4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <button onclick="toggleRegion('region1')" class="w-full px-6 py-4 bg-slate-50 flex justify-between items-center hover:bg-slate-100 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold"><i class="fas fa-map-marker-alt"></i></div>
+                    <h2 class="text-lg font-bold text-slate-800">Anamur - Bozyazı Bölgesi</h2>
+                </div>
+                <i id="icon-region1" class="fas fa-chevron-down text-slate-400 transition-transform"></i>
+            </button>
+            <div id="content-region1" class="p-6 hidden border-t border-slate-200 bg-white">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-user-tie text-blue-500"></i> Mühendisler</h3>
+                        <div id="reg1-engStats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-tools text-purple-500"></i> Teknikerler</h3>
+                        <div id="reg1-techStats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="mb-4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <button onclick="toggleRegion('region2')" class="w-full px-6 py-4 bg-slate-50 flex justify-between items-center hover:bg-slate-100 transition-colors">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold"><i class="fas fa-map-marker-alt"></i></div>
-                <h2 class="text-lg font-bold text-slate-800">Silifke - Gülnar - Aydıncık Bölgesi</h2>
-            </div>
-            <i id="icon-region2" class="fas fa-chevron-down text-slate-400 transition-transform"></i>
-        </button>
-        <div id="content-region2" class="p-6 hidden border-t border-slate-200 bg-white">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                    <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-user-tie text-amber-500"></i> Mühendisler</h3>
-                    <div id="reg2-engStats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+        <div class="mb-4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <button onclick="toggleRegion('region2')" class="w-full px-6 py-4 bg-slate-50 flex justify-between items-center hover:bg-slate-100 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold"><i class="fas fa-map-marker-alt"></i></div>
+                    <h2 class="text-lg font-bold text-slate-800">Silifke - Gülnar - Aydıncık Bölgesi</h2>
                 </div>
-                <div>
-                    <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-tools text-emerald-500"></i> Teknikerler</h3>
-                    <div id="reg2-techStats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                <i id="icon-region2" class="fas fa-chevron-down text-slate-400 transition-transform"></i>
+            </button>
+            <div id="content-region2" class="p-6 hidden border-t border-slate-200 bg-white">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-user-tie text-amber-500"></i> Mühendisler</h3>
+                        <div id="reg2-engStats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-tools text-emerald-500"></i> Teknikerler</h3>
+                        <div id="reg2-techStats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Süreç İlerleme Özeti -->
-    <div id="progressSummary" class="flex gap-4 overflow-x-auto pb-4 mb-4 snap-x">
-        <!-- JS ile dolacak -->
-    </div>
+        <!-- Süreç İlerleme Özeti -->
+        <div id="progressSummary" class="flex gap-4 overflow-x-auto pb-4 mb-4 snap-x">
+            <!-- JS ile dolacak -->
+        </div>
 
-    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-        <div class="table-container">
-            <table class="w-full text-xs text-left border-collapse" id="mainTable">
-                <thead class="sticky-header bg-slate-900 text-white shadow-md">
-                    <tr>
-                        <th class="p-3 font-bold whitespace-nowrap">S.N.</th>
-                        <th class="p-3 font-bold whitespace-nowrap">İlçe</th>
-                        <th class="p-3 font-bold whitespace-nowrap min-w-[120px]">Mahalle</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap" title="Toplam Parsel Sayısı">T. Parsel</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap">İDÖ</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap">22-A</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap">EK-1</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap" title="Kadastro Yönüyle İşleme Tabi Parsel Sayısı">Kad. İşlem</th>
-                        <th class="p-4 font-bold text-center bg-emerald-700/40 whitespace-nowrap" title="İhaleye Çıkılacak Toplam Parsel Sayısı">İhale Parsel</th>
-                        <th class="p-4 font-bold bg-slate-800/80 whitespace-nowrap text-center">Görevli Personeller</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap border-l border-slate-700 bg-slate-800">Genel Durum</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap border-l border-slate-700">Altlık Durum</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap">Arazi Ölçüm Tar.</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap">Uçuş Tarihi</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap">Uçuş Kıymetlendirme</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap">Değerlendirme Dur.</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap">Bilgilendirme Tar.</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap">Komisyon Durum</th>
-                        <th class="p-3 font-bold text-center whitespace-nowrap">Kesin Askı Tar.</th>
-                        <th class="p-3 font-bold text-left whitespace-nowrap min-w-[150px]">Not</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
-            </table>
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="table-container">
+                <table class="w-full text-xs text-left border-collapse" id="mainTable">
+                    <thead class="sticky-header bg-slate-900 text-white shadow-md">
+                        <tr>
+                            <th class="p-3 font-bold whitespace-nowrap">S.N.</th>
+                            <th class="p-3 font-bold whitespace-nowrap">İlçe</th>
+                            <th class="p-3 font-bold whitespace-nowrap min-w-[120px]">Mahalle</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap" title="Toplam Parsel Sayısı">T. Parsel</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap">İDÖ</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap">22-A</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap">EK-1</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap" title="Kadastro Yönüyle İşleme Tabi Parsel Sayısı">Kad. İşlem</th>
+                            <th class="p-4 font-bold text-center bg-emerald-700/40 whitespace-nowrap" title="İhaleye Çıkılacak Toplam Parsel Sayısı">İhale Parsel</th>
+                            <th class="p-4 font-bold bg-slate-800/80 whitespace-nowrap text-center">Görevli Personeller</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap border-l border-slate-700 bg-slate-800">Genel Durum</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap border-l border-slate-700">Altlık Durum</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap">Arazi Ölçüm Tar.</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap">Uçuş Tarihi</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap">Uçuş Kıymetlendirme</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap">Değerlendirme Dur.</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap">Bilgilendirme Tar.</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap">Komisyon Durum</th>
+                            <th class="p-3 font-bold text-center whitespace-nowrap">Kesin Askı Tar.</th>
+                            <th class="p-3 font-bold text-left whitespace-nowrap min-w-[150px]">Not</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -297,6 +356,41 @@ durumListesi.forEach(durum => {
 const encodeBase64 = (str) => btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str)));
 const decodeBase64 = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
 
+// Giriş İşlemleri
+function handleLogin() {
+    const user = document.getElementById('loginUsername').value;
+    const pass = document.getElementById('loginPassword').value;
+    const remember = document.getElementById('rememberMe').checked;
+    const errorDiv = document.getElementById('loginError');
+
+    if (user === 'mersinkm' && pass === '503344') {
+        errorDiv.classList.add('hidden');
+        if (remember) {
+            localStorage.setItem('isLoggedIn', 'true');
+        }
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('appContainer').classList.remove('hidden');
+        fetchFromGithub(true);
+    } else {
+        errorDiv.classList.remove('hidden');
+    }
+}
+
+function logout() {
+    localStorage.removeItem('isLoggedIn');
+    document.getElementById('loginUsername').value = "";
+    document.getElementById('loginPassword').value = "";
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('appContainer').classList.add('hidden');
+}
+
+document.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter' && !document.getElementById('loginScreen').classList.contains('hidden')) {
+        handleLogin();
+    }
+});
+
+// Admin Girişi
 document.getElementById('titleContainer').addEventListener('click', () => {
     clickCount++;
     clearTimeout(clickTimer);
@@ -825,7 +919,12 @@ function exportToExcel() {
 document.getElementById('globalSearch').addEventListener('input', (e) => renderTable());
 
 window.onload = () => {
-    fetchFromGithub(true);
+    const isLogged = localStorage.getItem('isLoggedIn');
+    if (isLogged === 'true') {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('appContainer').classList.remove('hidden');
+        fetchFromGithub(true);
+    }
 };
 </script>
 
