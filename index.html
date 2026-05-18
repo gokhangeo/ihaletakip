@@ -185,7 +185,6 @@
             </button>
         </div>
 
-        <!-- Bölge İstatistikleri -->
         <div class="mb-4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <button onclick="toggleRegion('region1')" class="w-full px-6 py-4 bg-slate-50 flex justify-between items-center hover:bg-slate-100 transition-colors">
                 <div class="flex items-center gap-3">
@@ -241,7 +240,7 @@
                 <div class="flex items-center gap-4">
                     <h3 class="font-bold text-sm text-slate-700"><i class="fas fa-list text-blue-500 mr-2"></i>İhale ve Durum Listesi</h3>
                     
-                    <!-- DİKKAT ÇEKİCİ KAYDET BUTONU (Herkes İçin) -->
+                    <!-- DİKKAT ÇEKİCİ KAYDET BUTONU -->
                     <button id="tableSaveBtn" onclick="saveToGithub()" class="hidden bg-red-600 text-white px-4 py-1.5 rounded-lg hover:bg-red-700 transition items-center gap-2 text-xs font-bold shadow-md border border-red-500 animate-soft-blink">
                         <i class="fas fa-cloud-upload-alt"></i> Değişiklikleri Kaydet
                     </button>
@@ -408,6 +407,7 @@ const _p6 = "GBTj";
 const _getToken = () => _p1 + _p2 + _p3 + _p4 + _p5 + _p6;
 const _repo = "gokhangeo/ihaletakip";
 const _path = "data.json";
+const _durumPath = "durumlar.json"; // YENİ: Durumlar için GitHub dosya yolu
 const _docsPath = "docs";
 
 let isAdmin = false;
@@ -547,9 +547,30 @@ function setUnsavedState(state) {
     }
 }
 
+
+// ANA VERİ ÇEKME FONKSİYONU (DURUMLARI VE TABLOYU AYNI ANDA ÇEKER)
 async function fetchFromGithub(isAuto = false) {
     try {
         if(!isAuto) showToast("Bağlanıyor...", "GitHub'dan veriler çekiliyor.", "info");
+        
+        // 1. ÖNCE GENEL DURUM LİSTESİNİ ÇEK
+        try {
+            const resDurum = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumPath}?t=${new Date().getTime()}`, {
+                headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
+                cache: 'no-store'
+            });
+            if (resDurum.ok) {
+                const fileData = await resDurum.json();
+                const content = decodeBase64(fileData.content);
+                durumListesi = JSON.parse(content);
+                localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
+                populateDurumFilter();
+            }
+        } catch(e) {
+            console.warn("Bulutta durum listesi bulunamadı veya çekilemedi, yerel veri kullanılıyor.");
+        }
+
+        // 2. SONRA ANA TABLO VERİLERİNİ ÇEK
         const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
             cache: 'no-store'
@@ -572,9 +593,10 @@ async function fetchFromGithub(isAuto = false) {
     }
 }
 
+// ANA TABLOYU GITHUB'A KAYDETME
 async function saveToGithub(isAuto = false) {
     try {
-        if(!isAuto) showToast("Kaydediliyor...", "GitHub'a gönderiliyor.", "info");
+        if(!isAuto) showToast("Kaydediliyor...", "Tablo GitHub'a gönderiliyor.", "info");
         const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
             cache: 'no-store'
@@ -589,7 +611,7 @@ async function saveToGithub(isAuto = false) {
         data.forEach((d, i) => d.sn = i + 1);
 
         const content = encodeBase64(JSON.stringify(data, null, 2));
-        const body = { message: `Update via Panel - ${new Date().toLocaleString()}`, content: content };
+        const body = { message: `Update Tablo - ${new Date().toLocaleString()}`, content: content };
         if (currentSha) body.sha = currentSha; 
 
         const putRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
@@ -600,12 +622,47 @@ async function saveToGithub(isAuto = false) {
 
         if (putRes.ok) {
             setUnsavedState(false);
-            if(!isAuto) showToast("Kaydedildi", "Veriler buluta aktarıldı.", "success");
+            if(!isAuto) showToast("Kaydedildi", "Tablo buluta aktarıldı.", "success");
         } else {
             throw new Error('Kayıt Başarısız');
         }
     } catch (e) {
-        if(!isAuto) showToast("Hata", "Buluta kaydedilemedi! Çevrimdışı kayıt yapıldı.", "error");
+        if(!isAuto) showToast("Hata", "Tablo buluta kaydedilemedi! Çevrimdışı kayıt yapıldı.", "error");
+    }
+}
+
+// DURUMLAR LİSTESİNİ GITHUB'A KAYDETME (YENİ)
+async function saveDurumlarToGithub() {
+    try {
+        showToast("Kaydediliyor...", "Genel Durum listesi GitHub'a gönderiliyor.", "info");
+        const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumPath}?t=${new Date().getTime()}`, {
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
+            cache: 'no-store'
+        });
+
+        let currentSha = null;
+        if (getRes.ok) {
+            const fileData = await getRes.json();
+            currentSha = fileData.sha;
+        }
+
+        const content = encodeBase64(JSON.stringify(durumListesi, null, 2));
+        const body = { message: `Durumlar Güncellendi - ${new Date().toLocaleString()}`, content: content };
+        if (currentSha) body.sha = currentSha;
+
+        const putRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumPath}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (putRes.ok) {
+            showToast("Başarılı", "Genel Durum listesi buluta kaydedildi.", "success");
+        } else {
+            throw new Error('Kayıt Başarısız');
+        }
+    } catch (e) {
+        showToast("Hata", "Genel Durumlar buluta kaydedilemedi!", "error");
     }
 }
 
@@ -949,7 +1006,9 @@ function addDurum() {
     if (durumListesi.includes(name)) return alert("Bu durum zaten ekli.");
     durumListesi.push(name);
     localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
-    nameInput.value = ""; renderDurumList(); populateDurumFilter(); renderTable();
+    nameInput.value = ""; 
+    renderDurumList(); populateDurumFilter(); renderTable();
+    saveDurumlarToGithub(); // GITHUB'A SENKRONİZE ET
 }
 
 function removeDurum(index) {
@@ -957,6 +1016,7 @@ function removeDurum(index) {
         durumListesi.splice(index, 1);
         localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
         renderDurumList(); populateDurumFilter(); renderTable();
+        saveDurumlarToGithub(); // GITHUB'A SENKRONİZE ET
     }
 }
 
@@ -967,6 +1027,7 @@ function moveDurum(index, dir) {
     durumListesi[index + dir] = temp;
     localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
     renderDurumList(); populateDurumFilter(); renderTable();
+    saveDurumlarToGithub(); // GITHUB'A SENKRONİZE ET
 }
 
 function editDurum(index) {
@@ -975,6 +1036,7 @@ function editDurum(index) {
         durumListesi[index] = newName.trim().toLocaleUpperCase('tr-TR');
         localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
         renderDurumList(); populateDurumFilter(); renderTable();
+        saveDurumlarToGithub(); // GITHUB'A SENKRONİZE ET
     }
 }
 
@@ -1009,7 +1071,6 @@ function createSelect(currentValue, list, sn, field, roleLabel) {
     return `<div class="flex items-center justify-between py-0.5 border-b border-slate-100 last:border-0 hover:bg-white rounded px-1 group"><select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full font-bold text-[11px] outline-none bg-transparent cursor-pointer text-blue-700 group-hover:text-blue-800">${options}</select><div class="flex items-center flex-shrink-0">${currentValue ? `<i class="fas fa-times text-red-400 hover:text-red-600 cursor-pointer mx-1" onclick="updateValue(${sn}, '${field}', '')" title="Personeli Kaldır"></i>` : ''}${roleSpan}</div></div>`;
 }
 
-// Artık normal kullanıcılar da süreci düzenleyebildiği için isAdmin kontrolünü kaldırdık.
 function createStatusSelect(val, sn, field) {
     const opts = ["Yapılmadı", "Devam Ediyor", "Yapıldı"];
     val = val || "Yapılmadı";
@@ -1021,7 +1082,6 @@ function createStatusSelect(val, sn, field) {
     return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">${options}</select>`;
 }
 
-// Artık normal kullanıcılar da süreci düzenleyebildiği için isAdmin kontrolünü kaldırdık.
 function createGenelDurumSelect(val, sn, field) {
     val = val || "HERHANGİ BİRŞEY YAPILMADI";
     let colorClass = "text-slate-600 bg-slate-100";
@@ -1032,14 +1092,12 @@ function createGenelDurumSelect(val, sn, field) {
     return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[10px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors whitespace-normal h-full shadow-sm border-none leading-tight">${options}</select>`;
 }
 
-// Artık normal kullanıcılar da süreci düzenleyebildiği için isAdmin kontrolünü kaldırdık.
 function createDateInput(val, sn, field) {
     val = val || "";
     let colorClass = val ? "text-indigo-800 bg-indigo-200" : "text-slate-600 bg-slate-50";
     return `<input type="date" value="${val}" onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">`;
 }
 
-// Artık normal kullanıcılar da süreci düzenleyebildiği için isAdmin kontrolünü kaldırdık.
 function createTextInput(val, sn, field) {
     val = val || "";
     return `<input type="text" value="${val}" placeholder="Not ekle..." onblur="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-medium text-slate-700 bg-transparent outline-none p-1 rounded focus:bg-white hover:bg-slate-100 min-w-[150px]">`;
@@ -1258,7 +1316,6 @@ function calculateProgressStats() {
 
 function updateValue(sn, field, newValue) {
     const adminOnlyFields = ['toplam_parsel', 'ido', 'yirmi_iki_a', 'ek_1', 'kadastro_islem', 'parsel', 'muhendis', 'tekniker', 'kadastro', 'fen', 'tas'];
-    // Eğer admin değilse ve yetkisi olmayan bir alana dokunuyorsa hiçbir işlem yapma
     if (!isAdmin && adminOnlyFields.includes(field)) return;
 
     const item = data.find(d => d.sn === sn);
