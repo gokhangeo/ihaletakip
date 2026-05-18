@@ -531,10 +531,10 @@ function renderPersonnelList() {
 function createSelect(currentValue, list, sn, field, roleLabel) {
     const roleSpan = `<span class="text-[10px] text-slate-500 font-medium ml-1 shrink-0">(${roleLabel})</span>`;
     if (!isAdmin) {
-        return `<div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 rounded px-1"><span class="font-bold text-slate-700 text-[11px] truncate">${currentValue}</span> ${roleSpan}</div>`;
+        return `<div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 rounded px-1"><span class="font-bold text-slate-700 text-[11px] truncate">${currentValue || '-'}</span> ${roleSpan}</div>`;
     } 
-    let options = list.map(name => `<option value="${name}" ${name === currentValue ? 'selected' : ''}>${name}</option>`).join('');
-    return `<div class="flex items-center justify-between py-0.5 border-b border-slate-100 last:border-0 hover:bg-white rounded px-1 group"><select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full font-bold text-[11px] outline-none bg-transparent cursor-pointer text-blue-700 group-hover:text-blue-800">${options}</select>${roleSpan}</div>`;
+    let options = `<option value="">- Atanmadı -</option>` + list.map(name => `<option value="${name}" ${name === currentValue ? 'selected' : ''}>${name}</option>`).join('');
+    return `<div class="flex items-center justify-between py-0.5 border-b border-slate-100 last:border-0 hover:bg-white rounded px-1 group"><select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full font-bold text-[11px] outline-none bg-transparent cursor-pointer text-blue-700 group-hover:text-blue-800">${options}</select><div class="flex items-center flex-shrink-0">${currentValue ? `<i class="fas fa-times text-red-400 hover:text-red-600 cursor-pointer mx-1" onclick="updateValue(${sn}, '${field}', '')" title="Personeli Kaldır"></i>` : ''}${roleSpan}</div></div>`;
 }
 
 function createStatusSelect(val, sn, field) {
@@ -624,7 +624,7 @@ function renderTable() {
             
             <td class="p-2 align-top bg-slate-50/40 min-w-[200px]">
                 <button onclick="toggleDropdown(${item.sn})" class="w-full text-left px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 rounded flex justify-between items-center text-[10px] font-bold text-slate-600 transition-colors shadow-sm">
-                    <span class="truncate mr-2"><i class="fas fa-users text-blue-500 mr-1.5"></i> ${item.muhendis} & ${item.tekniker}</span>
+                    <span class="truncate mr-2"><i class="fas fa-users text-blue-500 mr-1.5"></i> ${item.muhendis || 'Atanmadı'} & ${item.tekniker || 'Atanmadı'}</span>
                     <i class="fas fa-chevron-down text-slate-400"></i>
                 </button>
                 <div id="pers-${item.sn}" class="${openDropdowns.has(item.sn) ? 'flex' : 'hidden'} flex-col gap-1 mt-2 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
