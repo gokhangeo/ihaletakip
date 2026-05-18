@@ -1036,28 +1036,73 @@ function editDurum(index) {
         durumListesi[index] = newName.trim().toLocaleUpperCase('tr-TR');
         localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
         renderDurumList(); populateDurumFilter(); renderTable();
-        saveDurumlarToGithub(); // GITHUB'A SENKRONİZE ET
     }
+}
+
+// YENİ: Durumlar için geniş renk paleti ve sürükle-bırak değişkenleri
+const durumColorsPalette = [
+    "bg-red-100 text-red-700", "bg-orange-100 text-orange-700", "bg-amber-100 text-amber-700",
+    "bg-yellow-100 text-yellow-700", "bg-lime-100 text-lime-700", "bg-green-100 text-green-700",
+    "bg-emerald-100 text-emerald-700", "bg-teal-100 text-teal-700", "bg-cyan-100 text-cyan-700",
+    "bg-sky-100 text-sky-700", "bg-blue-100 text-blue-700", "bg-indigo-100 text-indigo-700",
+    "bg-violet-100 text-violet-700", "bg-purple-100 text-purple-700", "bg-fuchsia-100 text-fuchsia-700",
+    "bg-pink-100 text-pink-700", "bg-rose-100 text-rose-700", "bg-slate-200 text-slate-800"
+];
+
+function getDurumColor(str) {
+    if(!str) return "bg-slate-100 text-slate-600";
+    // Metne göre her zaman aynı kalacak benzersiz bir renk seçimi yapar
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return durumColorsPalette[Math.abs(hash) % durumColorsPalette.length];
+}
+
+let draggedDurumIdx = null;
+
+function handleDurumDragStart(e, idx) {
+    draggedDurumIdx = idx;
+    e.dataTransfer.effectAllowed = 'move';
+    e.currentTarget.classList.add('opacity-50', 'bg-slate-100');
+}
+function handleDurumDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('border-t-2', 'border-violet-500', 'shadow-md');
+}
+function handleDurumDragLeave(e) {
+    e.currentTarget.classList.remove('border-t-2', 'border-violet-500', 'shadow-md');
+}
+function handleDurumDrop(e, targetIdx) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('border-t-2', 'border-violet-500', 'shadow-md');
+    if (draggedDurumIdx !== null && draggedDurumIdx !== targetIdx) {
+        const movedItem = durumListesi.splice(draggedDurumIdx, 1)[0];
+        durumListesi.splice(targetIdx, 0, movedItem);
+        localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
+        renderDurumList(); populateDurumFilter(); renderTable();
+        // Eğer Github kayıt fonksiyonu açıksa, sıralamayı hemen buluta senkronize eder
+        if(typeof saveDurumlarToGithub === 'function') saveDurumlarToGithub(); 
+    }
+}
+function handleDurumDragEnd(e) {
+    e.currentTarget.classList.remove('opacity-50', 'bg-slate-100');
+    draggedDurumIdx = null;
 }
 
 function renderDurumList() {
     let html = "";
     durumListesi.forEach((name, idx) => {
-        let colorClass = "text-slate-600 bg-slate-100";
-        if(name.includes("BİTTİ") || name.includes("YAPILDI")) colorClass = "text-emerald-700 bg-emerald-100";
-        else if(name.includes("DEVAM") || name.includes("AŞAMASINDA") || name.includes("HAZIRLANIYOR") || name.includes("DEĞERLENDİRMEDE")) colorClass = "text-amber-700 bg-amber-100";
+        let colorClass = getDurumColor(name); // Benzersiz rengi getir
         
-        html += `<div class="flex items-center justify-between p-2 bg-white border border-slate-200 rounded-lg shadow-sm">
-            <div class="flex items-center gap-2">
-                <div class="flex flex-col gap-1">
-                    <button onclick="moveDurum(${idx}, -1)" class="text-slate-300 hover:text-blue-500 leading-none"><i class="fas fa-caret-up"></i></button>
-                    <button onclick="moveDurum(${idx}, 1)" class="text-slate-300 hover:text-blue-500 leading-none"><i class="fas fa-caret-down"></i></button>
-                </div>
-                <span class="font-bold text-[11px] ${colorClass} px-2 py-1 rounded">${name}</span>
+        html += `<div draggable="true" ondragstart="handleDurumDragStart(event, ${idx})" ondragover="handleDurumDragOver(event)" ondragleave="handleDurumDragLeave(event)" ondrop="handleDurumDrop(event, ${idx})" ondragend="handleDurumDragEnd(event)" class="flex items-center justify-between p-2 bg-white border border-slate-200 rounded-lg shadow-sm mb-1.5 cursor-grab active:cursor-grabbing transition-all hover:border-violet-300">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <i class="fas fa-grip-vertical text-slate-300 hover:text-violet-500 flex-shrink-0" title="Sıralamayı değiştirmek için sürükle"></i>
+                <span class="font-bold text-[11px] ${colorClass} px-2 py-1.5 rounded-md shadow-sm border border-black/5 truncate">${name}</span>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="editDurum(${idx})" class="text-blue-400 hover:text-blue-600 p-1"><i class="fas fa-edit"></i></button>
-                <button onclick="removeDurum(${idx})" class="text-red-400 hover:text-red-600 p-1"><i class="fas fa-trash-alt"></i></button>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <button onclick="editDurum(${idx})" class="text-blue-400 hover:text-blue-600 p-1 bg-blue-50 hover:bg-blue-100 rounded transition-colors"><i class="fas fa-edit"></i></button>
+                <button onclick="removeDurum(${idx})" class="text-red-400 hover:text-red-600 p-1 bg-red-50 hover:bg-red-100 rounded transition-colors"><i class="fas fa-trash-alt"></i></button>
             </div>
         </div>`;
     });
@@ -1082,16 +1127,16 @@ function createStatusSelect(val, sn, field) {
     return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">${options}</select>`;
 }
 
+// Artık normal kullanıcılar da süreci düzenleyebildiği için isAdmin kontrolünü kaldırdık.
 function createGenelDurumSelect(val, sn, field) {
     val = val || "HERHANGİ BİRŞEY YAPILMADI";
-    let colorClass = "text-slate-600 bg-slate-100";
-    if(val.includes("BİTTİ") || val.includes("YAPILDI")) colorClass = "text-emerald-700 bg-emerald-100";
-    else if(val.includes("DEVAM") || val.includes("AŞAMASINDA") || val.includes("HAZIRLANIYOR") || val.includes("DEĞERLENDİRMEDE")) colorClass = "text-amber-700 bg-amber-100";
+    let colorClass = getDurumColor(val); // Dinamik palet rengini kullan
 
     let options = durumListesi.map(o => `<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
-    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[10px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors whitespace-normal h-full shadow-sm border-none leading-tight">${options}</select>`;
+    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[10px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors whitespace-normal h-full shadow-sm border border-black/5 leading-tight">${options}</select>`;
 }
 
+// Artık normal kullanıcılar da süreci düzenleyebildiği için isAdmin kontrolünü kaldırdık.
 function createDateInput(val, sn, field) {
     val = val || "";
     let colorClass = val ? "text-indigo-800 bg-indigo-200" : "text-slate-600 bg-slate-50";
