@@ -49,16 +49,6 @@
         .drag-handle { cursor: grab; color: #cbd5e1; transition: color 0.2s; }
         .drag-handle:hover { color: #64748b; }
         .drag-handle:active { cursor: grabbing; }
-
-        /* Yazdırma Tablosu İçin Özel CSS (PDF Oluştururken Kullanılır) */
-        .print-table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; font-family: sans-serif; table-layout: auto; }
-        .print-table th { background-color: #0f172a; color: white; padding: 10px 6px; border: 1px solid #64748b; text-align: center; font-weight: bold; }
-        .print-table td { padding: 8px 6px; border: 1px solid #cbd5e1; vertical-align: middle; }
-        .print-badge { padding: 5px 6px; border-radius: 6px; font-weight: bold; display: block; width: 100%; text-align: center; }
-        .print-badge.success { background-color: #d1fae5; color: #047857; }
-        .print-badge.warning { background-color: #fef3c7; color: #b45309; }
-        .print-badge.neutral { background-color: #f1f5f9; color: #475569; }
-        .print-badge.date-filled { background-color: #e0e7ff; color: #4338ca; }
     </style>
 </head>
 <body class="text-slate-800 h-screen w-screen overflow-hidden">
@@ -588,7 +578,7 @@ async function saveToGithub(isAuto = false) {
     }
 }
 
-// ====================== PDF YAZDIRMA MOTORU (Kusursuz Chunking) ======================
+// ====================== GELİŞMİŞ PDF YAZDIRMA MOTORU ======================
 function openPdfModal() { document.getElementById('pdfModal').classList.remove('hidden'); }
 function closePdfModal() { document.getElementById('pdfModal').classList.add('hidden'); }
 
@@ -598,44 +588,55 @@ function updateSplitLabels() {
     document.getElementById('split2Lbl').innerText = val + 1;
 }
 
-function getStatusBadge(val) {
-    if(!val || val === '-' || val === 'Yapılmadı' || val === 'HERHANGİ BİRŞEY YAPILMADI') return `<span class="print-badge neutral">${val||'Yapılmadı'}</span>`;
-    if(val.includes('BİTTİ') || val.includes('YAPILDI') || val === 'Yapıldı') return `<span class="print-badge success">${val}</span>`;
-    return `<span class="print-badge warning">${val}</span>`;
-}
-
 function createPrintTable(items) {
-    let html = '<table class="print-table"><thead><tr>';
-    const printHeaders = ["S.N.", "İlçe", "Mahalle", "T. Parsel", "İDÖ", "22-A", "EK-1", "Kad. İşlem", "İhale Parseli", "Görevliler (Müh. & Tek.)", "Genel Durum", "Altlık Durum", "Uçuş Tarihi", "Uçuş Kıymet.", "Değerlendirme", "Bilgi. Tar.", "Komisyon", "Kesin Askı", "Not"];
+    // Sabit genişlikli tablo tasarımı. Bu sayede sayfa 1 ve sayfa 2 birebir aynı hizada çıkar.
+    let html = '<table style="width: 2600px; border-collapse: collapse; font-family: sans-serif; font-size: 13px; background: white; table-layout: fixed;"><thead><tr>';
     
-    printHeaders.forEach(h => html += `<th>${h}</th>`);
+    const cols = [
+        {n: "S.N.", w: 50}, {n: "İlçe", w: 120}, {n: "Mahalle", w: 180},
+        {n: "T. Parsel", w: 80}, {n: "İDÖ", w: 60}, {n: "22-A", w: 80},
+        {n: "EK-1", w: 60}, {n: "Kad. İşlem", w: 90}, {n: "İhale Parseli", w: 110},
+        {n: "Görevliler (Müh. & Tek.)", w: 260}, {n: "Genel Durum", w: 220},
+        {n: "Altlık Durum", w: 140}, {n: "Uçuş Tarihi", w: 130},
+        {n: "Uçuş Kıymet.", w: 140}, {n: "Değerlendirme", w: 140},
+        {n: "Bilgilendirme", w: 130}, {n: "Komisyon", w: 140},
+        {n: "Kesin Askı", w: 130}, {n: "Not", w: 180}
+    ];
+    
+    cols.forEach(c => html += `<th style="width:${c.w}px; background-color:#0f172a; color:white; padding:12px 6px; border:1px solid #64748b; text-align:center; font-weight:bold; overflow:hidden;">${c.n}</th>`);
     html += '</tr></thead><tbody>';
+
+    const getStatusBadge = (val) => {
+        if(!val || val === '-' || val === 'Yapılmadı' || val === 'HERHANGİ BİRŞEY YAPILMADI') return `<span style="background-color:#f1f5f9; color:#475569; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val||'Yapılmadı'}</span>`;
+        if(val.includes('BİTTİ') || val.includes('YAPILDI') || val === 'Yapıldı') return `<span style="background-color:#d1fae5; color:#047857; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
+        return `<span style="background-color:#fef3c7; color:#b45309; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
+    };
 
     items.forEach(item => {
         const trDate = (val) => val ? new Date(val).toLocaleDateString('tr-TR') : '-';
-        const personeller = `Müh: ${item.muhendis || '-'}<br>Tek: ${item.tekniker || '-'}`;
-        const getDateBadge = (val) => val ? `<span class="print-badge date-filled">${trDate(val)}</span>` : '-';
+        const personeller = `<div style="text-align:left;"><span style="color:#1e40af; font-weight:900;">Müh:</span> ${item.muhendis || '-'}<br><span style="color:#1e40af; font-weight:900;">Tek:</span> ${item.tekniker || '-'}</div>`;
+        const getDateBadge = (val) => val ? `<span style="background-color:#e0e7ff; color:#3730a3; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${trDate(val)}</span>` : '-';
         
         html += `<tr>
-            <td style="text-align:center; font-weight:bold; font-size:14px;">${item.sn}</td>
-            <td style="font-weight:bold; font-size:13px;">${item.ilce}</td>
-            <td style="font-weight:bold; color:#2563eb; font-size:13px;">${item.mahalle}</td>
-            <td style="text-align:center; font-size:12px;">${item.toplam_parsel}</td>
-            <td style="text-align:center; font-size:12px;">${item.ido}</td>
-            <td style="text-align:center; font-size:12px;">${item.yirmi_iki_a}</td>
-            <td style="text-align:center; font-size:12px;">${item.ek_1}</td>
-            <td style="text-align:center; font-size:12px;">${item.kadastro_islem}</td>
-            <td style="text-align:center; font-weight:900; font-size:14px; color:#047857; background:#ecfdf5;">${item.parsel.toLocaleString('tr-TR')}</td>
-            <td style="font-size:11px; font-weight:bold; color:#334155;">${personeller}</td>
-            <td>${getStatusBadge(item.genel_durum)}</td>
-            <td>${getStatusBadge(item.altlik_durum)}</td>
-            <td style="text-align:center;">${getDateBadge(item.ucus_tarihi)}</td>
-            <td>${getStatusBadge(item.ucus_kiymet_durum)}</td>
-            <td>${getStatusBadge(item.degerlendirme_durum)}</td>
-            <td style="text-align:center;">${getDateBadge(item.bilgilendirme_tarihi)}</td>
-            <td>${getStatusBadge(item.komisyon_durum)}</td>
-            <td style="text-align:center;">${getDateBadge(item.kesin_aski_tarihi)}</td>
-            <td style="font-size:10px; max-width:150px;">${item.notlar || '-'}</td>
+            <td style="text-align:center; font-weight:bold; font-size:14px; padding:8px 4px; border:1px solid #cbd5e1;">${item.sn}</td>
+            <td style="font-weight:bold; font-size:13px; padding:8px 4px; border:1px solid #cbd5e1;">${item.ilce}</td>
+            <td style="font-weight:bold; color:#2563eb; font-size:13px; padding:8px 4px; border:1px solid #cbd5e1;">${item.mahalle}</td>
+            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.toplam_parsel}</td>
+            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.ido}</td>
+            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.yirmi_iki_a}</td>
+            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.ek_1}</td>
+            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.kadastro_islem}</td>
+            <td style="text-align:center; font-weight:900; font-size:14px; color:#047857; background:#ecfdf5; padding:8px 4px; border:1px solid #cbd5e1;">${item.parsel.toLocaleString('tr-TR')}</td>
+            <td style="font-size:12px; color:#334155; padding:8px 6px; border:1px solid #cbd5e1;">${personeller}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.genel_durum)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.altlik_durum)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getDateBadge(item.ucus_tarihi)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.ucus_kiymet_durum)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.degerlendirme_durum)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getDateBadge(item.bilgilendirme_tarihi)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.komisyon_durum)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getDateBadge(item.kesin_aski_tarihi)}</td>
+            <td style="font-size:11px; padding:8px 4px; border:1px solid #cbd5e1; overflow:hidden; text-overflow:ellipsis;">${item.notlar || '-'}</td>
         </tr>`;
     });
     html += '</tbody></table>';
@@ -645,15 +646,25 @@ function createPrintTable(items) {
 async function exportToPDF(exportType) {
     const splitSn = parseInt(document.getElementById('pdfSplitRow').value) || 32;
     closePdfModal();
-    showToast("Hazırlanıyor...", "Kayıpsız PDF motoru çalışıyor, bu işlem birkaç saniye sürebilir.", "info");
+    
+    // İşlem uzun süreceği için tam ekran overlay çıkartalım ki sistem dondu sanılmasın.
+    const overlay = document.createElement('div');
+    overlay.className = "fixed inset-0 bg-white z-[99998] flex flex-col items-center justify-center gap-4";
+    overlay.innerHTML = '<i class="fas fa-spinner fa-spin text-6xl text-blue-600"></i><span class="text-xl font-bold text-slate-700">Yüksek Kaliteli PDF Oluşturuluyor... Lütfen Bekleyin.</span>';
+    document.body.appendChild(overlay);
+
+    // html2canvas'ın kırpma yapmasını engellemek için scroll'u en başa çekiyoruz.
+    const origScrollX = window.scrollX;
+    const origScrollY = window.scrollY;
+    window.scrollTo(0, 0);
 
     const wrapper = document.createElement('div');
     wrapper.style.position = 'absolute';
-    wrapper.style.top = '-9999px';
+    wrapper.style.top = '0';
     wrapper.style.left = '0';
-    wrapper.style.padding = '20px';
+    wrapper.style.width = '2600px'; 
     wrapper.style.backgroundColor = 'white';
-    wrapper.style.zIndex = '-1';
+    wrapper.style.zIndex = '-9999'; // Kullanıcı görmez, arkada kalır
     document.body.appendChild(wrapper);
 
     data.forEach((d, i) => d.sn = i + 1); 
@@ -663,13 +674,12 @@ async function exportToPDF(exportType) {
     else if (exportType === 'page2') dataToProcess = data.filter(d => d.sn > splitSn);
     else dataToProcess = [...data];
 
-    // Satır kesilmesini önlemek için seçilen datayı "sayfalara" böleceğiz. 
-    // ExportType 'all' ise splitSn baz alınarak iki sayfa olacak (Veya daha fazla gerekiyorsa)
     const chunks = [];
     if (exportType === 'all') {
-        chunks.push(data.filter(d => d.sn <= splitSn));
-        const rem = data.filter(d => d.sn > splitSn);
-        if(rem.length > 0) chunks.push(rem);
+        const p1 = data.filter(d => d.sn <= splitSn);
+        const p2 = data.filter(d => d.sn > splitSn);
+        if(p1.length > 0) chunks.push(p1);
+        if(p2.length > 0) chunks.push(p2);
     } else {
         chunks.push(dataToProcess);
     }
@@ -685,31 +695,32 @@ async function exportToPDF(exportType) {
             if (i > 0) pdf.addPage(); 
 
             wrapper.innerHTML = createPrintTable(chunks[i]);
-            await new Promise(r => setTimeout(r, 300)); 
+            await new Promise(r => setTimeout(r, 600)); // DOM'un kendini tamamen çizmesi için süre
             
             const canvas = await html2canvas(wrapper, { 
                 scale: 2, 
                 backgroundColor: '#ffffff', 
                 useCORS: true,
-                width: wrapper.scrollWidth,
-                windowWidth: Math.max(2400, wrapper.scrollWidth) 
+                scrollY: -window.scrollY, 
+                width: 2600,
+                height: wrapper.offsetHeight,
+                windowWidth: 2600,
+                windowHeight: wrapper.offsetHeight 
             });
             
             const imgData = canvas.toDataURL('image/jpeg', 1.0);
             const imgProps = pdf.getImageProperties(imgData);
             
-            let margin = 5;
+            let margin = 5; 
             let maxPdfWidth = pdfWidth - (margin * 2);
             let maxPdfHeight = pdfHeight - (margin * 2);
             
-            // Tabloyu tamamen A3'e sığdırmak için En/Boy oranına göre daraltma
             let scale = Math.min(maxPdfWidth / imgProps.width, maxPdfHeight / imgProps.height);
             let finalWidth = imgProps.width * scale;
             let finalHeight = imgProps.height * scale;
 
-            // Ortala
             let xOffset = margin + (maxPdfWidth - finalWidth) / 2;
-            let yOffset = margin; // Üstten başlasın
+            let yOffset = margin; 
 
             pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight);
         }
@@ -717,9 +728,12 @@ async function exportToPDF(exportType) {
         pdf.save(`Ihale_Takip_${exportType}_${new Date().toLocaleDateString('tr-TR')}.pdf`);
         showToast("Başarılı", "PDF başarıyla oluşturuldu.", "success");
     } catch (error) {
+        console.error(error);
         showToast("Hata", "PDF oluşturulamadı.", "error");
     } finally {
         document.body.removeChild(wrapper);
+        document.body.removeChild(overlay);
+        window.scrollTo(origScrollX, origScrollY);
     }
 }
 // =================================================================
@@ -990,7 +1004,7 @@ function createGenelDurumSelect(val, sn, field) {
 
 function createDateInput(val, sn, field) {
     val = val || "";
-    let colorClass = val ? "text-indigo-700 bg-indigo-100" : "text-slate-600 bg-slate-50";
+    let colorClass = val ? "text-indigo-800 bg-indigo-200" : "text-slate-600 bg-slate-50";
     if (!isAdmin) return `<div class="flex justify-center"><span class="text-[11px] font-bold px-2 py-1.5 rounded-md ${colorClass} w-full text-center shadow-sm block">${val ? new Date(val).toLocaleDateString('tr-TR') : '-'}</span></div>`;
     return `<input type="date" value="${val}" onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">`;
 }
