@@ -43,24 +43,22 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        @keyframes softBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+        @keyframes softBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .animate-soft-blink { animation: softBlink 1.5s ease-in-out infinite; }
         
         .drag-handle { cursor: grab; color: #cbd5e1; transition: color 0.2s; }
         .drag-handle:hover { color: #64748b; }
         .drag-handle:active { cursor: grabbing; }
 
-        /* Yazdırma Tablosu İçin Özel CSS (Sadece PDF esnasında kullanılır) */
-        .print-table { width: 100%; border-collapse: collapse; font-size: 11px; background: white; }
-        .print-table th { background-color: #1e293b; color: white; padding: 8px; border: 1px solid #cbd5e1; text-align: center; }
-        .print-table td { padding: 8px; border: 1px solid #cbd5e1; vertical-align: middle; }
-        .print-badge { padding: 4px 6px; border-radius: 6px; font-weight: bold; display: inline-block; width: 100%; text-align: center; }
+        /* Yazdırma Tablosu İçin Özel CSS (PDF Oluştururken Kullanılır) */
+        .print-table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; font-family: sans-serif; table-layout: auto; }
+        .print-table th { background-color: #0f172a; color: white; padding: 10px 6px; border: 1px solid #64748b; text-align: center; font-weight: bold; }
+        .print-table td { padding: 8px 6px; border: 1px solid #cbd5e1; vertical-align: middle; }
+        .print-badge { padding: 5px 6px; border-radius: 6px; font-weight: bold; display: block; width: 100%; text-align: center; }
         .print-badge.success { background-color: #d1fae5; color: #047857; }
         .print-badge.warning { background-color: #fef3c7; color: #b45309; }
         .print-badge.neutral { background-color: #f1f5f9; color: #475569; }
+        .print-badge.date-filled { background-color: #e0e7ff; color: #4338ca; }
     </style>
 </head>
 <body class="text-slate-800 h-screen w-screen overflow-hidden">
@@ -294,6 +292,7 @@
                 <input type="text" id="newDurumName" placeholder="YENİ DURUM EKLE" class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-violet-500 outline-none flex-1 uppercase font-medium">
                 <button onclick="addDurum()" class="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-violet-700 transition">Ekle</button>
             </div>
+            <p class="text-[10px] text-slate-400">Not: Düzenlemek veya silmek istediğiniz öğeyi aşağıdan seçebilirsiniz.</p>
         </div>
         <div class="p-4 overflow-y-auto flex-1 bg-slate-50 border-t border-slate-100">
             <div id="durumListContainer" class="flex flex-col gap-2"></div>
@@ -312,15 +311,23 @@
             <div class="bg-blue-50 border border-blue-100 p-3 rounded-xl">
                 <label class="block text-xs font-bold text-blue-800 mb-1.5">Kaçıncı Sırada (S.N) Sayfa Bölünsün?</label>
                 <div class="flex items-center gap-2">
-                    <input type="number" id="pdfSplitRow" value="33" min="1" max="100" class="w-20 border border-blue-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center font-bold text-blue-900">
-                    <span class="text-xs text-blue-600 font-medium">satırdan sonra 2. sayfaya geçilecek.</span>
+                    <input type="number" id="pdfSplitRow" value="32" min="1" max="100" oninput="updateSplitLabels()" class="w-20 border border-blue-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center font-bold text-blue-900">
+                    <span class="text-xs text-blue-600 font-medium">. satırdan sonra diğer sayfaya geçilecek.</span>
                 </div>
             </div>
             
-            <button onclick="exportToPDF()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl flex justify-center items-center gap-2 transition shadow-md hover:shadow-lg mt-2">
-                <i class="fas fa-download"></i> PDF Oluştur ve İndir
-            </button>
-            <p class="text-[10px] text-slate-400 text-center font-medium mt-1">Not: Tablo, sığması için yüksek çözünürlükte sıkıştırılacaktır.</p>
+            <div class="flex flex-col gap-2 mt-2">
+                <button onclick="exportToPDF('page1')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold py-2.5 px-4 rounded-xl flex justify-between items-center transition text-sm">
+                    <span>1. Sayfayı İndir <span class="font-normal text-[10px] text-blue-500 ml-1">(1 - <span id="split1Lbl">32</span>)</span></span> <i class="fas fa-download"></i>
+                </button>
+                <button onclick="exportToPDF('page2')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold py-2.5 px-4 rounded-xl flex justify-between items-center transition text-sm">
+                    <span>2. Sayfayı İndir <span class="font-normal text-[10px] text-emerald-500 ml-1">(<span id="split2Lbl">33</span> - Son)</span></span> <i class="fas fa-download"></i>
+                </button>
+                <button onclick="exportToPDF('all')" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-xl flex justify-between items-center transition mt-1 text-sm shadow-md">
+                    <span>İkisini Tek PDF Yap <span class="font-normal text-[10px] text-slate-300 ml-1">(Tümü)</span></span> <i class="fas fa-file-pdf"></i>
+                </button>
+            </div>
+            <p class="text-[10px] text-slate-400 text-center font-medium mt-1">Kesilmeleri engellemek için sistem yüksek çözünürlükte daraltma yapar.</p>
         </div>
     </div>
 </div>
@@ -332,11 +339,9 @@
             <h3 class="font-bold text-lg text-slate-800"><i class="fas fa-file-pdf text-teal-600 mr-2"></i>Genelgeler ve Talimatlar</h3>
             <button onclick="closeDocsModal()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
         </div>
-        
         <div class="p-4 overflow-y-auto flex-1 bg-slate-50 min-h-[200px]" id="docsListContainer">
             <div class="text-center text-slate-400 text-xs py-4"><i class="fas fa-spinner fa-spin mr-1"></i> Yükleniyor...</div>
         </div>
-
         <div id="adminDocControls" class="hidden p-4 border-t border-slate-200 bg-white">
             <input type="file" id="docUpload" accept="application/pdf" onchange="handleDocUpload(event)" class="hidden">
             <label for="docUpload" class="w-full bg-teal-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-teal-700 transition cursor-pointer flex justify-center items-center gap-2 shadow-sm">
@@ -346,6 +351,7 @@
     </div>
 </div>
 
+<!-- Personel Yönetim Modalı -->
 <div id="personnelModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -559,7 +565,6 @@ async function saveToGithub(isAuto = false) {
             currentSha = fileData.sha;
         }
 
-        // SN numaralarının ardışık düzgün sıralandığından emin ol
         data.forEach((d, i) => d.sn = i + 1);
 
         const content = encodeBase64(JSON.stringify(data, null, 2));
@@ -583,9 +588,15 @@ async function saveToGithub(isAuto = false) {
     }
 }
 
-// ====================== PDF YAZDIRMA MOTORU ======================
+// ====================== PDF YAZDIRMA MOTORU (Kusursuz Chunking) ======================
 function openPdfModal() { document.getElementById('pdfModal').classList.remove('hidden'); }
 function closePdfModal() { document.getElementById('pdfModal').classList.add('hidden'); }
+
+function updateSplitLabels() {
+    const val = parseInt(document.getElementById('pdfSplitRow').value) || 32;
+    document.getElementById('split1Lbl').innerText = val;
+    document.getElementById('split2Lbl').innerText = val + 1;
+}
 
 function getStatusBadge(val) {
     if(!val || val === '-' || val === 'Yapılmadı' || val === 'HERHANGİ BİRŞEY YAPILMADI') return `<span class="print-badge neutral">${val||'Yapılmadı'}</span>`;
@@ -595,85 +606,116 @@ function getStatusBadge(val) {
 
 function createPrintTable(items) {
     let html = '<table class="print-table"><thead><tr>';
-    const printHeaders = ["S.N.", "İlçe", "Mahalle", "T. Parsel", "İDÖ", "22-A", "EK-1", "Kad. İşlem", "İhale Parseli", "Görevliler", "Genel Durum", "Altlık Durum", "Uçuş Tarihi", "Uçuş Kıymet.", "Değerlendirme", "Bilgi. Tar.", "Komisyon", "Kesin Askı", "Not"];
+    const printHeaders = ["S.N.", "İlçe", "Mahalle", "T. Parsel", "İDÖ", "22-A", "EK-1", "Kad. İşlem", "İhale Parseli", "Görevliler (Müh. & Tek.)", "Genel Durum", "Altlık Durum", "Uçuş Tarihi", "Uçuş Kıymet.", "Değerlendirme", "Bilgi. Tar.", "Komisyon", "Kesin Askı", "Not"];
     
     printHeaders.forEach(h => html += `<th>${h}</th>`);
     html += '</tr></thead><tbody>';
 
     items.forEach(item => {
         const trDate = (val) => val ? new Date(val).toLocaleDateString('tr-TR') : '-';
-        const personeller = `${item.muhendis || '-'}\n${item.tekniker || '-'}\n${item.kadastro || '-'}\n${item.fen || '-'}\n${item.tas || '-'}`;
+        const personeller = `Müh: ${item.muhendis || '-'}<br>Tek: ${item.tekniker || '-'}`;
+        const getDateBadge = (val) => val ? `<span class="print-badge date-filled">${trDate(val)}</span>` : '-';
         
         html += `<tr>
-            <td style="text-align:center; font-weight:bold;">${item.sn}</td>
-            <td style="font-weight:bold;">${item.ilce}</td>
-            <td style="font-weight:bold; color:#2563eb;">${item.mahalle}</td>
-            <td style="text-align:center;">${item.toplam_parsel}</td>
-            <td style="text-align:center;">${item.ido}</td>
-            <td style="text-align:center;">${item.yirmi_iki_a}</td>
-            <td style="text-align:center;">${item.ek_1}</td>
-            <td style="text-align:center;">${item.kadastro_islem}</td>
-            <td style="text-align:center; font-weight:900;">${item.parsel.toLocaleString('tr-TR')}</td>
-            <td style="font-size:9px; white-space:pre-wrap;">${personeller}</td>
+            <td style="text-align:center; font-weight:bold; font-size:14px;">${item.sn}</td>
+            <td style="font-weight:bold; font-size:13px;">${item.ilce}</td>
+            <td style="font-weight:bold; color:#2563eb; font-size:13px;">${item.mahalle}</td>
+            <td style="text-align:center; font-size:12px;">${item.toplam_parsel}</td>
+            <td style="text-align:center; font-size:12px;">${item.ido}</td>
+            <td style="text-align:center; font-size:12px;">${item.yirmi_iki_a}</td>
+            <td style="text-align:center; font-size:12px;">${item.ek_1}</td>
+            <td style="text-align:center; font-size:12px;">${item.kadastro_islem}</td>
+            <td style="text-align:center; font-weight:900; font-size:14px; color:#047857; background:#ecfdf5;">${item.parsel.toLocaleString('tr-TR')}</td>
+            <td style="font-size:11px; font-weight:bold; color:#334155;">${personeller}</td>
             <td>${getStatusBadge(item.genel_durum)}</td>
             <td>${getStatusBadge(item.altlik_durum)}</td>
-            <td style="text-align:center;">${trDate(item.ucus_tarihi)}</td>
+            <td style="text-align:center;">${getDateBadge(item.ucus_tarihi)}</td>
             <td>${getStatusBadge(item.ucus_kiymet_durum)}</td>
             <td>${getStatusBadge(item.degerlendirme_durum)}</td>
-            <td style="text-align:center;">${trDate(item.bilgilendirme_tarihi)}</td>
+            <td style="text-align:center;">${getDateBadge(item.bilgilendirme_tarihi)}</td>
             <td>${getStatusBadge(item.komisyon_durum)}</td>
-            <td style="text-align:center;">${trDate(item.kesin_aski_tarihi)}</td>
-            <td style="font-size:9px; white-space:pre-wrap;">${item.notlar || '-'}</td>
+            <td style="text-align:center;">${getDateBadge(item.kesin_aski_tarihi)}</td>
+            <td style="font-size:10px; max-width:150px;">${item.notlar || '-'}</td>
         </tr>`;
     });
     html += '</tbody></table>';
     return html;
 }
 
-async function exportToPDF() {
-    const splitSn = parseInt(document.getElementById('pdfSplitRow').value) || 33;
+async function exportToPDF(exportType) {
+    const splitSn = parseInt(document.getElementById('pdfSplitRow').value) || 32;
     closePdfModal();
-    showToast("Hazırlanıyor...", "PDF motoru çalışıyor, lütfen bekleyin.", "info");
+    showToast("Hazırlanıyor...", "Kayıpsız PDF motoru çalışıyor, bu işlem birkaç saniye sürebilir.", "info");
 
     const wrapper = document.createElement('div');
     wrapper.style.position = 'absolute';
     wrapper.style.top = '-9999px';
-    wrapper.style.left = '-9999px';
-    wrapper.style.width = '2400px'; 
+    wrapper.style.left = '0';
+    wrapper.style.padding = '20px';
     wrapper.style.backgroundColor = 'white';
+    wrapper.style.zIndex = '-1';
     document.body.appendChild(wrapper);
 
-    data.forEach((d, i) => d.sn = i + 1); // İndirmeden önce sıra noları düzelt
-    const part1Data = data.filter(d => d.sn <= splitSn);
-    const part2Data = data.filter(d => d.sn > splitSn);
+    data.forEach((d, i) => d.sn = i + 1); 
+
+    let dataToProcess = [];
+    if (exportType === 'page1') dataToProcess = data.filter(d => d.sn <= splitSn);
+    else if (exportType === 'page2') dataToProcess = data.filter(d => d.sn > splitSn);
+    else dataToProcess = [...data];
+
+    // Satır kesilmesini önlemek için seçilen datayı "sayfalara" böleceğiz. 
+    // ExportType 'all' ise splitSn baz alınarak iki sayfa olacak (Veya daha fazla gerekiyorsa)
+    const chunks = [];
+    if (exportType === 'all') {
+        chunks.push(data.filter(d => d.sn <= splitSn));
+        const rem = data.filter(d => d.sn > splitSn);
+        if(rem.length > 0) chunks.push(rem);
+    } else {
+        chunks.push(dataToProcess);
+    }
 
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('l', 'mm', 'a3'); 
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    const addTablePage = async (pageData, isFirstPage) => {
-        if (!isFirstPage) pdf.addPage();
-        wrapper.innerHTML = createPrintTable(pageData);
-        
-        const canvas = await html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
-        
-        const imgProps = pdf.getImageProperties(imgData);
-        const imgRatio = imgProps.width / imgProps.height;
-        const pdfRatio = pdfWidth / pdfHeight;
-        
-        let finalWidth = pdfWidth - 10;
-        let finalHeight = finalWidth / imgRatio;
-
-        pdf.addImage(imgData, 'JPEG', 5, 5, finalWidth, finalHeight);
-    };
-
     try {
-        if (part1Data.length > 0) await addTablePage(part1Data, true);
-        if (part2Data.length > 0) await addTablePage(part2Data, false);
-        pdf.save(`Ihale_Takip_Genel_${new Date().toLocaleDateString('tr-TR')}.pdf`);
-        showToast("Başarılı", "Geniş A3 PDF başarıyla indirildi.", "success");
+        for (let i = 0; i < chunks.length; i++) {
+            if (chunks[i].length === 0) continue;
+            if (i > 0) pdf.addPage(); 
+
+            wrapper.innerHTML = createPrintTable(chunks[i]);
+            await new Promise(r => setTimeout(r, 300)); 
+            
+            const canvas = await html2canvas(wrapper, { 
+                scale: 2, 
+                backgroundColor: '#ffffff', 
+                useCORS: true,
+                width: wrapper.scrollWidth,
+                windowWidth: Math.max(2400, wrapper.scrollWidth) 
+            });
+            
+            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const imgProps = pdf.getImageProperties(imgData);
+            
+            let margin = 5;
+            let maxPdfWidth = pdfWidth - (margin * 2);
+            let maxPdfHeight = pdfHeight - (margin * 2);
+            
+            // Tabloyu tamamen A3'e sığdırmak için En/Boy oranına göre daraltma
+            let scale = Math.min(maxPdfWidth / imgProps.width, maxPdfHeight / imgProps.height);
+            let finalWidth = imgProps.width * scale;
+            let finalHeight = imgProps.height * scale;
+
+            // Ortala
+            let xOffset = margin + (maxPdfWidth - finalWidth) / 2;
+            let yOffset = margin; // Üstten başlasın
+
+            pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight);
+        }
+
+        pdf.save(`Ihale_Takip_${exportType}_${new Date().toLocaleDateString('tr-TR')}.pdf`);
+        showToast("Başarılı", "PDF başarıyla oluşturuldu.", "success");
     } catch (error) {
         showToast("Hata", "PDF oluşturulamadı.", "error");
     } finally {
@@ -682,7 +724,6 @@ async function exportToPDF() {
 }
 // =================================================================
 
-// Genelgeler / Belgeler Yönetimi
 function openDocsModal() {
     document.getElementById('docsModal').classList.remove('hidden');
     fetchDocs();
@@ -819,7 +860,6 @@ function toggleDropdown(sn) {
     else { el.classList.add('hidden'); el.classList.remove('flex'); openDropdowns.delete(sn); }
 }
 
-// Personel Modalı
 function openPersonnelModal() { renderPersonnelList(); document.getElementById('personnelModal').classList.remove('hidden'); }
 function closePersonnelModal() { document.getElementById('personnelModal').classList.add('hidden'); }
 
@@ -843,6 +883,8 @@ function removePerson(role, index) {
     }
 }
 
+const roleNames = { muhendis: "Mühendisler", tekniker: "Teknikerler", kadastro: "Kadastro Üyeleri", fen: "Fen Kontrol", tas: "Tas. Kontrol" };
+
 function renderPersonnelList() {
     let html = "";
     for (const [key, list] of Object.entries(personnel)) {
@@ -855,7 +897,6 @@ function renderPersonnelList() {
     document.getElementById('personnelListContainer').innerHTML = html;
 }
 
-// Durum Modalı
 function openDurumModal() { renderDurumList(); document.getElementById('durumModal').classList.remove('hidden'); }
 function closeDurumModal() { document.getElementById('durumModal').classList.add('hidden'); }
 
@@ -867,12 +908,29 @@ function addDurum() {
     durumListesi.push(name);
     localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
     nameInput.value = ""; renderDurumList(); populateDurumFilter(); renderTable();
-    showToast("Eklendi", `Durum eklendi.`);
 }
 
 function removeDurum(index) {
-    if(confirm("Bu durumu silmek istediğinize emin misiniz? (Tablodaki mevcut seçimler silinmez)")) {
+    if(confirm("Bu durumu silmek istediğinize emin misiniz?")) {
         durumListesi.splice(index, 1);
+        localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
+        renderDurumList(); populateDurumFilter(); renderTable();
+    }
+}
+
+function moveDurum(index, dir) {
+    if (index + dir < 0 || index + dir >= durumListesi.length) return;
+    const temp = durumListesi[index];
+    durumListesi[index] = durumListesi[index + dir];
+    durumListesi[index + dir] = temp;
+    localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
+    renderDurumList(); populateDurumFilter(); renderTable();
+}
+
+function editDurum(index) {
+    const newName = prompt("Durumun yeni adını girin:", durumListesi[index]);
+    if (newName && newName.trim() !== "") {
+        durumListesi[index] = newName.trim().toLocaleUpperCase('tr-TR');
         localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
         renderDurumList(); populateDurumFilter(); renderTable();
     }
@@ -886,8 +944,17 @@ function renderDurumList() {
         else if(name.includes("DEVAM") || name.includes("AŞAMASINDA") || name.includes("HAZIRLANIYOR") || name.includes("DEĞERLENDİRMEDE")) colorClass = "text-amber-700 bg-amber-100";
         
         html += `<div class="flex items-center justify-between p-2 bg-white border border-slate-200 rounded-lg shadow-sm">
-            <span class="font-bold text-[11px] ${colorClass} px-2 py-1 rounded">${name}</span>
-            <button onclick="removeDurum(${idx})" class="text-red-400 hover:text-red-600 p-1"><i class="fas fa-trash-alt"></i></button>
+            <div class="flex items-center gap-2">
+                <div class="flex flex-col gap-1">
+                    <button onclick="moveDurum(${idx}, -1)" class="text-slate-300 hover:text-blue-500 leading-none"><i class="fas fa-caret-up"></i></button>
+                    <button onclick="moveDurum(${idx}, 1)" class="text-slate-300 hover:text-blue-500 leading-none"><i class="fas fa-caret-down"></i></button>
+                </div>
+                <span class="font-bold text-[11px] ${colorClass} px-2 py-1 rounded">${name}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="editDurum(${idx})" class="text-blue-400 hover:text-blue-600 p-1"><i class="fas fa-edit"></i></button>
+                <button onclick="removeDurum(${idx})" class="text-red-400 hover:text-red-600 p-1"><i class="fas fa-trash-alt"></i></button>
+            </div>
         </div>`;
     });
     document.getElementById('durumListContainer').innerHTML = html;
@@ -923,7 +990,9 @@ function createGenelDurumSelect(val, sn, field) {
 
 function createDateInput(val, sn, field) {
     val = val || "";
-    return `<input type="date" value="${val}" onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-medium text-slate-700 bg-transparent outline-none cursor-pointer p-1 rounded hover:bg-slate-100 text-center">`;
+    let colorClass = val ? "text-indigo-700 bg-indigo-100" : "text-slate-600 bg-slate-50";
+    if (!isAdmin) return `<div class="flex justify-center"><span class="text-[11px] font-bold px-2 py-1.5 rounded-md ${colorClass} w-full text-center shadow-sm block">${val ? new Date(val).toLocaleDateString('tr-TR') : '-'}</span></div>`;
+    return `<input type="date" value="${val}" onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">`;
 }
 
 function createTextInput(val, sn, field) {
@@ -937,7 +1006,6 @@ function reorderData(fromSn, toSn) {
     const [movedItem] = data.splice(fromIndex, 1);
     data.splice(toIndex, 0, movedItem);
     
-    // SN numaralarını baştan düzenle
     data.forEach((d, i) => d.sn = i + 1);
     localStorage.setItem('ihaleData', JSON.stringify(data));
     setUnsavedState(true);
