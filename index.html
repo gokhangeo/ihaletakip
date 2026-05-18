@@ -7,11 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF ve Ekran Görüntüsü Kütüphaneleri -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .table-container { max-height: 60vh; overflow-y: auto; overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
         .sticky-header { position: sticky; top: 0; z-index: 20; }
-        .district-row { border-left: 4px solid transparent; transition: all 0.2s; }
+        .district-row { border-left: 4px solid transparent; transition: all 0.2s; background: white; }
+        .district-row.dragging { opacity: 0.5; background-color: #e2e8f0; }
         .district-ANAMUR { border-left-color: #3b82f6; }
         .district-BOZYAZI { border-left-color: #10b981; }
         .district-SİLİFKE { border-left-color: #f59e0b; }
@@ -42,6 +48,19 @@
             50% { opacity: 0.5; }
         }
         .animate-soft-blink { animation: softBlink 1.5s ease-in-out infinite; }
+        
+        .drag-handle { cursor: grab; color: #cbd5e1; transition: color 0.2s; }
+        .drag-handle:hover { color: #64748b; }
+        .drag-handle:active { cursor: grabbing; }
+
+        /* Yazdırma Tablosu İçin Özel CSS (Sadece PDF esnasında kullanılır) */
+        .print-table { width: 100%; border-collapse: collapse; font-size: 11px; background: white; }
+        .print-table th { background-color: #1e293b; color: white; padding: 8px; border: 1px solid #cbd5e1; text-align: center; }
+        .print-table td { padding: 8px; border: 1px solid #cbd5e1; vertical-align: middle; }
+        .print-badge { padding: 4px 6px; border-radius: 6px; font-weight: bold; display: inline-block; width: 100%; text-align: center; }
+        .print-badge.success { background-color: #d1fae5; color: #047857; }
+        .print-badge.warning { background-color: #fef3c7; color: #b45309; }
+        .print-badge.neutral { background-color: #f1f5f9; color: #475569; }
     </style>
 </head>
 <body class="text-slate-800 h-screen w-screen overflow-hidden">
@@ -49,7 +68,6 @@
 <!-- Giriş Ekranı -->
 <div id="loginScreen" class="fixed inset-0 bg-slate-100 z-[100] flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 md:p-10 flex flex-col gap-6 relative overflow-hidden border border-slate-200">
-        <!-- Dekoratif Arka Plan -->
         <div class="absolute -top-24 -right-24 w-56 h-56 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
         <div class="absolute -bottom-24 -left-24 w-56 h-56 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
         
@@ -99,9 +117,8 @@
     </div>
 </div>
 
-<!-- Ana Uygulama Alanı (Giriş yapılana kadar gizli) -->
+<!-- Ana Uygulama Alanı -->
 <div id="appContainer" class="hidden h-full overflow-y-auto p-2 md:p-6">
-    <!-- Kaydedilmeyen Değişiklikler Uyarısı -->
     <div id="unsavedAlert" class="fixed bottom-24 right-5 md:right-10 bg-amber-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-xl shadow-lg flex items-center gap-2 z-40 hidden animate-soft-blink pointer-events-none border border-amber-400">
         <i class="fas fa-save"></i>
         <span class="text-xs font-bold tracking-wide">Kaydedilmeyen Değişiklikler Var!</span>
@@ -138,6 +155,9 @@
                 </button>
 
                 <div id="adminControls" class="hidden flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                    <button onclick="openDurumModal()" class="bg-violet-500 text-white px-3 py-2 rounded-xl hover:bg-violet-600 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                        <i class="fas fa-tags"></i> Durumlar
+                    </button>
                     <button onclick="openPersonnelModal()" class="bg-amber-500 text-white px-3 py-2 rounded-xl hover:bg-amber-600 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
                         <i class="fas fa-users-cog"></i> Personel
                     </button>
@@ -216,18 +236,25 @@
             <!-- JS ile dolacak -->
         </div>
 
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <!-- Ana Tablo Bölümü -->
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col">
             <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                 <h3 class="font-bold text-sm text-slate-700"><i class="fas fa-list text-blue-500 mr-2"></i>İhale ve Durum Listesi</h3>
-                <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
-                    <i class="fas fa-file-excel"></i> Excel İndir
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="openPdfModal()" class="bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
+                        <i class="fas fa-file-pdf"></i> PDF İndir
+                    </button>
+                    <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
+                        <i class="fas fa-file-excel"></i> Excel İndir
+                    </button>
+                </div>
             </div>
-            <div class="table-container">
+            
+            <div id="tableWrapper" class="table-container bg-white relative">
                 <table class="w-full text-xs text-left border-collapse" id="mainTable">
                     <thead class="sticky-header bg-slate-900 text-white shadow-md">
                         <tr>
-                            <th class="p-3 font-bold whitespace-nowrap">S.N.</th>
+                            <th class="p-3 font-bold whitespace-nowrap text-center">S.N.</th>
                             <th class="p-3 font-bold whitespace-nowrap">İlçe</th>
                             <th class="p-3 font-bold whitespace-nowrap min-w-[120px]">Mahalle</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap" title="Toplam Parsel Sayısı">T. Parsel</th>
@@ -239,7 +266,6 @@
                             <th class="p-4 font-bold bg-slate-800/80 whitespace-nowrap text-center">Görevli Personeller</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap border-l border-slate-700 bg-slate-800">Genel Durum</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap border-l border-slate-700">Altlık Durum</th>
-                            <th class="p-3 font-bold text-center whitespace-nowrap">Arazi Ölçüm Tar.</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap">Uçuş Tarihi</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap">Uçuş Kıymetlendirme</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap">Değerlendirme Dur.</th>
@@ -252,6 +278,49 @@
                     <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Durum Yönetim Modalı -->
+<div id="durumModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+            <h3 class="font-bold text-lg text-slate-800"><i class="fas fa-tags text-violet-500 mr-2"></i>Genel Durum Yönetimi</h3>
+            <button onclick="closeDurumModal()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-4 flex flex-col gap-3">
+            <div class="flex gap-2">
+                <input type="text" id="newDurumName" placeholder="YENİ DURUM EKLE" class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-violet-500 outline-none flex-1 uppercase font-medium">
+                <button onclick="addDurum()" class="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-violet-700 transition">Ekle</button>
+            </div>
+        </div>
+        <div class="p-4 overflow-y-auto flex-1 bg-slate-50 border-t border-slate-100">
+            <div id="durumListContainer" class="flex flex-col gap-2"></div>
+        </div>
+    </div>
+</div>
+
+<!-- PDF İndirme Modal -->
+<div id="pdfModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
+        <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+            <h3 class="font-bold text-lg text-slate-800"><i class="fas fa-file-pdf text-red-600 mr-2"></i>A3 Geniş PDF İndir</h3>
+            <button onclick="closePdfModal()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-5 flex flex-col gap-4">
+            <div class="bg-blue-50 border border-blue-100 p-3 rounded-xl">
+                <label class="block text-xs font-bold text-blue-800 mb-1.5">Kaçıncı Sırada (S.N) Sayfa Bölünsün?</label>
+                <div class="flex items-center gap-2">
+                    <input type="number" id="pdfSplitRow" value="33" min="1" max="100" class="w-20 border border-blue-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center font-bold text-blue-900">
+                    <span class="text-xs text-blue-600 font-medium">satırdan sonra 2. sayfaya geçilecek.</span>
+                </div>
+            </div>
+            
+            <button onclick="exportToPDF()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl flex justify-center items-center gap-2 transition shadow-md hover:shadow-lg mt-2">
+                <i class="fas fa-download"></i> PDF Oluştur ve İndir
+            </button>
+            <p class="text-[10px] text-slate-400 text-center font-medium mt-1">Not: Tablo, sığması için yüksek çözünürlükte sıkıştırılacaktır.</p>
         </div>
     </div>
 </div>
@@ -277,7 +346,6 @@
     </div>
 </div>
 
-<!-- Personel Yönetim Modalı -->
 <div id="personnelModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -335,6 +403,7 @@ let activePersonFilter = null;
 let activeCardFilter = null;
 let hasUnsavedChanges = false;
 let openDropdowns = new Set();
+let draggedSn = null;
 
 const defaultPersonnel = {
     muhendis: ["TEVFİK YILDIZ", "HİLMİ MÜFTÜOĞLU", "HİKMET GÜLCAN", "MEHTAP AKDOĞAN", "VOLKAN İZCİ"],
@@ -344,49 +413,35 @@ const defaultPersonnel = {
     tas: ["MUSTAFA BICAK"]
 };
 
-const durumListesi = [
-    "HERHANGİ BİRŞEY YAPILMADI",
-    "ÇALIŞMA PROGRAMINA ALINDI(ONAY GELMEDİ)",
-    "ÇALIŞMA PROGRAMINA ALINDI",
-    "BİLİRKİŞİ SEÇİMİ YAPILIYOR",
-    "BİLİRKİŞİ YEMİNLERİ YAPTIRILACAK",
-    "YER TESLİMİ YAPILDI",
-    "TAPU KAYIT KARŞILAŞTIRMA",
-    "ÇALIŞMA ALANI İLANI YAPILDI",
-    "BİLİRKİŞİ YEMİN/ADA-MEVKİ İLAN",
-    "ARAZİ DEVAM EDİYOR",
-    "VERİLER ELEKTRONİK ORTAMDA HAZIRLANDI",
-    "DEĞERLENDİRMEDE",
-    "ORMAN ASKISI",
-    "FİRMAYA TESLİM EDİLDİ",
-    "KROKİ/TUTANAK KONTROLÜ",
-    "ASKI İLANINA HAZIRLANIYOR",
-    "BİLGİLENDİRME İLANINDA",
-    "KOMİSYON AŞAMASINDA",
-    "KOMİSYON YAPILDI",
-    "KESİN ASKIDA",
-    "KESİN ASKIDAN İNDİ. BEKLEMEDE",
-    "DEVİR YAPILDI",
-    "TESCİL AŞAMASINDA",
-    "İHALEDEN/PROGRAMDAN ÇIKARILDI",
-    "TESCİLİ BİTTİ"
+const defaultDurumlar = [
+    "HERHANGİ BİRŞEY YAPILMADI", "ÇALIŞMA PROGRAMINA ALINDI(ONAY GELMEDİ)", "ÇALIŞMA PROGRAMINA ALINDI",
+    "BİLİRKİŞİ SEÇİMİ YAPILIYOR", "BİLİRKİŞİ YEMİNLERİ YAPTIRILACAK", "YER TESLİMİ YAPILDI",
+    "TAPU KAYIT KARŞILAŞTIRMA", "ÇALIŞMA ALANI İLANI YAPILDI", "BİLİRKİŞİ YEMİN/ADA-MEVKİ İLAN",
+    "ARAZİ DEVAM EDİYOR", "VERİLER ELEKTRONİK ORTAMDA HAZIRLANDI", "DEĞERLENDİRMEDE",
+    "ORMAN ASKISI", "FİRMAYA TESLİM EDİLDİ", "KROKİ/TUTANAK KONTROLÜ", "ASKI İLANINA HAZIRLANIYOR",
+    "BİLGİLENDİRME İLANINDA", "KOMİSYON AŞAMASINDA", "KOMİSYON YAPILDI", "KESİN ASKIDA",
+    "KESİN ASKIDAN İNDİ. BEKLEMEDE", "DEVİR YAPILDI", "TESCİL AŞAMASINDA", "İHALEDEN/PROGRAMDAN ÇIKARILDI", "TESCİLİ BİTTİ"
 ];
 
 let personnel = JSON.parse(localStorage.getItem('customPersonnel')) || JSON.parse(JSON.stringify(defaultPersonnel));
+let durumListesi = JSON.parse(localStorage.getItem('customDurumlar')) || [...defaultDurumlar];
 let data = JSON.parse(localStorage.getItem('ihaleData')) || [];
 
-const filterSelect = document.getElementById('statusFilter');
-durumListesi.forEach(durum => {
-    const opt = document.createElement('option');
-    opt.value = durum;
-    opt.innerText = durum;
-    filterSelect.appendChild(opt);
-});
+function populateDurumFilter() {
+    const filterSelect = document.getElementById('statusFilter');
+    filterSelect.innerHTML = '<option value="">Tüm Durumlar</option>';
+    durumListesi.forEach(durum => {
+        const opt = document.createElement('option');
+        opt.value = durum;
+        opt.innerText = durum;
+        filterSelect.appendChild(opt);
+    });
+}
+populateDurumFilter();
 
 const encodeBase64 = (str) => btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str)));
 const decodeBase64 = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
 
-// Giriş İşlemleri
 function handleLogin() {
     const user = document.getElementById('loginUsername').value;
     const pass = document.getElementById('loginPassword').value;
@@ -395,9 +450,7 @@ function handleLogin() {
 
     if (user === 'mersinkm' && pass === '503344') {
         errorDiv.classList.add('hidden');
-        if (remember) {
-            localStorage.setItem('isLoggedIn', 'true');
-        }
+        if (remember) localStorage.setItem('isLoggedIn', 'true');
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('appContainer').classList.remove('hidden');
         fetchFromGithub(true);
@@ -420,7 +473,6 @@ document.addEventListener('keypress', function (e) {
     }
 });
 
-// Admin Girişi
 document.getElementById('titleContainer').addEventListener('click', () => {
     clickCount++;
     clearTimeout(clickTimer);
@@ -507,6 +559,9 @@ async function saveToGithub(isAuto = false) {
             currentSha = fileData.sha;
         }
 
+        // SN numaralarının ardışık düzgün sıralandığından emin ol
+        data.forEach((d, i) => d.sn = i + 1);
+
         const content = encodeBase64(JSON.stringify(data, null, 2));
         const body = { message: `Update via Panel - ${new Date().toLocaleString()}`, content: content };
         if (currentSha) body.sha = currentSha; 
@@ -528,15 +583,111 @@ async function saveToGithub(isAuto = false) {
     }
 }
 
-// Genelgeler Bölümü
+// ====================== PDF YAZDIRMA MOTORU ======================
+function openPdfModal() { document.getElementById('pdfModal').classList.remove('hidden'); }
+function closePdfModal() { document.getElementById('pdfModal').classList.add('hidden'); }
+
+function getStatusBadge(val) {
+    if(!val || val === '-' || val === 'Yapılmadı' || val === 'HERHANGİ BİRŞEY YAPILMADI') return `<span class="print-badge neutral">${val||'Yapılmadı'}</span>`;
+    if(val.includes('BİTTİ') || val.includes('YAPILDI') || val === 'Yapıldı') return `<span class="print-badge success">${val}</span>`;
+    return `<span class="print-badge warning">${val}</span>`;
+}
+
+function createPrintTable(items) {
+    let html = '<table class="print-table"><thead><tr>';
+    const printHeaders = ["S.N.", "İlçe", "Mahalle", "T. Parsel", "İDÖ", "22-A", "EK-1", "Kad. İşlem", "İhale Parseli", "Görevliler", "Genel Durum", "Altlık Durum", "Uçuş Tarihi", "Uçuş Kıymet.", "Değerlendirme", "Bilgi. Tar.", "Komisyon", "Kesin Askı", "Not"];
+    
+    printHeaders.forEach(h => html += `<th>${h}</th>`);
+    html += '</tr></thead><tbody>';
+
+    items.forEach(item => {
+        const trDate = (val) => val ? new Date(val).toLocaleDateString('tr-TR') : '-';
+        const personeller = `${item.muhendis || '-'}\n${item.tekniker || '-'}\n${item.kadastro || '-'}\n${item.fen || '-'}\n${item.tas || '-'}`;
+        
+        html += `<tr>
+            <td style="text-align:center; font-weight:bold;">${item.sn}</td>
+            <td style="font-weight:bold;">${item.ilce}</td>
+            <td style="font-weight:bold; color:#2563eb;">${item.mahalle}</td>
+            <td style="text-align:center;">${item.toplam_parsel}</td>
+            <td style="text-align:center;">${item.ido}</td>
+            <td style="text-align:center;">${item.yirmi_iki_a}</td>
+            <td style="text-align:center;">${item.ek_1}</td>
+            <td style="text-align:center;">${item.kadastro_islem}</td>
+            <td style="text-align:center; font-weight:900;">${item.parsel.toLocaleString('tr-TR')}</td>
+            <td style="font-size:9px; white-space:pre-wrap;">${personeller}</td>
+            <td>${getStatusBadge(item.genel_durum)}</td>
+            <td>${getStatusBadge(item.altlik_durum)}</td>
+            <td style="text-align:center;">${trDate(item.ucus_tarihi)}</td>
+            <td>${getStatusBadge(item.ucus_kiymet_durum)}</td>
+            <td>${getStatusBadge(item.degerlendirme_durum)}</td>
+            <td style="text-align:center;">${trDate(item.bilgilendirme_tarihi)}</td>
+            <td>${getStatusBadge(item.komisyon_durum)}</td>
+            <td style="text-align:center;">${trDate(item.kesin_aski_tarihi)}</td>
+            <td style="font-size:9px; white-space:pre-wrap;">${item.notlar || '-'}</td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    return html;
+}
+
+async function exportToPDF() {
+    const splitSn = parseInt(document.getElementById('pdfSplitRow').value) || 33;
+    closePdfModal();
+    showToast("Hazırlanıyor...", "PDF motoru çalışıyor, lütfen bekleyin.", "info");
+
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'absolute';
+    wrapper.style.top = '-9999px';
+    wrapper.style.left = '-9999px';
+    wrapper.style.width = '2400px'; 
+    wrapper.style.backgroundColor = 'white';
+    document.body.appendChild(wrapper);
+
+    data.forEach((d, i) => d.sn = i + 1); // İndirmeden önce sıra noları düzelt
+    const part1Data = data.filter(d => d.sn <= splitSn);
+    const part2Data = data.filter(d => d.sn > splitSn);
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('l', 'mm', 'a3'); 
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    const addTablePage = async (pageData, isFirstPage) => {
+        if (!isFirstPage) pdf.addPage();
+        wrapper.innerHTML = createPrintTable(pageData);
+        
+        const canvas = await html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgRatio = imgProps.width / imgProps.height;
+        const pdfRatio = pdfWidth / pdfHeight;
+        
+        let finalWidth = pdfWidth - 10;
+        let finalHeight = finalWidth / imgRatio;
+
+        pdf.addImage(imgData, 'JPEG', 5, 5, finalWidth, finalHeight);
+    };
+
+    try {
+        if (part1Data.length > 0) await addTablePage(part1Data, true);
+        if (part2Data.length > 0) await addTablePage(part2Data, false);
+        pdf.save(`Ihale_Takip_Genel_${new Date().toLocaleDateString('tr-TR')}.pdf`);
+        showToast("Başarılı", "Geniş A3 PDF başarıyla indirildi.", "success");
+    } catch (error) {
+        showToast("Hata", "PDF oluşturulamadı.", "error");
+    } finally {
+        document.body.removeChild(wrapper);
+    }
+}
+// =================================================================
+
+// Genelgeler / Belgeler Yönetimi
 function openDocsModal() {
     document.getElementById('docsModal').classList.remove('hidden');
     fetchDocs();
 }
-
-function closeDocsModal() {
-    document.getElementById('docsModal').classList.add('hidden');
-}
+function closeDocsModal() { document.getElementById('docsModal').classList.add('hidden'); }
 
 async function fetchDocs() {
     try {
@@ -544,17 +695,13 @@ async function fetchDocs() {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
             cache: 'no-store'
         });
-        
         if (res.ok) {
             const files = await res.json();
             renderDocs(files);
         } else if (res.status === 404) {
             renderDocs([]); 
-        } else {
-            throw new Error('Belgeler çekilemedi');
-        }
+        } else throw new Error('Belgeler çekilemedi');
     } catch (e) {
-        console.error(e);
         document.getElementById('docsListContainer').innerHTML = `<div class="text-center text-red-500 text-xs py-4">Belgeler yüklenemedi.</div>`;
     }
 }
@@ -565,66 +712,41 @@ function renderDocs(files) {
         container.innerHTML = `<div class="text-center text-slate-400 text-xs py-4">Henüz belge yüklenmemiş.</div>`;
         return;
     }
-    
     let html = '<div class="flex flex-col gap-2">';
     files.forEach(file => {
         if(file.name.endsWith('.pdf')) {
-            html += `
-            <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition">
+            html += `<div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition">
                 <div class="flex items-center gap-3 cursor-pointer overflow-hidden flex-1" onclick="window.open('${file.download_url}', '_blank')">
-                    <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-file-pdf text-red-500 text-lg"></i>
-                    </div>
-                    <div class="flex flex-col min-w-0">
-                        <span class="text-sm font-bold text-slate-700 truncate">${file.name}</span>
-                        <span class="text-[10px] text-slate-400 uppercase">PDF Belgesi</span>
-                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0"><i class="fas fa-file-pdf text-red-500 text-lg"></i></div>
+                    <div class="flex flex-col min-w-0"><span class="text-sm font-bold text-slate-700 truncate">${file.name}</span><span class="text-[10px] text-slate-400 uppercase">PDF Belgesi</span></div>
                 </div>
                 ${isAdmin ? `<button onclick="deleteDoc('${file.path}', '${file.sha}')" class="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center flex-shrink-0 transition ml-2"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}
             </div>`;
         }
     });
-    html += '</div>';
-    container.innerHTML = html;
+    container.innerHTML = html + '</div>';
 }
 
 async function handleDocUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    if (file.type !== "application/pdf") {
-        showToast("Hata", "Sadece PDF dosyaları yüklenebilir.", "error");
-        return;
-    }
-    
+    if (file.type !== "application/pdf") return showToast("Hata", "Sadece PDF dosyaları yüklenebilir.", "error");
     showToast("Yükleniyor...", "Belge GitHub'a aktarılıyor.", "info");
     
     const reader = new FileReader();
     reader.onload = async function(e) {
         const base64Data = e.target.result.split(',')[1];
         const safeName = file.name.replace(/\s+/g, '_'); 
-        const filePath = `${_docsPath}/${safeName}`;
-        
         try {
-            const body = {
-                message: `Belge eklendi: ${safeName}`,
-                content: base64Data
-            };
-            
-            const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${filePath}`, {
+            const body = { message: `Belge eklendi: ${safeName}`, content: base64Data };
+            const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${_docsPath}/${safeName}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
-            
-            if (res.ok) {
-                showToast("Başarılı", "Belge sisteme yüklendi.", "success");
-                fetchDocs();
-            } else {
-                throw new Error("Yükleme hatası");
-            }
-        } catch(err) {
-            showToast("Hata", "Belge yüklenemedi.", "error");
-        }
+            if (res.ok) { showToast("Başarılı", "Belge sisteme yüklendi.", "success"); fetchDocs(); }
+            else throw new Error("Yükleme hatası");
+        } catch(err) { showToast("Hata", "Belge yüklenemedi.", "error"); }
     };
     reader.readAsDataURL(file);
     event.target.value = ''; 
@@ -632,7 +754,6 @@ async function handleDocUpload(event) {
 
 async function deleteDoc(path, sha) {
     if(!confirm("Bu belgeyi kalıcı olarak silmek istediğinize emin misiniz?")) return;
-    
     showToast("Siliniyor...", "Belge kaldırılıyor.", "info");
     try {
         const body = { message: `Belge silindi: ${path}`, sha: sha };
@@ -641,15 +762,9 @@ async function deleteDoc(path, sha) {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
-        if(res.ok) {
-            showToast("Silindi", "Belge başarıyla kaldırıldı.", "success");
-            fetchDocs();
-        } else {
-            throw new Error("Silme hatası");
-        }
-    } catch(err) {
-        showToast("Hata", "Belge silinemedi.", "error");
-    }
+        if(res.ok) { showToast("Silindi", "Belge başarıyla kaldırıldı.", "success"); fetchDocs(); }
+        else throw new Error("Silme hatası");
+    } catch(err) { showToast("Hata", "Belge silinemedi.", "error"); }
 }
 
 function showToast(title, msg, type = "success") {
@@ -664,10 +779,8 @@ function showToast(title, msg, type = "success") {
 }
 
 function toggleRegion(regionId) {
-    const content = document.getElementById(`content-${regionId}`);
-    const icon = document.getElementById(`icon-${regionId}`);
-    content.classList.toggle('hidden');
-    icon.classList.toggle('rotate-180');
+    document.getElementById(`content-${regionId}`).classList.toggle('hidden');
+    document.getElementById(`icon-${regionId}`).classList.toggle('rotate-180');
 }
 
 function updateFilterBanner() {
@@ -676,68 +789,39 @@ function updateFilterBanner() {
     if (activeCardFilter) texts.push(`${activeCardFilter.label} (${activeCardFilter.val})`);
     
     const banner = document.getElementById('activeFilterBanner');
-    const display = document.getElementById('filterNameDisplay');
-    
     if (texts.length > 0) {
-        display.innerText = texts.join(' | ');
+        document.getElementById('filterNameDisplay').innerText = texts.join(' | ');
         banner.classList.remove('hidden');
-    } else {
-        banner.classList.add('hidden');
-    }
+    } else banner.classList.add('hidden');
 }
 
 function clearAllFilters() {
-    activePersonFilter = null;
-    activeCardFilter = null;
-    document.getElementById('statusFilter').value = "";
-    document.getElementById('globalSearch').value = "";
-    updateFilterBanner();
-    renderTable();
+    activePersonFilter = null; activeCardFilter = null;
+    document.getElementById('statusFilter').value = ""; document.getElementById('globalSearch').value = "";
+    updateFilterBanner(); renderTable();
 }
 
 function togglePersonFilter(personName) {
-    if (activePersonFilter === personName) {
-        activePersonFilter = null;
-    } else {
-        activePersonFilter = personName;
-    }
+    activePersonFilter = activePersonFilter === personName ? null : personName;
     document.getElementById('globalSearch').value = "";
-    updateFilterBanner();
-    renderTable();
+    updateFilterBanner(); renderTable();
 }
 
 function setCardFilter(field, label, val) {
-    if (activeCardFilter && activeCardFilter.field === field && activeCardFilter.val === val) {
-        activeCardFilter = null;
-    } else {
-        activeCardFilter = { field, label, val };
-        document.getElementById('statusFilter').value = ""; 
-    }
-    updateFilterBanner();
-    renderTable();
+    if (activeCardFilter && activeCardFilter.field === field && activeCardFilter.val === val) activeCardFilter = null;
+    else { activeCardFilter = { field, label, val }; document.getElementById('statusFilter').value = ""; }
+    updateFilterBanner(); renderTable();
 }
 
 function toggleDropdown(sn) {
     const el = document.getElementById('pers-' + sn);
-    if (el.classList.contains('hidden')) {
-        el.classList.remove('hidden');
-        el.classList.add('flex');
-        openDropdowns.add(sn);
-    } else {
-        el.classList.add('hidden');
-        el.classList.remove('flex');
-        openDropdowns.delete(sn);
-    }
+    if (el.classList.contains('hidden')) { el.classList.remove('hidden'); el.classList.add('flex'); openDropdowns.add(sn); } 
+    else { el.classList.add('hidden'); el.classList.remove('flex'); openDropdowns.delete(sn); }
 }
 
-function openPersonnelModal() {
-    renderPersonnelList();
-    document.getElementById('personnelModal').classList.remove('hidden');
-}
-
-function closePersonnelModal() {
-    document.getElementById('personnelModal').classList.add('hidden');
-}
+// Personel Modalı
+function openPersonnelModal() { renderPersonnelList(); document.getElementById('personnelModal').classList.remove('hidden'); }
+function closePersonnelModal() { document.getElementById('personnelModal').classList.add('hidden'); }
 
 function addPerson() {
     const role = document.getElementById('newPersonRole').value;
@@ -747,9 +831,7 @@ function addPerson() {
     if (personnel[role].includes(name)) return alert("Bu personel zaten ekli.");
     personnel[role].push(name);
     localStorage.setItem('customPersonnel', JSON.stringify(personnel));
-    nameInput.value = "";
-    renderPersonnelList();
-    renderTable();
+    nameInput.value = ""; renderPersonnelList(); renderTable();
     showToast("Eklendi", `${name} listeye eklendi.`);
 }
 
@@ -757,16 +839,11 @@ function removePerson(role, index) {
     if(confirm("Bu personeli listeden silmek istediğinize emin misiniz?")) {
         personnel[role].splice(index, 1);
         localStorage.setItem('customPersonnel', JSON.stringify(personnel));
-        renderPersonnelList();
-        renderTable();
-        showToast("Silindi", "Personel listeden çıkarıldı.", "info");
+        renderPersonnelList(); renderTable();
     }
 }
 
-const roleNames = { muhendis: "Mühendisler", tekniker: "Teknikerler", kadastro: "Kadastro Üyeleri", fen: "Fen Kontrol", tas: "Tas. Kontrol" };
-
 function renderPersonnelList() {
-    const container = document.getElementById('personnelListContainer');
     let html = "";
     for (const [key, list] of Object.entries(personnel)) {
         html += `<div class="mb-4"><h4 class="font-bold text-xs text-slate-500 mb-2 uppercase border-b border-slate-200 pb-1">${roleNames[key]}</h4><div class="flex flex-wrap gap-2">`;
@@ -775,14 +852,50 @@ function renderPersonnelList() {
         });
         html += `</div></div>`;
     }
-    container.innerHTML = html;
+    document.getElementById('personnelListContainer').innerHTML = html;
+}
+
+// Durum Modalı
+function openDurumModal() { renderDurumList(); document.getElementById('durumModal').classList.remove('hidden'); }
+function closeDurumModal() { document.getElementById('durumModal').classList.add('hidden'); }
+
+function addDurum() {
+    const nameInput = document.getElementById('newDurumName');
+    const name = nameInput.value.trim().toLocaleUpperCase('tr-TR');
+    if (!name) return alert("Lütfen durum adı girin.");
+    if (durumListesi.includes(name)) return alert("Bu durum zaten ekli.");
+    durumListesi.push(name);
+    localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
+    nameInput.value = ""; renderDurumList(); populateDurumFilter(); renderTable();
+    showToast("Eklendi", `Durum eklendi.`);
+}
+
+function removeDurum(index) {
+    if(confirm("Bu durumu silmek istediğinize emin misiniz? (Tablodaki mevcut seçimler silinmez)")) {
+        durumListesi.splice(index, 1);
+        localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
+        renderDurumList(); populateDurumFilter(); renderTable();
+    }
+}
+
+function renderDurumList() {
+    let html = "";
+    durumListesi.forEach((name, idx) => {
+        let colorClass = "text-slate-600 bg-slate-100";
+        if(name.includes("BİTTİ") || name.includes("YAPILDI")) colorClass = "text-emerald-700 bg-emerald-100";
+        else if(name.includes("DEVAM") || name.includes("AŞAMASINDA") || name.includes("HAZIRLANIYOR") || name.includes("DEĞERLENDİRMEDE")) colorClass = "text-amber-700 bg-amber-100";
+        
+        html += `<div class="flex items-center justify-between p-2 bg-white border border-slate-200 rounded-lg shadow-sm">
+            <span class="font-bold text-[11px] ${colorClass} px-2 py-1 rounded">${name}</span>
+            <button onclick="removeDurum(${idx})" class="text-red-400 hover:text-red-600 p-1"><i class="fas fa-trash-alt"></i></button>
+        </div>`;
+    });
+    document.getElementById('durumListContainer').innerHTML = html;
 }
 
 function createSelect(currentValue, list, sn, field, roleLabel) {
     const roleSpan = `<span class="text-[10px] text-slate-500 font-medium ml-1 shrink-0">(${roleLabel})</span>`;
-    if (!isAdmin) {
-        return `<div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 rounded px-1"><span class="font-bold text-slate-700 text-[11px] truncate">${currentValue || '-'}</span> ${roleSpan}</div>`;
-    } 
+    if (!isAdmin) return `<div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 rounded px-1"><span class="font-bold text-slate-700 text-[11px] truncate">${currentValue || '-'}</span> ${roleSpan}</div>`;
     let options = `<option value="">- Atanmadı -</option>` + list.map(name => `<option value="${name}" ${name === currentValue ? 'selected' : ''}>${name}</option>`).join('');
     return `<div class="flex items-center justify-between py-0.5 border-b border-slate-100 last:border-0 hover:bg-white rounded px-1 group"><select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full font-bold text-[11px] outline-none bg-transparent cursor-pointer text-blue-700 group-hover:text-blue-800">${options}</select><div class="flex items-center flex-shrink-0">${currentValue ? `<i class="fas fa-times text-red-400 hover:text-red-600 cursor-pointer mx-1" onclick="updateValue(${sn}, '${field}', '')" title="Personeli Kaldır"></i>` : ''}${roleSpan}</div></div>`;
 }
@@ -790,40 +903,45 @@ function createSelect(currentValue, list, sn, field, roleLabel) {
 function createStatusSelect(val, sn, field) {
     const opts = ["Yapılmadı", "Devam Ediyor", "Yapıldı"];
     val = val || "Yapılmadı";
-    
     let colorClass = "text-slate-600 bg-slate-100";
     if(val === "Devam Ediyor") colorClass = "text-amber-700 bg-amber-100";
     if(val === "Yapıldı") colorClass = "text-emerald-700 bg-emerald-100";
 
-    if (!isAdmin) return `<div class="flex justify-center"><span class="text-[11px] font-bold px-2 py-1 rounded-md ${colorClass} w-full text-center">${val}</span></div>`;
-    
     let options = opts.map(o => `<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
     return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">${options}</select>`;
 }
 
 function createGenelDurumSelect(val, sn, field) {
     val = val || "HERHANGİ BİRŞEY YAPILMADI";
-    
     let colorClass = "text-slate-600 bg-slate-100";
     if(val.includes("BİTTİ") || val.includes("YAPILDI")) colorClass = "text-emerald-700 bg-emerald-100";
     else if(val.includes("DEVAM") || val.includes("AŞAMASINDA") || val.includes("HAZIRLANIYOR") || val.includes("DEĞERLENDİRMEDE")) colorClass = "text-amber-700 bg-amber-100";
 
-    if (!isAdmin) return `<div class="flex justify-center"><span class="text-[10px] font-bold px-2 py-1.5 rounded-md ${colorClass} w-full text-center block leading-tight shadow-sm">${val}</span></div>`;
-    
     let options = durumListesi.map(o => `<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
     return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[10px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors whitespace-normal h-full shadow-sm border-none leading-tight">${options}</select>`;
 }
 
 function createDateInput(val, sn, field) {
     val = val || "";
-    if (!isAdmin) return `<span class="text-[11px] font-medium text-slate-700">${val ? new Date(val).toLocaleDateString('tr-TR') : '-'}</span>`;
     return `<input type="date" value="${val}" onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-medium text-slate-700 bg-transparent outline-none cursor-pointer p-1 rounded hover:bg-slate-100 text-center">`;
 }
 
 function createTextInput(val, sn, field) {
     val = val || "";
-    if (!isAdmin) return `<span class="text-[11px] font-medium text-slate-700 block min-w-[150px] break-words whitespace-normal">${val || '-'}</span>`;
     return `<input type="text" value="${val}" placeholder="Not ekle..." onblur="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-medium text-slate-700 bg-transparent outline-none p-1 rounded focus:bg-white hover:bg-slate-100 min-w-[150px]">`;
+}
+
+function reorderData(fromSn, toSn) {
+    const fromIndex = data.findIndex(d => d.sn === fromSn);
+    const toIndex = data.findIndex(d => d.sn === toSn);
+    const [movedItem] = data.splice(fromIndex, 1);
+    data.splice(toIndex, 0, movedItem);
+    
+    // SN numaralarını baştan düzenle
+    data.forEach((d, i) => d.sn = i + 1);
+    localStorage.setItem('ihaleData', JSON.stringify(data));
+    setUnsavedState(true);
+    renderTable();
 }
 
 function renderTable() {
@@ -841,7 +959,7 @@ function renderTable() {
         if (activeCardFilter) {
             const f = activeCardFilter.field;
             const v = activeCardFilter.val;
-            if (f === 'ucus_tarihi' || f === 'bilgilendirme_tarihi' || f === 'arazi_olcum_tarihi' || f === 'kesin_aski_tarihi') {
+            if (f === 'ucus_tarihi' || f === 'bilgilendirme_tarihi' || f === 'kesin_aski_tarihi') {
                 const isDone = !!item[f];
                 matchesCard = (v === 'Yapıldı' && isDone) || (v === 'Yapılmadı' && !isDone);
             } else {
@@ -849,26 +967,41 @@ function renderTable() {
                 matchesCard = (currentVal === v);
             }
         }
-        
         return matchesSearch && matchesPerson && matchesStatus && matchesCard;
     });
 
     const editableClass = isAdmin ? "editable-cell cursor-text hover:bg-slate-100" : "";
     const editableAttr = isAdmin ? 'contenteditable="true"' : '';
+    const canDrag = isAdmin && !searchText && !statusText && !activePersonFilter && !activeCardFilter;
 
     filtered.forEach(item => {
         const row = document.createElement('tr');
         row.className = `district-row district-${item.ilce} hover:bg-slate-50/80 transition-colors group`;
         
+        if (canDrag) {
+            row.draggable = true;
+            row.addEventListener('dragstart', (e) => {
+                draggedSn = item.sn;
+                e.dataTransfer.effectAllowed = 'move';
+                row.classList.add('opacity-50', 'bg-slate-100');
+            });
+            row.addEventListener('dragover', (e) => { e.preventDefault(); row.classList.add('border-t-2', 'border-blue-500'); });
+            row.addEventListener('dragleave', () => row.classList.remove('border-t-2', 'border-blue-500'));
+            row.addEventListener('drop', (e) => {
+                e.preventDefault();
+                row.classList.remove('border-t-2', 'border-blue-500');
+                if(draggedSn && draggedSn !== item.sn) reorderData(draggedSn, item.sn);
+            });
+            row.addEventListener('dragend', () => { row.classList.remove('opacity-50', 'bg-slate-100'); draggedSn = null; });
+        }
+        
         row.innerHTML = `
-            <td class="p-3 text-slate-400 font-medium text-center">${item.sn}</td>
+            <td class="p-3 text-slate-400 font-medium text-center">${canDrag ? '<i class="fas fa-grip-vertical drag-handle mr-2" title="Sıralamayı değiştirmek için sürükle"></i>' : ''}${item.sn}</td>
             <td class="p-3 font-bold text-slate-700">${item.ilce}</td>
             <td class="p-3 font-semibold text-blue-600">
                 <div class="flex items-center gap-2" title="${item.mahalle}">
                     <span class="truncate max-w-[130px]">${item.mahalle}</span>
-                    <a href="https://maps.google.com/?q=${encodeURIComponent(item.mahalle + ' Mahallesi, ' + item.ilce + ', Mersin')}&t=k" target="_blank" class="text-slate-400 hover:text-red-500 transition-colors" title="Haritada Uydu Görünümü">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
+                    <a href="https://maps.google.com/?q=${encodeURIComponent(item.mahalle + ' Mahallesi, ' + item.ilce + ', Mersin')}&t=k" target="_blank" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-map-marker-alt"></i></a>
                 </div>
             </td>
             
@@ -881,8 +1014,7 @@ function renderTable() {
             
             <td class="p-2 align-top bg-slate-50/40 min-w-[200px]">
                 <button onclick="toggleDropdown(${item.sn})" class="w-full text-left px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 rounded flex justify-between items-center text-[10px] font-bold text-slate-600 transition-colors shadow-sm">
-                    <span class="truncate mr-2"><i class="fas fa-users text-blue-500 mr-1.5"></i> ${item.muhendis || 'Atanmadı'} & ${item.tekniker || 'Atanmadı'}</span>
-                    <i class="fas fa-chevron-down text-slate-400"></i>
+                    <span class="truncate mr-2"><i class="fas fa-users text-blue-500 mr-1.5"></i> ${item.muhendis || 'Atanmadı'} & ${item.tekniker || 'Atanmadı'}</span><i class="fas fa-chevron-down text-slate-400"></i>
                 </button>
                 <div id="pers-${item.sn}" class="${openDropdowns.has(item.sn) ? 'flex' : 'hidden'} flex-col gap-1 mt-2 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
                     ${createSelect(item.muhendis, personnel.muhendis, item.sn, 'muhendis', 'Mühendis')}
@@ -895,7 +1027,6 @@ function renderTable() {
 
             <td class="p-2 border-l border-slate-200 bg-slate-50 min-w-[180px]">${createGenelDurumSelect(item.genel_durum, item.sn, 'genel_durum')}</td>
             <td class="p-2 border-l border-slate-100 text-center bg-white/50">${createStatusSelect(item.altlik_durum, item.sn, 'altlik_durum')}</td>
-            <td class="p-2 text-center bg-white/50">${createDateInput(item.arazi_olcum_tarihi, item.sn, 'arazi_olcum_tarihi')}</td>
             <td class="p-2 text-center bg-white/50">${createDateInput(item.ucus_tarihi, item.sn, 'ucus_tarihi')}</td>
             <td class="p-2 text-center bg-slate-50/50">${createStatusSelect(item.ucus_kiymet_durum, item.sn, 'ucus_kiymet_durum')}</td>
             <td class="p-2 text-center bg-slate-50/50">${createStatusSelect(item.degerlendirme_durum, item.sn, 'degerlendirme_durum')}</td>
@@ -929,13 +1060,8 @@ function calculateStats() {
             map[person].details[dist].count += 1;
         };
 
-        if (region1Districts.includes(dist)) {
-            updateMap(r1Eng, item.muhendis);
-            updateMap(r1Tech, item.tekniker);
-        } else if (region2Districts.includes(dist)) {
-            updateMap(r2Eng, item.muhendis);
-            updateMap(r2Tech, item.tekniker);
-        }
+        if (region1Districts.includes(dist)) { updateMap(r1Eng, item.muhendis); updateMap(r1Tech, item.tekniker); } 
+        else if (region2Districts.includes(dist)) { updateMap(r2Eng, item.muhendis); updateMap(r2Tech, item.tekniker); }
     });
 
     const buildCards = (mapContainer, domId) => {
@@ -985,30 +1111,24 @@ function calculateProgressStats() {
 
     const createCard = (title, icon, s, field) => {
         const getActiveClass = (val) => activeCardFilter && activeCardFilter.field === field && activeCardFilter.val === val ? 'bg-blue-100 ring-1 ring-blue-400' : '';
-        
         return `
         <div class="progress-card shadow-sm border border-slate-200 p-3 w-[220px] flex-shrink-0">
             <div class="flex items-center gap-2 mb-3 border-b border-slate-100 pb-2">
-                <i class="fas ${icon} text-blue-500"></i>
-                <h4 class="font-bold text-[11px] text-slate-700 uppercase whitespace-nowrap">${title}</h4>
+                <i class="fas ${icon} text-blue-500"></i><h4 class="font-bold text-[11px] text-slate-700 uppercase whitespace-nowrap">${title}</h4>
             </div>
             <div onclick="setCardFilter('${field}', '${title}', 'Yapıldı')" class="cursor-pointer flex justify-between items-center text-[11px] mb-1.5 p-1 rounded hover:bg-slate-50 transition ${getActiveClass('Yapıldı')}">
-                <span class="text-emerald-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Yapıldı</span>
-                <span class="font-bold bg-emerald-50 px-2 py-0.5 rounded text-emerald-700">${s.yapildi}</span>
+                <span class="text-emerald-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Yapıldı</span><span class="font-bold bg-emerald-50 px-2 py-0.5 rounded text-emerald-700">${s.yapildi}</span>
             </div>
-            ${s.devam !== undefined ? `
-            <div onclick="setCardFilter('${field}', '${title}', 'Devam Ediyor')" class="cursor-pointer flex justify-between items-center text-[11px] mb-1.5 p-1 rounded hover:bg-slate-50 transition ${getActiveClass('Devam Ediyor')}">
-                <span class="text-amber-500 font-semibold"><i class="fas fa-spinner mr-1"></i>Devam Ediyor</span>
-                <span class="font-bold bg-amber-50 px-2 py-0.5 rounded text-amber-600">${s.devam}</span>
+            ${s.devam !== undefined ? `<div onclick="setCardFilter('${field}', '${title}', 'Devam Ediyor')" class="cursor-pointer flex justify-between items-center text-[11px] mb-1.5 p-1 rounded hover:bg-slate-50 transition ${getActiveClass('Devam Ediyor')}">
+                <span class="text-amber-500 font-semibold"><i class="fas fa-spinner mr-1"></i>Devam Ediyor</span><span class="font-bold bg-amber-50 px-2 py-0.5 rounded text-amber-600">${s.devam}</span>
             </div>` : ''}
             <div onclick="setCardFilter('${field}', '${title}', 'Yapılmadı')" class="cursor-pointer flex justify-between items-center text-[11px] p-1 rounded hover:bg-slate-50 transition ${getActiveClass('Yapılmadı')}">
-                <span class="text-slate-400 font-semibold"><i class="fas fa-minus-circle mr-1"></i>Yapılmadı</span>
-                <span class="font-bold bg-slate-50 px-2 py-0.5 rounded text-slate-500">${s.yapilmadi}</span>
+                <span class="text-slate-400 font-semibold"><i class="fas fa-minus-circle mr-1"></i>Yapılmadı</span><span class="font-bold bg-slate-50 px-2 py-0.5 rounded text-slate-500">${s.yapilmadi}</span>
             </div>
         </div>`;
     };
 
-    const summaryHtml = `
+    document.getElementById('progressSummary').innerHTML = `
         ${createCard(stats.altlik.label, stats.altlik.icon, stats.altlik, stats.altlik.field)}
         ${createCard(stats.ucusTarihi.label, stats.ucusTarihi.icon, stats.ucusTarihi, stats.ucusTarihi.field)}
         ${createCard(stats.ucus.label, stats.ucus.icon, stats.ucus, stats.ucus.field)}
@@ -1021,32 +1141,26 @@ function calculateProgressStats() {
             <div class="text-3xl font-black text-indigo-600">${bitenIsler}<span class="text-sm text-indigo-400 font-normal"> / ${data.length}</span></div>
         </div>
     `;
-    document.getElementById('progressSummary').innerHTML = summaryHtml;
 }
 
 function updateValue(sn, field, newValue) {
-    if (!isAdmin) return;
+    const adminOnlyFields = ['toplam_parsel', 'ido', 'yirmi_iki_a', 'ek_1', 'kadastro_islem', 'parsel', 'muhendis', 'tekniker', 'kadastro', 'fen', 'tas'];
+    if (!isAdmin && adminOnlyFields.includes(field)) return;
+
     const item = data.find(d => d.sn === sn);
     if (item) {
-        if (['toplam_parsel', 'ido', 'yirmi_iki_a', 'ek_1', 'kadastro_islem', 'parsel'].includes(field)) {
+        if (adminOnlyFields.includes(field) && !['muhendis', 'tekniker', 'kadastro', 'fen', 'tas'].includes(field)) {
             item[field] = parseInt(newValue.toString().replace(/[^0-9]/g, '')) || 0;
-        } else {
-            item[field] = newValue.trim();
-        }
+        } else item[field] = newValue.trim();
         
         localStorage.setItem('ihaleData', JSON.stringify(data));
         setUnsavedState(true);
         
-        if (!['toplam_parsel', 'ido', 'yirmi_iki_a', 'ek_1', 'kadastro_islem', 'parsel'].includes(field)) {
-            if(field === 'notlar' || field.includes('durum') || field.includes('tarihi')){
-                if(field !== 'notlar') renderTable();
-            } else {
-                renderTable();
-            }
+        if (!adminOnlyFields.includes(field)) {
+            if(field !== 'notlar') renderTable();
         } else {
             calculateStats();
         }
-
         calculateProgressStats();
     }
 }
@@ -1059,10 +1173,10 @@ function resetData() {
 }
 
 function exportToExcel() {
-    let csv = "S.N;İlçe;Mahalle;Toplam Parsel;İDÖ;22-A;EK-1;Kadastro İşlem;İhale Parseli;Mühendis;Tekniker;Kadastro Üyesi;Fen Kontrol;Tas. Kontrol;Genel Durum;Altlık Durum;Arazi Yersel Ölçüm Tarihi;Uçuş Tarihi;Uçuş Kıymetlendirme Durum;Değerlendirme Durum;Bilgilendirme İlanı Tarihi;Komisyon Durum;Kesin Askı Tarihi;Not\n";
+    let csv = "S.N;İlçe;Mahalle;Toplam Parsel;İDÖ;22-A;EK-1;Kadastro İşlem;İhale Parseli;Mühendis;Tekniker;Kadastro Üyesi;Fen Kontrol;Tas. Kontrol;Genel Durum;Altlık Durum;Uçuş Tarihi;Uçuş Kıymetlendirme Durum;Değerlendirme Durum;Bilgilendirme İlanı Tarihi;Komisyon Durum;Kesin Askı Tarihi;Not\n";
     data.forEach(r => {
         const trDate = (val) => val ? new Date(val).toLocaleDateString('tr-TR') : '';
-        csv += `${r.sn};${r.ilce};${r.mahalle};${r.toplam_parsel};${r.ido};${r.yirmi_iki_a};${r.ek_1};${r.kadastro_islem};${r.parsel};${r.muhendis};${r.tekniker};${r.kadastro};${r.fen};${r.tas};${r.genel_durum || 'HERHANGİ BİRŞEY YAPILMADI'};${r.altlik_durum || 'Yapılmadı'};${trDate(r.arazi_olcum_tarihi)};${trDate(r.ucus_tarihi)};${r.ucus_kiymet_durum || 'Yapılmadı'};${r.degerlendirme_durum || 'Yapılmadı'};${trDate(r.bilgilendirme_tarihi)};${r.komisyon_durum || 'Yapılmadı'};${trDate(r.kesin_aski_tarihi)};${r.notlar || ''}\n`;
+        csv += `${r.sn};${r.ilce};${r.mahalle};${r.toplam_parsel};${r.ido};${r.yirmi_iki_a};${r.ek_1};${r.kadastro_islem};${r.parsel};${r.muhendis};${r.tekniker};${r.kadastro};${r.fen};${r.tas};${r.genel_durum || 'HERHANGİ BİRŞEY YAPILMADI'};${r.altlik_durum || 'Yapılmadı'};${trDate(r.ucus_tarihi)};${r.ucus_kiymet_durum || 'Yapılmadı'};${r.degerlendirme_durum || 'Yapılmadı'};${trDate(r.bilgilendirme_tarihi)};${r.komisyon_durum || 'Yapılmadı'};${trDate(r.kesin_aski_tarihi)};${r.notlar || ''}\n`;
     });
     const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
@@ -1072,7 +1186,7 @@ function exportToExcel() {
     a.click();
 }
 
-document.getElementById('globalSearch').addEventListener('input', (e) => renderTable());
+document.getElementById('globalSearch').addEventListener('input', () => renderTable());
 
 window.onload = () => {
     const isLogged = localStorage.getItem('isLoggedIn');
