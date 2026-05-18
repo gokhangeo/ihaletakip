@@ -380,25 +380,6 @@
   },
   {
     "sn": 23,
-    "ilce": "AYDINCIK",
-    "mahalle": "HACIBAHATTİN",
-    "toplam_parsel": 1354,
-    "ido": 41,
-    "yirmi_iki_a": 1313,
-    "ek_1": 0,
-    "kadastro_islem": 0,
-    "parsel": 1354,
-    "muhendis": "VOLKAN İZCİ",
-    "tekniker": "SERDAR ŞAHİN",
-    "kadastro": "MEHMET AKDENİZ",
-    "fen": "MÜMİN AKDOĞAN",
-    "tas": "MUSTAFA BICAK",
-    "ucus_kiymet_durum": "Yapıldı",
-    "ucus_tarihi": "2026-05-01",
-    "genel_durum": "YER TESLİMİ YAPILDI"
-  },
-  {
-    "sn": 24,
     "ilce": "BOZYAZI",
     "mahalle": "BAHÇEKOYAĞI",
     "toplam_parsel": 602,
@@ -415,7 +396,7 @@
     "genel_durum": "YER TESLİMİ YAPILDI"
   },
   {
-    "sn": 25,
+    "sn": 24,
     "ilce": "BOZYAZI",
     "mahalle": "BEYRELİ",
     "toplam_parsel": 933,
@@ -432,7 +413,7 @@
     "genel_durum": "YER TESLİMİ YAPILDI"
   },
   {
-    "sn": 26,
+    "sn": 25,
     "ilce": "BOZYAZI",
     "mahalle": "ELMAKUZU",
     "toplam_parsel": 2539,
@@ -449,7 +430,7 @@
     "genel_durum": "YER TESLİMİ YAPILDI"
   },
   {
-    "sn": 27,
+    "sn": 26,
     "ilce": "BOZYAZI",
     "mahalle": "GÖZCE",
     "toplam_parsel": 1198,
@@ -466,7 +447,7 @@
     "genel_durum": "YER TESLİMİ YAPILDI"
   },
   {
-    "sn": 28,
+    "sn": 27,
     "ilce": "BOZYAZI",
     "mahalle": "GÖZSÜZCE",
     "toplam_parsel": 376,
@@ -483,7 +464,7 @@
     "genel_durum": "YER TESLİMİ YAPILDI"
   },
   {
-    "sn": 29,
+    "sn": 28,
     "ilce": "BOZYAZI",
     "mahalle": "KÖMÜRLÜ",
     "toplam_parsel": 488,
@@ -500,7 +481,7 @@
     "genel_durum": "YER TESLİMİ YAPILDI"
   },
   {
-    "sn": 30,
+    "sn": 29,
     "ilce": "BOZYAZI",
     "mahalle": "LENGER",
     "toplam_parsel": 879,
@@ -517,7 +498,7 @@
     "genel_durum": "YER TESLİMİ YAPILDI"
   },
   {
-    "sn": 31,
+    "sn": 30,
     "ilce": "BOZYAZI",
     "mahalle": "KIZILCA",
     "toplam_parsel": 3675,
@@ -534,7 +515,7 @@
     "genel_durum": "YER TESLİMİ YAPILDI"
   },
   {
-    "sn": 32,
+    "sn": 31,
     "ilce": "BOZYAZI",
     "mahalle": "TEKEDÜZÜ",
     "toplam_parsel": 99,
@@ -551,7 +532,7 @@
     "genel_durum": "YER TESLİMİ YAPILDI"
   },
   {
-    "sn": 33,
+    "sn": 32,
     "ilce": "BOZYAZI",
     "mahalle": "DEREKÖY",
     "toplam_parsel": 2273,
@@ -565,6 +546,25 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
+    "genel_durum": "YER TESLİMİ YAPILDI"
+  },
+  {
+    "sn": 33,
+    "ilce": "AYDINCIK",
+    "mahalle": "HACIBAHATTİN",
+    "toplam_parsel": 1354,
+    "ido": 41,
+    "yirmi_iki_a": 1313,
+    "ek_1": 0,
+    "kadastro_islem": 0,
+    "parsel": 1354,
+    "muhendis": "VOLKAN İZCİ",
+    "tekniker": "SERDAR ŞAHİN",
+    "kadastro": "MEHMET AKDENİZ",
+    "fen": "MÜMİN AKDOĞAN",
+    "tas": "MUSTAFA BICAK",
+    "ucus_kiymet_durum": "Yapıldı",
+    "ucus_tarihi": "2026-05-01",
     "genel_durum": "YER TESLİMİ YAPILDI"
   },
   {
