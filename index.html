@@ -152,9 +152,6 @@
                     </button>
                 </div>
                 
-                <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-3 py-2 rounded-xl hover:bg-emerald-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
-                    <i class="fas fa-file-excel"></i> İndir
-                </button>
                 <button onclick="logout()" class="bg-red-50 text-red-600 px-3 py-2 rounded-xl hover:bg-red-100 transition flex items-center gap-1.5 text-sm font-bold whitespace-nowrap">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
@@ -220,6 +217,12 @@
         </div>
 
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-sm text-slate-700"><i class="fas fa-list text-blue-500 mr-2"></i>İhale ve Durum Listesi</h3>
+                <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
+                    <i class="fas fa-file-excel"></i> Excel İndir
+                </button>
+            </div>
             <div class="table-container">
                 <table class="w-full text-xs text-left border-collapse" id="mainTable">
                     <thead class="sticky-header bg-slate-900 text-white shadow-md">
