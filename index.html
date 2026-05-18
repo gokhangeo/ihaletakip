@@ -43,12 +43,22 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        @keyframes softBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes softBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
         .animate-soft-blink { animation: softBlink 1.5s ease-in-out infinite; }
         
         .drag-handle { cursor: grab; color: #cbd5e1; transition: color 0.2s; }
         .drag-handle:hover { color: #64748b; }
         .drag-handle:active { cursor: grabbing; }
+
+        /* Yazdırma Tablosu İçin Özel CSS (PDF Oluştururken Kullanılır) */
+        .print-table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; font-family: sans-serif; table-layout: auto; }
+        .print-table th { background-color: #0f172a; color: white; padding: 12px 6px; border: 1px solid #64748b; text-align: center; font-weight: bold; }
+        .print-table td { padding: 10px 6px; border: 1px solid #cbd5e1; vertical-align: middle; text-align: center; }
+        .print-badge { padding: 6px 6px; border-radius: 6px; font-weight: bold; display: inline-block; width: 100%; text-align: center; }
+        .print-badge.success { background-color: #d1fae5; color: #047857; }
+        .print-badge.warning { background-color: #fef3c7; color: #b45309; }
+        .print-badge.neutral { background-color: #f1f5f9; color: #475569; }
+        .print-badge.date-filled { background-color: #c7d2fe; color: #3730a3; }
     </style>
 </head>
 <body class="text-slate-800 h-screen w-screen overflow-hidden">
@@ -175,6 +185,7 @@
             </button>
         </div>
 
+        <!-- Bölge İstatistikleri -->
         <div class="mb-4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <button onclick="toggleRegion('region1')" class="w-full px-6 py-4 bg-slate-50 flex justify-between items-center hover:bg-slate-100 transition-colors">
                 <div class="flex items-center gap-3">
@@ -227,7 +238,15 @@
         <!-- Ana Tablo Bölümü -->
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col">
             <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-sm text-slate-700"><i class="fas fa-list text-blue-500 mr-2"></i>İhale ve Durum Listesi</h3>
+                <div class="flex items-center gap-4">
+                    <h3 class="font-bold text-sm text-slate-700"><i class="fas fa-list text-blue-500 mr-2"></i>İhale ve Durum Listesi</h3>
+                    
+                    <!-- DİKKAT ÇEKİCİ KAYDET BUTONU (Herkes İçin) -->
+                    <button id="tableSaveBtn" onclick="saveToGithub()" class="hidden bg-red-600 text-white px-4 py-1.5 rounded-lg hover:bg-red-700 transition items-center gap-2 text-xs font-bold shadow-md border border-red-500 animate-soft-blink">
+                        <i class="fas fa-cloud-upload-alt"></i> Değişiklikleri Kaydet
+                    </button>
+                </div>
+                
                 <div class="flex gap-2">
                     <button onclick="openPdfModal()" class="bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
                         <i class="fas fa-file-pdf"></i> PDF İndir
@@ -501,16 +520,29 @@ document.getElementById('titleContainer').addEventListener('click', () => {
 
 function setUnsavedState(state) {
     hasUnsavedChanges = state;
-    const btn = document.getElementById('saveBtn');
+    const topBtn = document.getElementById('saveBtn');
+    const tableBtn = document.getElementById('tableSaveBtn');
     const alertBox = document.getElementById('unsavedAlert');
     
     if (state) {
-        btn.classList.add('bg-red-600', 'animate-soft-blink');
-        btn.classList.remove('bg-indigo-600');
+        if(topBtn) {
+            topBtn.classList.add('bg-red-600', 'animate-soft-blink');
+            topBtn.classList.remove('bg-indigo-600');
+        }
+        if(tableBtn) {
+            tableBtn.classList.remove('hidden');
+            tableBtn.classList.add('flex');
+        }
         alertBox.classList.remove('hidden');
     } else {
-        btn.classList.remove('bg-red-600', 'animate-soft-blink');
-        btn.classList.add('bg-indigo-600');
+        if(topBtn) {
+            topBtn.classList.remove('bg-red-600', 'animate-soft-blink');
+            topBtn.classList.add('bg-indigo-600');
+        }
+        if(tableBtn) {
+            tableBtn.classList.add('hidden');
+            tableBtn.classList.remove('flex');
+        }
         alertBox.classList.add('hidden');
     }
 }
@@ -541,7 +573,6 @@ async function fetchFromGithub(isAuto = false) {
 }
 
 async function saveToGithub(isAuto = false) {
-    if (!isAdmin && !isAuto) return;
     try {
         if(!isAuto) showToast("Kaydediliyor...", "GitHub'a gönderiliyor.", "info");
         const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
@@ -589,7 +620,6 @@ function updateSplitLabels() {
 }
 
 function createPrintTable(items) {
-    // Sabit genişlikli tablo tasarımı. Bu sayede sayfa 1 ve sayfa 2 birebir aynı hizada çıkar.
     let html = '<table style="width: 2600px; border-collapse: collapse; font-family: sans-serif; font-size: 13px; background: white; table-layout: fixed;"><thead><tr>';
     
     const cols = [
@@ -647,13 +677,11 @@ async function exportToPDF(exportType) {
     const splitSn = parseInt(document.getElementById('pdfSplitRow').value) || 32;
     closePdfModal();
     
-    // İşlem uzun süreceği için tam ekran overlay çıkartalım ki sistem dondu sanılmasın.
     const overlay = document.createElement('div');
     overlay.className = "fixed inset-0 bg-white z-[99998] flex flex-col items-center justify-center gap-4";
     overlay.innerHTML = '<i class="fas fa-spinner fa-spin text-6xl text-blue-600"></i><span class="text-xl font-bold text-slate-700">Yüksek Kaliteli PDF Oluşturuluyor... Lütfen Bekleyin.</span>';
     document.body.appendChild(overlay);
 
-    // html2canvas'ın kırpma yapmasını engellemek için scroll'u en başa çekiyoruz.
     const origScrollX = window.scrollX;
     const origScrollY = window.scrollY;
     window.scrollTo(0, 0);
@@ -664,7 +692,7 @@ async function exportToPDF(exportType) {
     wrapper.style.left = '0';
     wrapper.style.width = '2600px'; 
     wrapper.style.backgroundColor = 'white';
-    wrapper.style.zIndex = '-9999'; // Kullanıcı görmez, arkada kalır
+    wrapper.style.zIndex = '-9999'; 
     document.body.appendChild(wrapper);
 
     data.forEach((d, i) => d.sn = i + 1); 
@@ -695,7 +723,7 @@ async function exportToPDF(exportType) {
             if (i > 0) pdf.addPage(); 
 
             wrapper.innerHTML = createPrintTable(chunks[i]);
-            await new Promise(r => setTimeout(r, 600)); // DOM'un kendini tamamen çizmesi için süre
+            await new Promise(r => setTimeout(r, 600)); 
             
             const canvas = await html2canvas(wrapper, { 
                 scale: 2, 
@@ -981,6 +1009,7 @@ function createSelect(currentValue, list, sn, field, roleLabel) {
     return `<div class="flex items-center justify-between py-0.5 border-b border-slate-100 last:border-0 hover:bg-white rounded px-1 group"><select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full font-bold text-[11px] outline-none bg-transparent cursor-pointer text-blue-700 group-hover:text-blue-800">${options}</select><div class="flex items-center flex-shrink-0">${currentValue ? `<i class="fas fa-times text-red-400 hover:text-red-600 cursor-pointer mx-1" onclick="updateValue(${sn}, '${field}', '')" title="Personeli Kaldır"></i>` : ''}${roleSpan}</div></div>`;
 }
 
+// Artık normal kullanıcılar da süreci düzenleyebildiği için isAdmin kontrolünü kaldırdık.
 function createStatusSelect(val, sn, field) {
     const opts = ["Yapılmadı", "Devam Ediyor", "Yapıldı"];
     val = val || "Yapılmadı";
@@ -992,6 +1021,7 @@ function createStatusSelect(val, sn, field) {
     return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">${options}</select>`;
 }
 
+// Artık normal kullanıcılar da süreci düzenleyebildiği için isAdmin kontrolünü kaldırdık.
 function createGenelDurumSelect(val, sn, field) {
     val = val || "HERHANGİ BİRŞEY YAPILMADI";
     let colorClass = "text-slate-600 bg-slate-100";
@@ -1002,13 +1032,14 @@ function createGenelDurumSelect(val, sn, field) {
     return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[10px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors whitespace-normal h-full shadow-sm border-none leading-tight">${options}</select>`;
 }
 
+// Artık normal kullanıcılar da süreci düzenleyebildiği için isAdmin kontrolünü kaldırdık.
 function createDateInput(val, sn, field) {
     val = val || "";
     let colorClass = val ? "text-indigo-800 bg-indigo-200" : "text-slate-600 bg-slate-50";
-    if (!isAdmin) return `<div class="flex justify-center"><span class="text-[11px] font-bold px-2 py-1.5 rounded-md ${colorClass} w-full text-center shadow-sm block">${val ? new Date(val).toLocaleDateString('tr-TR') : '-'}</span></div>`;
     return `<input type="date" value="${val}" onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">`;
 }
 
+// Artık normal kullanıcılar da süreci düzenleyebildiği için isAdmin kontrolünü kaldırdık.
 function createTextInput(val, sn, field) {
     val = val || "";
     return `<input type="text" value="${val}" placeholder="Not ekle..." onblur="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-medium text-slate-700 bg-transparent outline-none p-1 rounded focus:bg-white hover:bg-slate-100 min-w-[150px]">`;
@@ -1227,6 +1258,7 @@ function calculateProgressStats() {
 
 function updateValue(sn, field, newValue) {
     const adminOnlyFields = ['toplam_parsel', 'ido', 'yirmi_iki_a', 'ek_1', 'kadastro_islem', 'parsel', 'muhendis', 'tekniker', 'kadastro', 'fen', 'tas'];
+    // Eğer admin değilse ve yetkisi olmayan bir alana dokunuyorsa hiçbir işlem yapma
     if (!isAdmin && adminOnlyFields.includes(field)) return;
 
     const item = data.find(d => d.sn === sn);
