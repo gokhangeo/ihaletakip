@@ -324,7 +324,7 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ YAPILIYOR",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 20,
@@ -342,7 +342,7 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ YAPILIYOR",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 21,
@@ -549,7 +549,8 @@
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_tarihi": "2026-06-08"
+    "ucus_tarihi": "2026-06-08",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 33,
