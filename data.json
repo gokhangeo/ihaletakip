@@ -609,7 +609,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_tarihi": "2026-06-01"
+    "ucus_tarihi": "2026-06-01",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 36,
@@ -627,7 +628,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 37,
@@ -645,7 +647,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 38,
@@ -663,7 +666,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 39,
@@ -681,7 +685,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 40,
@@ -716,7 +721,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 42,
@@ -734,7 +740,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 43,
@@ -752,7 +759,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 44,
@@ -786,7 +794,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 46,
@@ -838,7 +847,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 49,
@@ -925,7 +935,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 54,
