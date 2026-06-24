@@ -572,9 +572,10 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapıldı",
     "ucus_tarihi": "2026-05-01",
-    "genel_durum": "ALTLIK HAZIRLANIYOR"
+    "genel_durum": "ALTLIK HAZIRLANIYOR",
+    "altlik_durum": "Devam Ediyor"
   },
   {
     "sn": 34,
@@ -629,7 +630,8 @@
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "altlik_durum": "Devam Ediyor"
   },
   {
     "sn": 37,
@@ -796,7 +798,7 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR",
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
