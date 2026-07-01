@@ -32,7 +32,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 3,
@@ -49,7 +50,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ YAPILIYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 4,
@@ -117,7 +119,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MAHMUT GÖK",
     "tas": "E. N. ÖNAL GÜLSOY",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 8,
@@ -203,7 +206,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "altlik_durum": "Devam Ediyor"
   },
   {
     "sn": 13,
@@ -256,7 +260,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "altlik_durum": "Devam Ediyor"
   },
   {
     "sn": 16,
@@ -273,7 +278,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 17,
@@ -290,7 +296,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ YAPILIYOR"
+    "genel_durum": "UÇUŞ YAPILIYOR",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 18,
@@ -307,7 +314,7 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR",
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı"
   },
   {
@@ -362,7 +369,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ BEKLİYOR",
+    "altlik_durum": "Yapılmadı"
   },
   {
     "sn": 22,
@@ -431,7 +439,8 @@
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_tarihi": "2026-06-07"
+    "ucus_tarihi": "2026-06-07",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 26,
@@ -535,7 +544,7 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "HERHANGİ BİRŞEY YAPILMADI",
+    "genel_durum": "DEĞERLENDİRMEDE",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor"
   },
