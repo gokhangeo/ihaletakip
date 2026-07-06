@@ -33,7 +33,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_tarihi": "2026-06-20"
   },
   {
     "sn": 3,
@@ -120,7 +121,8 @@
     "fen": "MAHMUT GÖK",
     "tas": "E. N. ÖNAL GÜLSOY",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_tarihi": "2026-06-19"
   },
   {
     "sn": 8,
@@ -172,7 +174,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_tarihi": "2026-06-15"
   },
   {
     "sn": 11,
@@ -207,7 +210,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-06-25"
   },
   {
     "sn": 13,
@@ -261,7 +265,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-06-25"
   },
   {
     "sn": 16,
@@ -279,7 +284,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_tarihi": "2026-06-15"
   },
   {
     "sn": 17,
@@ -315,7 +321,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_tarihi": "2026-06-15"
   },
   {
     "sn": 19,
@@ -439,7 +446,7 @@
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_tarihi": "2026-06-07",
+    "ucus_tarihi": "2026-06-05",
     "altlik_durum": "Yapıldı"
   },
   {
