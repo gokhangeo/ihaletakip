@@ -576,7 +576,9 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-06-08",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "degerlendirme_durum": "Devam Ediyor",
+    "notlar": "BARIŞ değerlendirme devam ediyor."
   },
   {
     "sn": 33,
