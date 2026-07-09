@@ -1,379 +1,190 @@
 <!DOCTYPE html>
-
 <html lang="tr">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
     <title>İhale ve Personel Yönetim Paneli</title>
-
     
-
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
     <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
-
-
     <style>
-
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-
         .table-container { max-height: 60vh; overflow-y: auto; overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
-
         .sticky-header { position: sticky; top: 0; z-index: 20; }
-
         .district-row { border-left: 4px solid transparent; transition: all 0.2s; background: white; }
-
         .editable-cell:focus { outline: 2px solid #3b82f6; background-color: #fff; border-radius: 4px; }
-
         select, input[type="date"], input[type="text"] { background: transparent; border: none; width: 100%; }
-
         select:focus, input[type="date"]:focus, input[type="text"]:focus { outline: none; background: #fff; box-shadow: 0 0 0 2px #3b82f6; border-radius: 4px;}
-
         .stat-card { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; transition: all 0.2s; cursor: pointer; }
-
         .stat-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-
         .stat-card.active-filter { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f1; background-color: #fefce8; }
-
         .progress-card { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; padding: 1rem; min-w-[200px]; flex-shrink: 0; }
-
         #toast { transition: opacity 0.3s, transform 0.3s; transform: translateY(100%); opacity: 0; }
-
         #toast.show { transform: translateY(0); opacity: 1; }
-
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-
         ::-webkit-scrollbar-track { background: #f1f1f1; }
-
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
         .animate-soft-blink { animation: softBlink 1.5s ease-in-out infinite; }
-
         @keyframes softBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-
     </style>
-
 </head>
-
 <body class="text-slate-800 h-screen w-screen overflow-hidden">
 
-
-
 <div id="loginScreen" class="fixed inset-0 bg-slate-100 z-[100] flex items-center justify-center p-4">
-
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 flex flex-col gap-6 relative border border-slate-200">
-
         <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight text-center">İhale Takip Sistemi</h2>
-
         <div class="flex flex-col gap-5">
-
             <div><label class="block text-xs font-bold text-slate-500 mb-1">Kullanıcı Adı</label><input type="text" id="loginUsername" class="pl-4 pr-4 py-3 w-full border border-slate-200 rounded-xl bg-slate-50"></div>
-
             <div><label class="block text-xs font-bold text-slate-500 mb-1">Şifre</label><input type="password" id="loginPassword" class="pl-4 pr-4 py-3 w-full border border-slate-200 rounded-xl bg-slate-50"></div>
-
             <button onclick="handleLogin()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl">Sisteme Gir</button>
-
         </div>
-
     </div>
-
 </div>
 
-
-
 <div id="appContainer" class="hidden h-full overflow-y-auto p-2 md:p-6">
-
     <div class="max-w-[1600px] mx-auto">
-
         <header class="mb-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200">
-
             <h1 class="text-2xl font-extrabold text-slate-900">İhale Takip Sistemi <span id="adminBadge" class="hidden text-[10px] bg-red-600 text-white px-2 py-1 rounded-md">Admin</span></h1>
-
             <div class="flex gap-2">
-
                 <input type="text" id="globalSearch" placeholder="İlçe veya Mahalle..." class="border border-slate-200 rounded-xl px-4 py-2 text-sm">
-
                 <select id="statusFilter" onchange="renderTable()" class="border border-slate-200 rounded-xl px-4 py-2 text-sm"></select>
-
                 <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-sm font-bold">Çıkış</button>
-
             </div>
-
         </header>
-
-
 
         <div id="progressSummary" class="flex gap-4 overflow-x-auto pb-4 mb-4"></div>
 
-
-
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-
             <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-
                 <div class="flex gap-2">
-
                     <button onclick="openReportModal()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 transition"><i class="fas fa-file-invoice mr-2"></i>Rapor Oluştur</button>
-
                     <button onclick="openPdfModal()" class="bg-red-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 transition"><i class="fas fa-file-pdf mr-2"></i>Tablo PDF</button>
-
                 </div>
-
             </div>
-
             <div id="tableWrapper" class="table-container">
-
                 <table class="w-full text-xs text-left" id="mainTable">
-
                     <thead class="sticky-header bg-slate-900 text-white">
-
                         <tr>
-
                             <th class="p-3">S.N.</th><th class="p-3">İlçe</th><th class="p-3">Mahalle</th><th class="p-3">İhale Parsel</th>
-
                             <th class="p-3">Genel Durum</th><th class="p-3">Altlık Durum</th><th class="p-3">Uçuş Tar.</th>
-
                             <th class="p-3">Uçuş Kıymet.</th><th class="p-3">Değerlendirme</th><th class="p-3">Bilgilendirme</th>
-
                             <th class="p-3">Komisyon</th><th class="p-3">Kesin Askı</th>
-
                         </tr>
-
                     </thead>
-
                     <tbody id="tableBody"></tbody>
-
                 </table>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
-
 
 <!-- Rapor Modalı -->
-
 <div id="reportModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
-
         <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-
             <h3 class="font-bold text-lg">Bilgi Notu</h3>
-
             <div class="flex gap-2">
-
                 <button onclick="exportReportToPDF()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-bold">PDF İndir</button>
-
                 <button onclick="exportReportToWord()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold">Word İndir</button>
-
                 <button onclick="closeReportModal()" class="text-slate-500"><i class="fas fa-times text-xl"></i></button>
-
             </div>
-
         </div>
-
         <div class="p-6 overflow-y-auto flex-1 bg-slate-50" id="reportContentContainer"></div>
-
     </div>
-
 </div>
-
-
 
 <div id="pdfModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4"><div class="bg-white rounded-2xl p-6 w-96 text-center"><h3 class="font-bold mb-4">PDF Ayarları</h3><input type="number" id="pdfSplitRow" value="32" class="border w-full p-2 mb-4 rounded"><button onclick="exportToPDF('all')" class="bg-slate-900 text-white w-full py-2 rounded-lg font-bold">Tümünü İndir</button><button onclick="closePdfModal()" class="mt-2 text-slate-500">İptal</button></div></div>
 
-
-
 <script>
-
 let data = JSON.parse(localStorage.getItem('ihaleData')) || [];
-
 let currentFilteredData = [];
-
 let hasUnsavedChanges = false;
-
-
 
 window.addEventListener('beforeunload', (e) => { if(hasUnsavedChanges) { e.preventDefault(); e.returnValue = ''; } });
 
-
-
 function renderTable() {
-
     const tableBody = document.getElementById('tableBody');
-
     tableBody.innerHTML = "";
-
     currentFilteredData = data.filter(item => {
-
         const searchText = document.getElementById('globalSearch').value.toLowerCase();
-
         return item.ilce.toLowerCase().includes(searchText) || item.mahalle.toLowerCase().includes(searchText);
-
     });
-
-
 
     currentFilteredData.forEach(item => {
-
         const row = document.createElement('tr');
-
         row.className = "border-b hover:bg-slate-50";
-
         row.innerHTML = `
-
             <td class="p-3">${item.sn}</td>
-
             <td class="p-3 font-bold">${item.ilce}</td>
-
             <td class="p-3">${item.mahalle}</td>
-
             <td class="p-3">${item.parsel || 0}</td>
-
             <td class="p-3">${item.genel_durum || '-'}</td>
-
             <td class="p-3">${item.altlik_durum || '-'}</td>
-
             <td class="p-3">${item.ucus_tarihi || '-'}</td>
-
             <td class="p-3">${item.ucus_kiymet_durum || '-'}</td>
-
             <td class="p-3">${item.degerlendirme_durum || '-'}</td>
-
             <td class="p-3">${item.bilgilendirme_tarihi || '-'}</td>
-
             <td class="p-3">${item.komisyon_durum || '-'}</td>
-
             <td class="p-3">${item.kesin_aski_tarihi || '-'}</td>
-
         `;
-
         tableBody.appendChild(row);
-
     });
-
 }
-
-
 
 function generateDynamicReport() {
-
     const stats = {
-
         bilgilendirme: [], komisyon: [], kesinAski: [], altlikYapilanlar: [],
-
         ucusYapilanlar: [], ucusKymetBekleyen: [], degerBiten: [], degerDevam: [], digerleri: {}
-
     };
 
-
-
     currentFilteredData.forEach(d => {
-
         const name = `${d.ilce}-${d.mahalle}`;
-
         if(d.altlik_durum === "Yapıldı") stats.altlikYapilanlar.push(name);
-
         if(d.ucus_tarihi) stats.ucusYapilanlar.push(name);
-
         if(d.ucus_kiymet_durum === "Devam Ediyor") stats.ucusKymetBekleyen.push(name);
-
         if(d.degerlendirme_durum === "Yapıldı") stats.degerBiten.push(name);
-
         else if(d.degerlendirme_durum === "Devam Ediyor") stats.degerDevam.push(name);
-
         else if(d.bilgilendirme_tarihi) stats.bilgilendirme.push(name);
-
         else if(d.komisyon_durum === "Yapıldı") stats.komisyon.push(name);
-
         else if(d.kesin_aski_tarihi) stats.kesinAski.push(name);
-
         else {
-
             let desc = d.genel_durum || "Çalışma Bekliyor";
-
             if(!stats.digerleri[desc]) stats.digerleri[desc] = [];
-
             stats.digerleri[desc].push(name);
-
         }
-
     });
 
-
-
     const html = `
-
         <h1 class="text-xl font-black text-center mb-6">MERSİN İLİ KADASTRO GÜNCELLEME ÇALIŞMALARI (MRS-ANM II GÜNCELLEME İŞİ)</h1>
-
         <div class="grid grid-cols-2 gap-4 mb-6">
-
             <div class="bg-white p-4 rounded-xl border"><strong>Altlık Yapılanlar:</strong> ${stats.altlikYapilanlar.length}</div>
-
             <div class="bg-white p-4 rounded-xl border"><strong>Uçuşu Yapılanlar:</strong> ${stats.ucusYapilanlar.length}</div>
-
             <div class="bg-white p-4 rounded-xl border"><strong>Uçuş Kıym. Bekleyen:</strong> ${stats.ucusKymetBekleyen.length}</div>
-
             <div class="bg-white p-4 rounded-xl border"><strong>Değerlendirme Biten:</strong> ${stats.degerBiten.length}</div>
-
         </div>
-
         <div class="bg-white p-4 rounded-xl border">
-
             <h4 class="font-bold mb-2">Diğer Aşamadakiler:</h4>
-
             ${Object.keys(stats.digerleri).map(k => `<div class="mb-2"><strong>${k}:</strong> ${stats.digerleri[k].join(', ')}</div>`).join('')}
-
         </div>
-
     `;
-
     document.getElementById('reportContentContainer').innerHTML = html;
-
 }
 
-
-
 function openReportModal() { generateDynamicReport(); document.getElementById('reportModal').classList.remove('hidden'); }
-
 function closeReportModal() { document.getElementById('reportModal').classList.add('hidden'); }
-
 function openPdfModal() { document.getElementById('pdfModal').classList.remove('hidden'); }
-
 function closePdfModal() { document.getElementById('pdfModal').classList.add('hidden'); }
-
 function handleLogin() { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('appContainer').classList.remove('hidden'); renderTable(); }
-
 function logout() { location.reload(); }
 
-
-
 window.onload = () => renderTable();
-
 </script>
-
 </body>
-
 </html>
