@@ -53,7 +53,8 @@
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 4,
@@ -343,7 +344,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ YAPILIYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 20,
