@@ -35,7 +35,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-20",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 3,
@@ -54,7 +55,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 4,
@@ -124,7 +126,8 @@
     "tas": "E. N. ÖNAL GÜLSOY",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_tarihi": "2026-06-19"
+    "ucus_tarihi": "2026-06-19",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 8,
@@ -177,7 +180,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_tarihi": "2026-06-15"
+    "ucus_tarihi": "2026-06-15",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 11,
@@ -213,7 +217,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-06-25"
+    "ucus_tarihi": "2026-06-25",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 13,
@@ -268,7 +273,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-06-25"
+    "ucus_tarihi": "2026-06-25",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 16,
@@ -287,7 +293,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_tarihi": "2026-06-15"
+    "ucus_tarihi": "2026-06-15",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 17,
@@ -306,7 +313,7 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ YAPILIYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapılmadı",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
@@ -326,7 +333,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_tarihi": "2026-06-15"
+    "ucus_tarihi": "2026-06-15",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 19,
@@ -452,7 +460,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-06-05",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 26,
@@ -541,7 +550,8 @@
     "ucus_tarihi": "2026-06-07",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "notlar": "Mustafa Baysal değerlendirme devam ediyor"
+    "notlar": "Mustafa Baysal değerlendirme devam ediyor",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 31,
@@ -582,7 +592,8 @@
     "ucus_tarihi": "2026-06-08",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "notlar": "BARIŞ değerlendirme devam ediyor."
+    "notlar": "BARIŞ değerlendirme devam ediyor.",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 33,
