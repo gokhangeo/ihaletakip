@@ -751,7 +751,7 @@ function generateDynamicReport() {
     let totalIhaleParsel = 0;
     
     let stats = {
-        bilgilendirme: [], komisyon: [], kesinAski: [], degerlendirme: [], teslim: [], digerleri: {}
+        bilgilendirme: [], komisyon: [], kesinAski: [], teslim: [], digerleri: {}
     };
 
     data.forEach(d => {
@@ -760,16 +760,29 @@ function generateDynamicReport() {
         
         const birimName = `${d.ilce}-${d.mahalle}`;
         
-        if (d.bilgilendirme_tarihi) stats.bilgilendirme.push(birimName);
-        if (d.komisyon_durum === "Yapıldı" || d.genel_durum === "KOMİSYON YAPILDI") stats.komisyon.push(birimName);
-        if (d.kesin_aski_tarihi || d.genel_durum === "KESİN ASKIDA" || d.genel_durum === "KESİN ASKIDAN İNDİ. BEKLEMEDE" || d.genel_durum === "TESCİLİ BİTTİ") stats.kesinAski.push(birimName);
-        else if (d.degerlendirme_durum === "Devam Ediyor" || d.genel_durum === "DEĞERLENDİRMEDE") stats.degerlendirme.push(birimName);
-        else if (d.genel_durum === "FİRMAYA TESLİM EDİLDİ") stats.teslim.push(birimName);
+        if (d.kesin_aski_tarihi || d.genel_durum === "KESİN ASKIDA" || d.genel_durum === "KESİN ASKIDAN İNDİ. BEKLEMEDE" || d.genel_durum === "TESCİLİ BİTTİ") {
+            stats.kesinAski.push(birimName);
+        }
+        else if (d.komisyon_durum === "Yapıldı" || d.genel_durum === "KOMİSYON YAPILDI") {
+            stats.komisyon.push(birimName);
+        }
+        else if (d.bilgilendirme_tarihi) {
+            stats.bilgilendirme.push(birimName);
+        }
+        else if (d.genel_durum === "FİRMAYA TESLİM EDİLDİ") {
+            stats.teslim.push(birimName);
+        }
         else {
-            let desc = "";
-            if (!d.ucus_tarihi) desc = "UÇUŞ BEKLİYOR";
-            else if (d.ucus_kiymet_durum !== "Yapıldı") desc = "UÇUŞ KIYM. BEKLİYOR";
-            else desc = d.genel_durum || "ÇALIŞMA BEKLİYOR";
+            let desc = "ÇALIŞMA BEKLİYOR";
+            if (d.degerlendirme_durum === "Yapıldı") {
+                desc = "DEĞERLENDİRMESİ BİTENLER";
+            } else if (d.degerlendirme_durum === "Devam Ediyor" || d.genel_durum === "DEĞERLENDİRMEDE") {
+                desc = "DEĞERLENDİRME DEVAM EDENLER";
+            } else if (d.ucus_tarihi) {
+                desc = "UÇUŞ YAPILANLAR";
+            } else if (d.genel_durum && d.genel_durum !== "HERHANGİ BİRŞEY YAPILMADI") {
+                desc = d.genel_durum;
+            }
             
             if (!stats.digerleri[desc]) stats.digerleri[desc] = [];
             stats.digerleri[desc].push(birimName);
@@ -780,11 +793,21 @@ function generateDynamicReport() {
 
     const formatArray = (arr) => arr.length > 0 ? arr.join(', ') : 'Bulunmamaktadır.';
     
-    // Diğer Birimler İçin Şık Kutu/Grup Görünümü Hazırlığı
     let digerleriHtml = '';
     if (Object.keys(stats.digerleri).length > 0) {
         digerleriHtml = '<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-3">';
-        for (const [durum, birimler] of Object.entries(stats.digerleri)) {
+        
+        // Önem sırasına göre dizilim (Değerlendirme, Uçuş, vs.)
+        const priority = { "DEĞERLENDİRMESİ BİTENLER": 1, "DEĞERLENDİRME DEVAM EDENLER": 2, "UÇUŞ YAPILANLAR": 3 };
+        const sortedKeys = Object.keys(stats.digerleri).sort((a, b) => {
+            let valA = priority[a] || 99;
+            let valB = priority[b] || 99;
+            if (valA !== valB) return valA - valB;
+            return a.localeCompare(b);
+        });
+
+        for (const durum of sortedKeys) {
+            const birimler = stats.digerleri[durum];
             digerleriHtml += `
                 <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
                     <h4 class="font-bold text-[11px] text-slate-700 mb-2 border-b border-slate-100 pb-1.5 flex justify-between items-center">
@@ -807,7 +830,7 @@ function generateDynamicReport() {
         </div>
         
         <div class="text-slate-700 text-sm leading-relaxed mb-6 bg-slate-100/50 p-4 rounded-xl border border-slate-200">
-            Mersin ili genelinde <strong>(MRS-ANM II Güncelleme İşi)</strong> yürütülen güncelleme çalışmaları kapsamında toplam <span class="font-bold text-indigo-700">${totalBirim}</span> adet birimde, <span class="font-bold text-indigo-700">${totalIDO.toLocaleString('tr-TR')}</span> adet İDÖ parseli ve <span class="font-bold text-indigo-700">${totalIhaleParsel.toLocaleString('tr-TR')}</span> adet parselde çalışmalar sürdürülmektedir.
+            Mersin ili genelinde yürütülen güncelleme çalışmaları kapsamında toplam <span class="font-bold text-indigo-700">${totalBirim}</span> adet birimde, <span class="font-bold text-indigo-700">${totalIDO.toLocaleString('tr-TR')}</span> adet İDÖ parseli ve <span class="font-bold text-indigo-700">${totalIhaleParsel.toLocaleString('tr-TR')}</span> adet parselde çalışmalar sürdürülmektedir.
         </div>
 
         <h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest mb-3">SÜREÇ ÖZETLERİ VE İLERLEME DURUMU</h3>
@@ -826,17 +849,12 @@ function generateDynamicReport() {
                 <p class="text-sm text-slate-700"><i class="fas fa-check-double text-indigo-600 w-5"></i> <strong>Kesin Askı İlanı:</strong> Toplam <strong class="text-indigo-600">${stats.kesinAski.length}</strong> birimin kesin askı ilanı gerçekleştirilmiştir.</p>
             </div>
             
-            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-amber-500">
-                <p class="text-sm text-slate-700"><i class="fas fa-tasks text-amber-600 w-5"></i> <strong>Değerlendirme Aşaması:</strong> Toplam <strong class="text-amber-600">${stats.degerlendirme.length}</strong> birimde değerlendirme çalışmaları aktif olarak sürmektedir.</p>
-                ${stats.degerlendirme.length > 0 ? `<div class="mt-2 text-xs text-slate-600 p-3 bg-amber-50/50 rounded border border-amber-100 font-medium">Değerlendirmedeki Birimler: ${formatArray(stats.degerlendirme)}</div>` : ''}
-            </div>
-            
             <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-pink-500">
                 <p class="text-sm text-slate-700"><i class="fas fa-truck text-pink-600 w-5"></i> <strong>Firmaya Teslim:</strong> Toplam <strong class="text-pink-600">${stats.teslim.length}</strong> birim firmaya teslim edilmiş olup süreç takibindedir.</p>
             </div>
             
             <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm">
-                <p class="text-sm text-slate-700"><i class="fas fa-info-circle text-slate-500 w-5"></i> <strong>Diğer Çalışma Aşamasındaki Birimler:</strong> Kalan birimlerin aşama durumları ve dağılımları aşağıda detaylandırılmıştır.</p>
+                <p class="text-sm text-slate-700 mb-2"><i class="fas fa-info-circle text-slate-500 w-5"></i> <strong>Diğer Çalışma Aşamasındaki Birimler:</strong> Kalan birimlerin aşama durumları ve dağılımları aşağıda detaylandırılmıştır.</p>
                 ${digerleriHtml}
             </div>
         </div>
@@ -855,7 +873,7 @@ function exportReportToWord() {
         new Paragraph({ text: "MERSİN İLİ KADASTRO GÜNCELLEME ÇALIŞMALARI\n(MRS-ANM II GÜNCELLEME İŞİ)\n", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
         new Paragraph({
             children: [
-                new TextRun("Mersin ili genelinde (MRS-ANM II Güncelleme İşi) yürütülen güncelleme çalışmaları kapsamında toplam "),
+                new TextRun("Mersin ili genelinde yürütülen güncelleme çalışmaları kapsamında toplam "),
                 new TextRun({ text: `${computedReportData.totalBirim}`, bold: true }),
                 new TextRun(" adet birimde, "),
                 new TextRun({ text: `${computedReportData.totalIDO.toLocaleString('tr-TR')}`, bold: true }),
@@ -894,14 +912,6 @@ function exportReportToWord() {
         new Paragraph({
             bullet: { level: 0 },
             children: [
-                new TextRun({ text: "Değerlendirme Aşaması: ", bold: true }),
-                new TextRun(`Toplam ${computedReportData.stats.degerlendirme.length} birimde değerlendirme çalışmaları aktif olarak sürmektedir. ${computedReportData.stats.degerlendirme.length > 0 ? '(' + computedReportData.stats.degerlendirme.join(', ') + ')' : ''}`)
-            ],
-            spacing: { after: 200, line: 360 }
-        }),
-        new Paragraph({
-            bullet: { level: 0 },
-            children: [
                 new TextRun({ text: "Firmaya Teslim: ", bold: true }),
                 new TextRun(`Toplam ${computedReportData.stats.teslim.length} birim firmaya teslim edilmiş olup süreç takibindedir.`)
             ],
@@ -919,7 +929,16 @@ function exportReportToWord() {
             spacing: { after: 100, line: 360 }
         }));
         
-        for (const [durum, birimler] of Object.entries(computedReportData.stats.digerleri)) {
+        const priority = { "DEĞERLENDİRMESİ BİTENLER": 1, "DEĞERLENDİRME DEVAM EDENLER": 2, "UÇUŞ YAPILANLAR": 3 };
+        const sortedKeys = Object.keys(computedReportData.stats.digerleri).sort((a, b) => {
+            let valA = priority[a] || 99;
+            let valB = priority[b] || 99;
+            if (valA !== valB) return valA - valB;
+            return a.localeCompare(b);
+        });
+
+        for (const durum of sortedKeys) {
+            const birimler = computedReportData.stats.digerleri[durum];
             wordChildren.push(new Paragraph({
                 bullet: { level: 1 },
                 children: [
@@ -945,7 +964,7 @@ function exportReportToWord() {
     });
 
     Packer.toBlob(doc).then(blob => {
-        saveAs(blob, `MRS_ANM_II_Bilgi_Notu_${new Date().toLocaleDateString('tr-TR')}.docx`);
+        saveAs(blob, `Mersin_Kadastro_Raporu_${new Date().toLocaleDateString('tr-TR')}.docx`);
         showToast("Başarılı", "Word Belgesi başarıyla indirildi.", "success");
     }).catch(err => {
         showToast("Hata", "Word Belgesi oluşturulamadı.", "error");
