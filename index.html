@@ -5,22 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>İhale ve Personel Yönetim Paneli</title>
     
-    <!-- Tailwind CSS ve Fontlar -->
+    <!-- Stil ve Fontlar -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- PDF ve Ekran Görüntüsü Kütüphaneleri -->
+    <!-- PDF, Ekran Görüntüsü ve Word Kütüphaneleri -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .table-container { max-height: 60vh; overflow-y: auto; overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
         .sticky-header { position: sticky; top: 0; z-index: 20; }
         .district-row { border-left: 4px solid transparent; transition: all 0.2s; background: white; }
-        .district-row.dragging { opacity: 0.5; background-color: #e2e8f0; border: 2px dashed #3b82f6; }
-        .durum-row.dragging { opacity: 0.5; background-color: #f1f5f9; transform: scale(0.98); }
+        .district-row.dragging { opacity: 0.5; background-color: #e2e8f0; }
         
         .district-ANAMUR { border-left-color: #3b82f6; }
         .district-BOZYAZI { border-left-color: #10b981; }
@@ -37,7 +38,7 @@
         .stat-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         .stat-card.active-filter { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f1; background-color: #fefce8; }
         
-        .progress-card { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; padding: 1rem; min-width: 200px; flex-shrink: 0; }
+        .progress-card { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; padding: 1rem; min-w-[200px]; flex-shrink: 0; }
         
         #toast { transition: opacity 0.3s, transform 0.3s; transform: translateY(100%); opacity: 0; }
         #toast.show { transform: translateY(0); opacity: 1; }
@@ -54,7 +55,7 @@
         .drag-handle:hover { color: #64748b; }
         .drag-handle:active { cursor: grabbing; }
 
-        /* Yazdırma Tablosu İçin Özel CSS (PDF Oluştururken Kullanılır) */
+        /* PDF Yazdırma CSS'i */
         .print-table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; font-family: sans-serif; table-layout: auto; }
         .print-table th { background-color: #0f172a; color: white; padding: 12px 6px; border: 1px solid #64748b; text-align: center; font-weight: bold; }
         .print-table td { padding: 10px 6px; border: 1px solid #cbd5e1; vertical-align: middle; text-align: center; }
@@ -147,36 +148,38 @@
                     </div>
                 </div>
                 
-                <button onclick="openDocsModal()" class="bg-teal-600 text-white px-3 py-2 rounded-xl hover:bg-teal-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                <button onclick="openReportModal()" class="bg-cyan-600 text-white px-3 py-2 rounded-xl hover:bg-cyan-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap shadow-sm">
+                    <i class="fas fa-file-invoice"></i> Rapor Oluştur
+                </button>
+
+                <button onclick="openDocsModal()" class="bg-teal-600 text-white px-3 py-2 rounded-xl hover:bg-teal-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap shadow-sm">
                     <i class="fas fa-file-pdf"></i> Genelgeler
                 </button>
 
-                <!-- Admin Mod Kontrolleri -->
                 <div id="adminControls" class="hidden flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-                    <button onclick="openDurumModal()" class="bg-violet-500 text-white px-3 py-2 rounded-xl hover:bg-violet-600 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                    <button onclick="openDurumModal()" class="bg-violet-500 text-white px-3 py-2 rounded-xl hover:bg-violet-600 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap shadow-sm">
                         <i class="fas fa-tags"></i> Durumlar
                     </button>
-                    <button onclick="openPersonnelModal()" class="bg-amber-500 text-white px-3 py-2 rounded-xl hover:bg-amber-600 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                    <button onclick="openPersonnelModal()" class="bg-amber-500 text-white px-3 py-2 rounded-xl hover:bg-amber-600 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap shadow-sm">
                         <i class="fas fa-users-cog"></i> Personel
                     </button>
-                    <button onclick="fetchFromGithub()" class="bg-blue-600 text-white px-3 py-2 rounded-xl hover:bg-blue-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                    <button onclick="fetchFromGithub()" class="bg-blue-600 text-white px-3 py-2 rounded-xl hover:bg-blue-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap shadow-sm">
                         <i class="fas fa-cloud-download-alt"></i> Çek
                     </button>
-                    <button id="saveBtn" onclick="saveAllToGithub()" class="bg-indigo-600 text-white px-3 py-2 rounded-xl hover:bg-indigo-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+                    <button id="saveBtn" onclick="saveToGithub()" class="bg-indigo-600 text-white px-3 py-2 rounded-xl hover:bg-indigo-700 transition flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap shadow-sm">
                         <i class="fas fa-cloud-upload-alt"></i> Kaydet
                     </button>
-                    <button onclick="resetData()" class="bg-slate-100 text-slate-600 px-3 py-2 rounded-xl hover:bg-red-50 hover:text-red-600 transition flex items-center gap-1.5 text-sm font-medium whitespace-nowrap">
+                    <button onclick="resetData()" class="bg-slate-100 text-slate-600 px-3 py-2 rounded-xl hover:bg-red-50 hover:text-red-600 transition flex items-center gap-1.5 text-sm font-medium whitespace-nowrap shadow-sm">
                         <i class="fas fa-undo"></i> Sıfırla
                     </button>
                 </div>
                 
-                <button onclick="logout()" class="bg-red-50 text-red-600 px-3 py-2 rounded-xl hover:bg-red-100 transition flex items-center gap-1.5 text-sm font-bold whitespace-nowrap">
+                <button onclick="logout()" class="bg-red-50 text-red-600 px-3 py-2 rounded-xl hover:bg-red-100 transition flex items-center gap-1.5 text-sm font-bold whitespace-nowrap shadow-sm">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Filtre Banner'ı -->
         <div id="activeFilterBanner" class="hidden mb-4 bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-xl flex justify-between items-center shadow-sm">
             <div class="text-sm font-medium">
                 <i class="fas fa-filter mr-2"></i> Aktif Filtre: <strong id="filterNameDisplay" class="ml-1 text-indigo-900 bg-indigo-200/50 px-2 py-0.5 rounded"></strong>
@@ -232,7 +235,9 @@
         </div>
 
         <!-- Süreç İlerleme Özeti -->
-        <div id="progressSummary" class="flex gap-4 overflow-x-auto pb-4 mb-4 snap-x"></div>
+        <div id="progressSummary" class="flex gap-4 overflow-x-auto pb-4 mb-4 snap-x">
+            <!-- JS ile dolacak -->
+        </div>
 
         <!-- Ana Tablo Bölümü -->
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col">
@@ -240,14 +245,14 @@
                 <div class="flex items-center gap-4">
                     <h3 class="font-bold text-sm text-slate-700"><i class="fas fa-list text-blue-500 mr-2"></i>İhale ve Durum Listesi</h3>
                     
-                    <button id="tableSaveBtn" onclick="saveAllToGithub()" class="hidden bg-red-600 text-white px-4 py-1.5 rounded-lg hover:bg-red-700 transition items-center gap-2 text-xs font-bold shadow-md border border-red-500 animate-soft-blink">
+                    <button id="tableSaveBtn" onclick="saveToGithub()" class="hidden bg-red-600 text-white px-4 py-1.5 rounded-lg hover:bg-red-700 transition items-center gap-2 text-xs font-bold shadow-md border border-red-500 animate-soft-blink">
                         <i class="fas fa-cloud-upload-alt"></i> Değişiklikleri Kaydet
                     </button>
                 </div>
                 
                 <div class="flex gap-2">
                     <button onclick="openPdfModal()" class="bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
-                        <i class="fas fa-file-pdf"></i> PDF İndir
+                        <i class="fas fa-file-pdf"></i> Tablo PDF İndir
                     </button>
                     <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
                         <i class="fas fa-file-excel"></i> Excel İndir
@@ -287,39 +292,31 @@
     </div>
 </div>
 
-<!-- Custom Confirm Modal -->
-<div id="confirmModal" class="fixed inset-0 bg-slate-900/50 z-[999] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col transform transition-all">
-        <div class="p-5 flex flex-col items-center text-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-red-100 text-red-500 flex items-center justify-center text-2xl"><i class="fas fa-exclamation-triangle"></i></div>
-            <h3 id="confirmTitle" class="font-bold text-lg text-slate-800">Onay</h3>
-            <p id="confirmMessage" class="text-sm text-slate-500">Bunu yapmak istediğinize emin misiniz?</p>
+<!-- Raporlama Görünüm ve İndirme Modalı -->
+<div id="reportModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+            <h3 class="font-extrabold text-xl text-slate-900 flex items-center gap-2">
+                <i class="fas fa-file-invoice text-indigo-600"></i> Bilgi Notu & İlerleme Raporu
+            </h3>
+            <div class="flex items-center gap-2 md:gap-3">
+                <button onclick="exportReportToPDF()" class="bg-red-600 hover:bg-red-700 text-white px-3 md:px-4 py-2 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 transition-all">
+                    <i class="fas fa-file-pdf text-sm"></i> <span class="hidden md:inline">PDF Olarak İndir</span><span class="md:hidden">PDF</span>
+                </button>
+                <button onclick="exportReportToWord()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 md:px-4 py-2 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 transition-all">
+                    <i class="fas fa-file-word text-sm"></i> <span class="hidden md:inline">Word Olarak İndir</span><span class="md:hidden">Word</span>
+                </button>
+                <button onclick="closeReportModal()" class="text-slate-400 hover:text-red-500 transition ml-1"><i class="fas fa-times text-xl"></i></button>
+            </div>
         </div>
-        <div class="p-3 bg-slate-50 border-t border-slate-100 flex gap-2 justify-end">
-            <button onclick="closeConfirm()" class="px-4 py-2 text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-sm font-bold transition shadow-sm">İptal</button>
-            <button id="confirmActionBtn" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold transition shadow-sm">Onayla</button>
-        </div>
-    </div>
-</div>
-
-<!-- Custom Prompt Modal -->
-<div id="promptModal" class="fixed inset-0 bg-slate-900/50 z-[999] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col">
-        <div class="p-4 border-b border-slate-200 bg-slate-50">
-            <h3 id="promptTitle" class="font-bold text-lg text-slate-800">Bilgi Girişi</h3>
-        </div>
-        <div class="p-4">
-            <input type="text" id="promptInput" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div class="p-3 bg-slate-50 border-t border-slate-100 flex gap-2 justify-end">
-            <button onclick="closeCustomPrompt()" class="px-4 py-2 text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-sm font-bold transition shadow-sm">İptal</button>
-            <button id="promptActionBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold transition shadow-sm">Tamam</button>
+        <div class="p-6 overflow-y-auto flex-1 bg-slate-50 space-y-6" id="reportContentContainer">
+            <!-- Dinamik Rapor Buraya Enjekte Edilecek -->
         </div>
     </div>
 </div>
 
-<!-- Durum Yönetim Modalı (Sürükle-Bırak Özellikli) -->
-<div id="durumModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+<!-- Durum Yönetim Modalı (Sürükle Bırak) -->
+<div id="durumModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
             <h3 class="font-bold text-lg text-slate-800"><i class="fas fa-tags text-violet-500 mr-2"></i>Genel Durum Yönetimi</h3>
@@ -330,7 +327,7 @@
                 <input type="text" id="newDurumName" placeholder="YENİ DURUM EKLE" class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-violet-500 outline-none flex-1 uppercase font-medium">
                 <button onclick="addDurum()" class="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-violet-700 transition">Ekle</button>
             </div>
-            <p class="text-[10px] text-slate-400">Not: Sıralamayı değiştirmek için <i class="fas fa-grip-vertical"></i> simgesinden sürükleyip bırakabilirsiniz.</p>
+            <p class="text-[10px] text-slate-400 font-semibold"><i class="fas fa-info-circle text-blue-500"></i> İpucu: Durumların yanındaki <i class="fas fa-grip-vertical"></i> simgesine basılı tutarak sıralamayı değiştirebilirsiniz.</p>
         </div>
         <div class="p-4 overflow-y-auto flex-1 bg-slate-50 border-t border-slate-100">
             <div id="durumListContainer" class="flex flex-col gap-2"></div>
@@ -338,8 +335,8 @@
     </div>
 </div>
 
-<!-- PDF İndirme Modal -->
-<div id="pdfModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+<!-- PDF İndirme Modal (Tablo İçin) -->
+<div id="pdfModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
             <h3 class="font-bold text-lg text-slate-800"><i class="fas fa-file-pdf text-red-600 mr-2"></i>A3 Geniş PDF İndir</h3>
@@ -365,13 +362,13 @@
                     <span>İkisini Tek PDF Yap <span class="font-normal text-[10px] text-slate-300 ml-1">(Tümü)</span></span> <i class="fas fa-file-pdf"></i>
                 </button>
             </div>
-            <p class="text-[10px] text-slate-400 text-center font-medium mt-1">Sistem mevcut HTML renklerini otomatik olarak PDF'e aktarır.</p>
+            <p class="text-[10px] text-slate-400 text-center font-medium mt-1">Kesilmeleri engellemek için sistem yüksek çözünürlükte daraltma yapar.</p>
         </div>
     </div>
 </div>
 
 <!-- Genelgeler / Belgeler Modalı -->
-<div id="docsModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+<div id="docsModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
             <h3 class="font-bold text-lg text-slate-800"><i class="fas fa-file-pdf text-teal-600 mr-2"></i>Genelgeler ve Talimatlar</h3>
@@ -390,7 +387,7 @@
 </div>
 
 <!-- Personel Yönetim Modalı -->
-<div id="personnelModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+<div id="personnelModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
             <h3 class="font-bold text-lg text-slate-800"><i class="fas fa-users-cog text-amber-500 mr-2"></i>Personel Yönetimi</h3>
@@ -422,14 +419,13 @@
 </div>
 
 <script>
-// Güvenli Ortam İzinleri
-window.addEventListener('unhandledrejection', function(event) {
-    if (event.reason && event.reason.message && event.reason.message.includes('listener indicated an asynchronous response')) {
-        event.preventDefault(); 
+window.addEventListener('beforeunload', function (e) {
+    if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
     }
 });
 
-// Github Kimlik Bilgileri (Güvenlik Amaçlı Parçalanmış Token)
 const _p1 = "ghp_";
 const _p2 = "1Im4128x";
 const _p3 = "UP1uC8Oo";
@@ -442,16 +438,16 @@ const _path = "data.json";
 const _durumlarPath = "durumlar.json";
 const _docsPath = "docs";
 
-// Temel Durum Değişkenleri
 let isAdmin = false;
 let clickCount = 0;
 let clickTimer;
+
 let activePersonFilter = null;
 let activeCardFilter = null;
 let hasUnsavedChanges = false;
 let openDropdowns = new Set();
 let draggedSn = null;
-let draggedDurumIdx = null;
+let computedReportData = null; // Rapor datalarını tutmak için
 
 const defaultPersonnel = {
     muhendis: ["TEVFİK YILDIZ", "HİLMİ MÜFTÜOĞLU", "HİKMET GÜLCAN", "MEHTAP AKDOĞAN", "VOLKAN İZCİ"],
@@ -461,110 +457,44 @@ const defaultPersonnel = {
     tas: ["MUSTAFA BICAK"]
 };
 
-// Özelleştirilmiş 18'li Renk Paleti (Durumlar İçin)
-const durumColorsPalette = [
-    "bg-red-100 text-red-700", "bg-orange-100 text-orange-700", "bg-amber-100 text-amber-700",
-    "bg-yellow-100 text-yellow-700", "bg-lime-100 text-lime-700", "bg-green-100 text-green-700",
-    "bg-emerald-100 text-emerald-700", "bg-teal-100 text-teal-700", "bg-cyan-100 text-cyan-700",
-    "bg-sky-100 text-sky-700", "bg-blue-100 text-blue-700", "bg-indigo-100 text-indigo-700",
-    "bg-violet-100 text-violet-700", "bg-purple-100 text-purple-700", "bg-fuchsia-100 text-fuchsia-700",
-    "bg-pink-100 text-pink-700", "bg-rose-100 text-rose-700", "bg-slate-200 text-slate-800"
+const defaultDurumlar = [
+    "HERHANGİ BİRŞEY YAPILMADI", "ÇALIŞMA PROGRAMINA ALINDI(ONAY GELMEDİ)", "ÇALIŞMA PROGRAMINA ALINDI",
+    "BİLİRKİŞİ SEÇİMİ YAPILIYOR", "BİLİRKİŞİ YEMİNLERİ YAPTIRILACAK", "YER TESLİMİ YAPILDI",
+    "TAPU KAYIT KARŞILAŞTIRMA", "ÇALIŞMA ALANI İLANI YAPILDI", "BİLİRKİŞİ YEMİN/ADA-MEVKİ İLAN",
+    "ARAZİ DEVAM EDİYOR", "VERİLER ELEKTRONİK ORTAMDA HAZIRLANDI", "DEĞERLENDİRMEDE",
+    "ORMAN ASKISI", "FİRMAYA TESLİM EDİLDİ", "KROKİ/TUTANAK KONTROLÜ", "ASKI İLANINA HAZIRLANIYOR",
+    "BİLGİLENDİRME İLANINDA", "KOMİSYON AŞAMASINDA", "KOMİSYON YAPILDI", "KESİN ASKIDA",
+    "KESİN ASKIDAN İNDİ. BEKLEMEDE", "DEVİR YAPILDI", "TESCİL AŞAMASINDA", "İHALEDEN/PROGRAMDAN ÇIKARILDI", "TESCİLİ BİTTİ"
 ];
 
-// PDF Yazdırma Motoru İçin HEX Dönüşümleri
-const tailwindColorMap = {
-    "bg-red-100 text-red-700": { bg: "#fee2e2", text: "#b91c1c" },
-    "bg-orange-100 text-orange-700": { bg: "#ffedd5", text: "#c2410c" },
-    "bg-amber-100 text-amber-700": { bg: "#fef3c7", text: "#b45309" },
-    "bg-yellow-100 text-yellow-700": { bg: "#fef9c3", text: "#a16207" },
-    "bg-lime-100 text-lime-700": { bg: "#ecfccb", text: "#4d7c0f" },
-    "bg-green-100 text-green-700": { bg: "#dcfce7", text: "#15803d" },
-    "bg-emerald-100 text-emerald-700": { bg: "#d1fae5", text: "#047857" },
-    "bg-teal-100 text-teal-700": { bg: "#ccfbf1", text: "#0f766e" },
-    "bg-cyan-100 text-cyan-700": { bg: "#cffafe", text: "#0e7490" },
-    "bg-sky-100 text-sky-700": { bg: "#e0f2fe", text: "#0369a1" },
-    "bg-blue-100 text-blue-700": { bg: "#dbeafe", text: "#1d4ed8" },
-    "bg-indigo-100 text-indigo-700": { bg: "#e0e7ff", text: "#4338ca" },
-    "bg-violet-100 text-violet-700": { bg: "#ede9fe", text: "#6d28d9" },
-    "bg-purple-100 text-purple-700": { bg: "#f3e8ff", text: "#7e22ce" },
-    "bg-fuchsia-100 text-fuchsia-700": { bg: "#fae8ff", text: "#a21caf" },
-    "bg-pink-100 text-pink-700": { bg: "#fce7f3", text: "#be185d" },
-    "bg-rose-100 text-rose-700": { bg: "#ffe4e6", text: "#be123c" },
-    "bg-slate-200 text-slate-800": { bg: "#e2e8f0", text: "#1e293b" }
-};
+const colorPalette = [
+    { bg: '#f1f5f9', text: '#475569', border: '#cbd5e1' }, { bg: '#fee2e2', text: '#991b1b', border: '#fca5a5' },
+    { bg: '#fef3c7', text: '#92400e', border: '#fcd34d' }, { bg: '#dcfce7', text: '#166534', border: '#86efac' },
+    { bg: '#dbeafe', text: '#1e40af', border: '#93c5fd' }, { bg: '#f3e8ff', text: '#6b21a8', border: '#d8b4fe' },
+    { bg: '#fce7f3', text: '#9d174d', border: '#f9a8d4' }, { bg: '#ffedd5', text: '#9a3412', border: '#fdba74' },
+    { bg: '#e0e7ff', text: '#3730a3', border: '#a5b4fc' }, { bg: '#ccfbf1', text: '#115e59', border: '#5eead4' },
+    { bg: '#fef08a', text: '#854d0e', border: '#fde047' }, { bg: '#e0f2fe', text: '#075985', border: '#7dd3fc' },
+    { bg: '#fae8ff', text: '#86198f', border: '#f0abfc' }, { bg: '#ffe4e6', text: '#9f1239', border: '#fda4af' },
+    { bg: '#d1fae5', text: '#065f46', border: '#6ee7b7' }, { bg: '#e2e8f0', text: '#334155', border: '#94a3b8' }
+];
 
 let personnel = JSON.parse(localStorage.getItem('customPersonnel')) || JSON.parse(JSON.stringify(defaultPersonnel));
-let durumListesi = JSON.parse(localStorage.getItem('customDurumlar')) || [];
+let durumListesi = [...defaultDurumlar];
 let data = JSON.parse(localStorage.getItem('ihaleData')) || [];
 
-// Metinden Dinamik ve Sabit Renk Sınıfı Üretme Algoritması
-function getDurumColor(str) {
-    if (!str || str === "HERHANGİ BİRŞEY YAPILMADI") return "bg-slate-100 text-slate-600";
-    if (str.includes("BİTTİ") || str.includes("YAPILDI") || str === "Yapıldı") return "bg-emerald-100 text-emerald-700";
-    if (str.includes("DEVAM") || str === "Devam Ediyor") return "bg-amber-100 text-amber-700";
+const encodeBase64 = (str) => btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str)));
+const decodeBase64 = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
+
+function getStringColorInfo(str) {
+    if(!str) return colorPalette[0];
+    if(str.includes("BİTTİ") || str.includes("YAPILDI") || str === "Yapıldı") return { bg: '#d1fae5', text: '#047857', border: '#6ee7b7' };
+    if(str.includes("DEVAM") || str.includes("AŞAMASINDA") || str.includes("HAZIRLANIYOR") || str.includes("DEĞERLENDİRMEDE")) return { bg: '#fef3c7', text: '#b45309', border: '#fcd34d' };
     
-    // Hash Fonksiyonu ile String'e Göre Sabit Renk
     let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const index = Math.abs(hash) % durumColorsPalette.length;
-    return durumColorsPalette[index];
+    for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
+    const index = Math.abs(hash) % colorPalette.length;
+    return colorPalette[index];
 }
-
-let confirmCallback = null;
-function openConfirm(title, message, callback) {
-    document.getElementById('confirmTitle').innerText = title;
-    document.getElementById('confirmMessage').innerText = message;
-    confirmCallback = callback;
-    document.getElementById('confirmModal').classList.remove('hidden');
-}
-function closeConfirm() {
-    document.getElementById('confirmModal').classList.add('hidden');
-    confirmCallback = null;
-}
-document.getElementById('confirmActionBtn').addEventListener('click', () => {
-    if(confirmCallback) confirmCallback();
-    closeConfirm();
-});
-
-let promptCallback = null;
-function openCustomPrompt(title, defaultValue, callback) {
-    document.getElementById('promptTitle').innerText = title;
-    const input = document.getElementById('promptInput');
-    input.value = defaultValue;
-    promptCallback = callback;
-    document.getElementById('promptModal').classList.remove('hidden');
-    input.focus();
-}
-function closeCustomPrompt() {
-    document.getElementById('promptModal').classList.add('hidden');
-    promptCallback = null;
-}
-document.getElementById('promptActionBtn').addEventListener('click', () => {
-    const val = document.getElementById('promptInput').value;
-    if(promptCallback) promptCallback(val);
-    closeCustomPrompt();
-});
-
-function showToast(title, msg, type = "success") {
-    const toast = document.getElementById('toast');
-    document.getElementById('toastTitle').innerText = title;
-    document.getElementById('toastMsg').innerText = msg;
-    const icon = document.getElementById('toastIcon');
-    icon.className = `w-8 h-8 rounded-full flex items-center justify-center ${type === 'error' ? 'bg-red-500' : type === 'info' ? 'bg-blue-500' : 'bg-emerald-500'}`;
-    icon.innerHTML = `<i class="fas ${type === 'error' ? 'fa-times' : type === 'info' ? 'fa-info' : 'fa-check'}"></i>`;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-// Sayfadan çıkmadan önce uyarı mekanizması
-window.addEventListener('beforeunload', function (e) {
-    if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = 'Kaydedilmeyen değişiklikleriniz var. Çıkmak istediğinize emin misiniz?';
-    }
-});
 
 function handleLogin() {
     const user = document.getElementById('loginUsername').value;
@@ -592,13 +522,7 @@ function logout() {
 }
 
 document.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter' && !document.getElementById('loginScreen').classList.contains('hidden')) {
-        handleLogin();
-    }
-    // Custom promptta entera basılırsa tamamla
-    if (e.key === 'Enter' && !document.getElementById('promptModal').classList.contains('hidden')) {
-        document.getElementById('promptActionBtn').click();
-    }
+    if (e.key === 'Enter' && !document.getElementById('loginScreen').classList.contains('hidden')) handleLogin();
 });
 
 document.getElementById('titleContainer').addEventListener('click', () => {
@@ -609,18 +533,15 @@ document.getElementById('titleContainer').addEventListener('click', () => {
     if (clickCount >= 5) {
         clickCount = 0;
         if (!isAdmin) {
-            openCustomPrompt("Yönetici Şifresi:", "", (pass) => {
-                if (pass === "5034") {
-                    isAdmin = true;
-                    document.getElementById('adminBadge').classList.remove('hidden');
-                    document.getElementById('adminControls').classList.remove('hidden');
-                    document.getElementById('adminDocControls').classList.remove('hidden');
-                    showToast("Admin Modu Aktif", "Değişiklik yapabilirsiniz.", "success");
-                    renderTable();
-                } else {
-                    showToast("Hata", "Hatalı şifre!", "error");
-                }
-            });
+            let pass = prompt("Yönetici Şifresi:");
+            if (pass === "5034") {
+                isAdmin = true;
+                document.getElementById('adminBadge').classList.remove('hidden');
+                document.getElementById('adminControls').classList.remove('hidden');
+                document.getElementById('adminDocControls').classList.remove('hidden');
+                showToast("Admin Modu Aktif", "Değişiklik yapabilirsiniz.", "success");
+                renderTable();
+            } else { alert("Hatalı şifre!"); }
         } else {
             isAdmin = false;
             document.getElementById('adminBadge').classList.add('hidden');
@@ -639,152 +560,85 @@ function setUnsavedState(state) {
     const alertBox = document.getElementById('unsavedAlert');
     
     if (state) {
-        if(topBtn) {
-            topBtn.classList.add('bg-red-600', 'animate-soft-blink');
-            topBtn.classList.remove('bg-indigo-600');
-        }
-        if(tableBtn) {
-            tableBtn.classList.remove('hidden');
-            tableBtn.classList.add('flex');
-        }
+        if(topBtn) { topBtn.classList.add('bg-red-600', 'animate-soft-blink'); topBtn.classList.remove('bg-indigo-600'); }
+        if(tableBtn) { tableBtn.classList.remove('hidden'); tableBtn.classList.add('flex'); }
         alertBox.classList.remove('hidden');
     } else {
-        if(topBtn) {
-            topBtn.classList.remove('bg-red-600', 'animate-soft-blink');
-            topBtn.classList.add('bg-indigo-600');
-        }
-        if(tableBtn) {
-            tableBtn.classList.add('hidden');
-            tableBtn.classList.remove('flex');
-        }
+        if(topBtn) { topBtn.classList.remove('bg-red-600', 'animate-soft-blink'); topBtn.classList.add('bg-indigo-600'); }
+        if(tableBtn) { tableBtn.classList.add('hidden'); tableBtn.classList.remove('flex'); }
         alertBox.classList.add('hidden');
     }
 }
-
-const encodeBase64 = (str) => btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str)));
-const decodeBase64 = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
 
 async function fetchFromGithub(isAuto = false) {
     try {
         if(!isAuto) showToast("Bağlanıyor...", "GitHub'dan veriler çekiliyor.", "info");
         
-        // 1. Data dosyasını çek
         const resData = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
-            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
-            cache: 'no-store'
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
         
         if (resData.ok) {
             const fileData = await resData.json();
-            const content = decodeBase64(fileData.content);
-            data = JSON.parse(content);
+            data = JSON.parse(decodeBase64(fileData.content));
             localStorage.setItem('ihaleData', JSON.stringify(data));
         }
 
-        // 2. Durumlar dosyasını çek
         const resDurum = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}?t=${new Date().getTime()}`, {
-            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
-            cache: 'no-store'
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
         
         if (resDurum.ok) {
             const fileDurum = await resDurum.json();
-            const durumContent = decodeBase64(fileDurum.content);
-            durumListesi = JSON.parse(durumContent);
-            localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
-        } else if (resDurum.status === 404 && durumListesi.length === 0) {
-            // İlk kullanımda dosya yoksa, default değerleri oluştur ve kaydet
-            durumListesi = [
-                "HERHANGİ BİRŞEY YAPILMADI", "ÇALIŞMA PROGRAMINA ALINDI", "YER TESLİMİ YAPILDI", 
-                "ORMAN ASKISI", "KOMİSYON YAPILDI", "TESCİLİ BİTTİ"
-            ];
-            saveDurumlarToGithub(true);
+            durumListesi = JSON.parse(decodeBase64(fileDurum.content));
+        } else {
+            durumListesi = [...defaultDurumlar];
         }
 
         setUnsavedState(false);
-        if(!isAuto) showToast("Başarılı", "Tüm veriler güncellendi.", "success");
-        
         populateDurumFilter();
+        if(!isAuto) showToast("Başarılı", "Veriler güncellendi.", "success");
         renderTable();
-
     } catch (e) {
-        console.error(e);
         if(!isAuto) showToast("Çevrimdışı Mod", "Güncel veriye ulaşılamadı. Yerel veri gösteriliyor.", "info");
         populateDurumFilter();
         renderTable();
     }
 }
 
-async function saveAllToGithub(isAuto = false) {
+async function saveToGithub(isAuto = false) {
     try {
-        if(!isAuto) showToast("Kaydediliyor...", "Tablo verileri GitHub'a gönderiliyor.", "info");
+        if(!isAuto) showToast("Kaydediliyor...", "GitHub'a gönderiliyor.", "info");
         
-        const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
-            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
-            cache: 'no-store'
+        // Tablo Kaydı
+        const getResData = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
-        
-        let currentSha = null;
-        if (getRes.ok) {
-            const fileData = await getRes.json();
-            currentSha = fileData.sha;
-        }
-
+        let currentShaData = null;
+        if (getResData.ok) currentShaData = (await getResData.json()).sha;
         data.forEach((d, i) => d.sn = i + 1);
-
-        const content = encodeBase64(JSON.stringify(data, null, 2));
-        const body = { message: `Update Data via Panel - ${new Date().toLocaleString()}`, content: content };
-        if (currentSha) body.sha = currentSha; 
-
-        const putRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
+        const bodyData = { message: `Update Data - ${new Date().toLocaleString()}`, content: encodeBase64(JSON.stringify(data, null, 2)) };
+        if (currentShaData) bodyData.sha = currentShaData;
+        await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
+            method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyData)
         });
 
-        if (putRes.ok) {
-            setUnsavedState(false);
-            if(!isAuto) showToast("Kaydedildi", "Veriler buluta aktarıldı.", "success");
-        } else {
-            throw new Error('Kayıt Başarısız');
-        }
+        // Durum Listesi Kaydı
+        const getResDurum = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}?t=${new Date().getTime()}`, {
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
+        });
+        let currentShaDurum = null;
+        if (getResDurum.ok) currentShaDurum = (await getResDurum.json()).sha;
+        const bodyDurum = { message: `Update Durum - ${new Date().toLocaleString()}`, content: encodeBase64(JSON.stringify(durumListesi, null, 2)) };
+        if (currentShaDurum) bodyDurum.sha = currentShaDurum;
+        await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}`, {
+            method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyDurum)
+        });
+
+        setUnsavedState(false);
+        if(!isAuto) showToast("Kaydedildi", "Tüm veriler buluta aktarıldı.", "success");
     } catch (e) {
         if(!isAuto) showToast("Hata", "Buluta kaydedilemedi! Çevrimdışı kayıt yapıldı.", "error");
-    }
-}
-
-async function saveDurumlarToGithub(silent = false) {
-    try {
-        if(!silent) showToast("Durumlar Kaydediliyor...", "GitHub ile senkronize ediliyor.", "info");
-        
-        const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}?t=${new Date().getTime()}`, {
-            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
-            cache: 'no-store'
-        });
-        
-        let currentSha = null;
-        if (getRes.ok) {
-            const fileData = await getRes.json();
-            currentSha = fileData.sha;
-        }
-
-        const content = encodeBase64(JSON.stringify(durumListesi, null, 2));
-        const body = { message: `Update Durumlar via Panel - ${new Date().toLocaleString()}`, content: content };
-        if (currentSha) body.sha = currentSha; 
-
-        const putRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
-
-        if (putRes.ok) {
-            if(!silent) showToast("Durumlar Senkronize", "Durum listesi buluta aktarıldı.", "success");
-        } else {
-            throw new Error('Kayıt Başarısız');
-        }
-    } catch (e) {
-        if(!silent) showToast("Hata", "Durumlar buluta kaydedilemedi!", "error");
     }
 }
 
@@ -799,78 +653,37 @@ function populateDurumFilter() {
     });
 }
 
+function showToast(title, msg, type = "success") {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastTitle').innerText = title;
+    document.getElementById('toastMsg').innerText = msg;
+    const icon = document.getElementById('toastIcon');
+    icon.className = `w-8 h-8 rounded-full flex items-center justify-center ${type === 'error' ? 'bg-red-500' : type === 'info' ? 'bg-blue-500' : 'bg-emerald-500'}`;
+    icon.innerHTML = `<i class="fas ${type === 'error' ? 'fa-times' : type === 'info' ? 'fa-info' : 'fa-check'}"></i>`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ====================== DURUM YÖNETİMİ ======================
 function openDurumModal() { renderDurumList(); document.getElementById('durumModal').classList.remove('hidden'); }
 function closeDurumModal() { document.getElementById('durumModal').classList.add('hidden'); }
 
 function addDurum() {
     const nameInput = document.getElementById('newDurumName');
     const name = nameInput.value.trim().toLocaleUpperCase('tr-TR');
-    if (!name) return showToast("Uyarı", "Lütfen durum adı girin.", "error");
-    if (durumListesi.includes(name)) return showToast("Uyarı", "Bu durum zaten ekli.", "error");
-    
+    if (!name) return alert("Lütfen durum adı girin.");
+    if (durumListesi.includes(name)) return alert("Bu durum zaten ekli.");
     durumListesi.push(name);
-    localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
-    nameInput.value = ""; 
-    renderDurumList(); 
-    populateDurumFilter(); 
-    renderTable();
-    saveDurumlarToGithub(); // Anında github'a yaz
+    setUnsavedState(true);
+    nameInput.value = ""; renderDurumList(); populateDurumFilter(); renderTable();
 }
 
 function removeDurum(index) {
-    openConfirm("Durum Silme", "Bu durumu kalıcı olarak silmek istediğinize emin misiniz?", () => {
+    if(confirm("Bu durumu silmek istediğinize emin misiniz?")) {
         durumListesi.splice(index, 1);
-        localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
-        renderDurumList(); 
-        populateDurumFilter(); 
-        renderTable();
-        saveDurumlarToGithub(); // Anında github'a yaz
-    });
-}
-
-function editDurum(index) {
-    openCustomPrompt("Durumu Düzenle", durumListesi[index], (newName) => {
-        if (newName && newName.trim() !== "") {
-            durumListesi[index] = newName.trim().toLocaleUpperCase('tr-TR');
-            localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
-            renderDurumList(); 
-            populateDurumFilter(); 
-            renderTable();
-            saveDurumlarToGithub(); // Anında github'a yaz
-        }
-    });
-}
-
-// Durumlar için Drag & Drop Fonksiyonları
-function handleDurumDragStart(e, idx) {
-    draggedDurumIdx = idx;
-    e.dataTransfer.effectAllowed = 'move';
-    e.target.classList.add('dragging');
-}
-
-function handleDurumDragOver(e) {
-    e.preventDefault(); // Sürüklemeye izin ver
-    e.dataTransfer.dropEffect = 'move';
-}
-
-function handleDurumDrop(e, targetIdx) {
-    e.preventDefault();
-    if (draggedDurumIdx === null || draggedDurumIdx === targetIdx) return;
-    
-    // Dizide yer değiştirme
-    const movedItem = durumListesi.splice(draggedDurumIdx, 1)[0];
-    durumListesi.splice(targetIdx, 0, movedItem);
-    
-    localStorage.setItem('customDurumlar', JSON.stringify(durumListesi));
-    renderDurumList(); 
-    populateDurumFilter(); 
-    renderTable();
-    saveDurumlarToGithub(true); // Sessiz kayıt
-}
-
-function handleDurumDragEnd(e) {
-    e.target.classList.remove('dragging');
-    draggedDurumIdx = null;
+        setUnsavedState(true);
+        renderDurumList(); populateDurumFilter(); renderTable();
+    }
 }
 
 function renderDurumList() {
@@ -878,31 +691,331 @@ function renderDurumList() {
     container.innerHTML = "";
     
     durumListesi.forEach((name, idx) => {
-        const colorClass = getDurumColor(name); // Sabit hash rengini al
+        const div = document.createElement('div');
+        div.className = "flex items-center justify-between p-2 bg-white border border-slate-200 rounded-lg shadow-sm mb-2 group cursor-grab active:cursor-grabbing";
+        div.draggable = true;
         
-        const row = document.createElement('div');
-        row.className = `durum-row flex items-center justify-between p-2 bg-white border border-slate-200 rounded-lg shadow-sm`;
-        row.draggable = true;
-        
-        row.addEventListener('dragstart', (e) => handleDurumDragStart(e, idx));
-        row.addEventListener('dragover', handleDurumDragOver);
-        row.addEventListener('drop', (e) => handleDurumDrop(e, idx));
-        row.addEventListener('dragend', handleDurumDragEnd);
-        
-        row.innerHTML = `
+        const colors = getStringColorInfo(name);
+
+        div.innerHTML = `
             <div class="flex items-center gap-3">
-                <i class="fas fa-grip-vertical drag-handle text-lg ml-1"></i>
-                <span class="font-bold text-[11px] ${colorClass} px-3 py-1.5 rounded-md shadow-sm">${name}</span>
+                <i class="fas fa-grip-vertical text-slate-300 group-hover:text-blue-400"></i>
+                <span class="font-bold text-[11px] px-2 py-1 rounded" style="background-color: ${colors.bg}; color: ${colors.text}; border: 1px solid ${colors.border}">${name}</span>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="editDurum(${idx})" class="text-blue-400 hover:text-blue-600 p-1 bg-blue-50 rounded"><i class="fas fa-edit"></i></button>
-                <button onclick="removeDurum(${idx})" class="text-red-400 hover:text-red-600 p-1 bg-red-50 rounded"><i class="fas fa-trash-alt"></i></button>
-            </div>
+            <button onclick="removeDurum(${idx})" class="text-red-400 hover:text-red-600 p-1"><i class="fas fa-trash-alt"></i></button>
         `;
-        container.appendChild(row);
+
+        div.addEventListener('dragstart', (e) => {
+            draggedSn = idx;
+            e.dataTransfer.effectAllowed = 'move';
+            div.classList.add('opacity-50');
+        });
+        
+        div.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            div.classList.add('border-t-2', 'border-blue-500');
+        });
+        
+        div.addEventListener('dragleave', () => {
+            div.classList.remove('border-t-2', 'border-blue-500');
+        });
+        
+        div.addEventListener('drop', (e) => {
+            e.preventDefault();
+            div.classList.remove('border-t-2', 'border-blue-500');
+            if(draggedSn !== null && draggedSn !== idx) {
+                const item = durumListesi.splice(draggedSn, 1)[0];
+                durumListesi.splice(idx, 0, item);
+                setUnsavedState(true);
+                renderDurumList(); populateDurumFilter(); renderTable();
+            }
+        });
+        
+        div.addEventListener('dragend', () => {
+            div.classList.remove('opacity-50');
+            draggedSn = null;
+        });
+
+        container.appendChild(div);
+    });
+}
+// ==========================================================
+
+// ====================== DİNAMİK RAPOR VE EXPORT ======================
+function openReportModal() { generateDynamicReport(); document.getElementById('reportModal').classList.remove('hidden'); }
+function closeReportModal() { document.getElementById('reportModal').classList.add('hidden'); }
+
+function generateDynamicReport() {
+    let totalBirim = data.length;
+    let totalIDO = 0;
+    let totalIhaleParsel = 0;
+    
+    let stats = {
+        bilgilendirme: [], komisyon: [], kesinAski: [], degerlendirme: [], teslim: [], digerleri: {}
+    };
+
+    data.forEach(d => {
+        totalIDO += parseInt(d.ido) || 0;
+        totalIhaleParsel += parseInt(d.parsel) || 0;
+        
+        const birimName = `${d.ilce}-${d.mahalle}`;
+        
+        if (d.bilgilendirme_tarihi) stats.bilgilendirme.push(birimName);
+        if (d.komisyon_durum === "Yapıldı" || d.genel_durum === "KOMİSYON YAPILDI") stats.komisyon.push(birimName);
+        if (d.kesin_aski_tarihi || d.genel_durum === "KESİN ASKIDA" || d.genel_durum === "KESİN ASKIDAN İNDİ. BEKLEMEDE" || d.genel_durum === "TESCİLİ BİTTİ") stats.kesinAski.push(birimName);
+        else if (d.degerlendirme_durum === "Devam Ediyor" || d.genel_durum === "DEĞERLENDİRMEDE") stats.degerlendirme.push(birimName);
+        else if (d.genel_durum === "FİRMAYA TESLİM EDİLDİ") stats.teslim.push(birimName);
+        else {
+            let desc = "";
+            if (!d.ucus_tarihi) desc = "UÇUŞ BEKLİYOR";
+            else if (d.ucus_kiymet_durum !== "Yapıldı") desc = "UÇUŞ KIYM. BEKLİYOR";
+            else desc = d.genel_durum || "ÇALIŞMA BEKLİYOR";
+            
+            if (!stats.digerleri[desc]) stats.digerleri[desc] = [];
+            stats.digerleri[desc].push(birimName);
+        }
+    });
+
+    computedReportData = { totalBirim, totalIDO, totalIhaleParsel, stats };
+
+    const formatArray = (arr) => arr.length > 0 ? arr.join(', ') : 'Bulunmamaktadır.';
+    
+    // Diğer Birimler İçin Şık Kutu/Grup Görünümü Hazırlığı
+    let digerleriHtml = '';
+    if (Object.keys(stats.digerleri).length > 0) {
+        digerleriHtml = '<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-3">';
+        for (const [durum, birimler] of Object.entries(stats.digerleri)) {
+            digerleriHtml += `
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-[11px] text-slate-700 mb-2 border-b border-slate-100 pb-1.5 flex justify-between items-center">
+                        <span class="text-indigo-700"><i class="fas fa-layer-group mr-1.5 opacity-50"></i>${durum}</span>
+                        <span class="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md text-[10px] font-black border border-indigo-100">${birimler.length} Birim</span>
+                    </h4>
+                    <div class="text-[10px] text-slate-500 leading-relaxed font-medium">${birimler.join(', ')}</div>
+                </div>`;
+        }
+        digerleriHtml += '</div>';
+    } else {
+        digerleriHtml = '<div class="text-xs text-slate-500 p-3 bg-white rounded-xl border border-slate-100 font-medium mt-2">Bulunmamaktadır.</div>';
+    }
+    
+    const html = `
+        <div class="text-center mb-6">
+            <h2 class="text-indigo-700 font-bold text-sm tracking-widest mb-1">BİLGİ NOTU</h2>
+            <h1 class="text-xl md:text-2xl font-black text-slate-900 uppercase">MERSİN İLİ KADASTRO GÜNCELLEME ÇALIŞMALARI</h1>
+            <h2 class="text-sm md:text-md font-bold text-slate-500 mt-1 uppercase">(MRS-ANM II GÜNCELLEME İŞİ)</h2>
+        </div>
+        
+        <div class="text-slate-700 text-sm leading-relaxed mb-6 bg-slate-100/50 p-4 rounded-xl border border-slate-200">
+            Mersin ili genelinde <strong>(MRS-ANM II Güncelleme İşi)</strong> yürütülen güncelleme çalışmaları kapsamında toplam <span class="font-bold text-indigo-700">${totalBirim}</span> adet birimde, <span class="font-bold text-indigo-700">${totalIDO.toLocaleString('tr-TR')}</span> adet İDÖ parseli ve <span class="font-bold text-indigo-700">${totalIhaleParsel.toLocaleString('tr-TR')}</span> adet parselde çalışmalar sürdürülmektedir.
+        </div>
+
+        <h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest mb-3">SÜREÇ ÖZETLERİ VE İLERLEME DURUMU</h3>
+        
+        <div class="space-y-3">
+            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-teal-500">
+                <p class="text-sm text-slate-700"><i class="fas fa-bullhorn text-teal-600 w-5"></i> <strong>Bilgilendirme İlanı:</strong> Toplam <strong class="text-teal-600">${stats.bilgilendirme.length}</strong> birimin bilgilendirme ilanı yapılmıştır.</p>
+                ${stats.bilgilendirme.length > 0 ? `<div class="mt-2 text-xs text-slate-500 p-2 bg-slate-50 rounded">${formatArray(stats.bilgilendirme)}</div>` : ''}
+            </div>
+            
+            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-blue-500">
+                <p class="text-sm text-slate-700"><i class="fas fa-gavel text-blue-600 w-5"></i> <strong>Komisyon Çalışmaları:</strong> Toplam <strong class="text-blue-600">${stats.komisyon.length}</strong> birimin komisyon çalışmaları tamamlanmıştır.</p>
+            </div>
+            
+            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-indigo-500">
+                <p class="text-sm text-slate-700"><i class="fas fa-check-double text-indigo-600 w-5"></i> <strong>Kesin Askı İlanı:</strong> Toplam <strong class="text-indigo-600">${stats.kesinAski.length}</strong> birimin kesin askı ilanı gerçekleştirilmiştir.</p>
+            </div>
+            
+            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-amber-500">
+                <p class="text-sm text-slate-700"><i class="fas fa-tasks text-amber-600 w-5"></i> <strong>Değerlendirme Aşaması:</strong> Toplam <strong class="text-amber-600">${stats.degerlendirme.length}</strong> birimde değerlendirme çalışmaları aktif olarak sürmektedir.</p>
+                ${stats.degerlendirme.length > 0 ? `<div class="mt-2 text-xs text-slate-600 p-3 bg-amber-50/50 rounded border border-amber-100 font-medium">Değerlendirmedeki Birimler: ${formatArray(stats.degerlendirme)}</div>` : ''}
+            </div>
+            
+            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-pink-500">
+                <p class="text-sm text-slate-700"><i class="fas fa-truck text-pink-600 w-5"></i> <strong>Firmaya Teslim:</strong> Toplam <strong class="text-pink-600">${stats.teslim.length}</strong> birim firmaya teslim edilmiş olup süreç takibindedir.</p>
+            </div>
+            
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm">
+                <p class="text-sm text-slate-700"><i class="fas fa-info-circle text-slate-500 w-5"></i> <strong>Diğer Çalışma Aşamasındaki Birimler:</strong> Kalan birimlerin aşama durumları ve dağılımları aşağıda detaylandırılmıştır.</p>
+                ${digerleriHtml}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('reportContentContainer').innerHTML = html;
+}
+
+function exportReportToWord() {
+    if (!computedReportData) { showToast("Hata", "Önce rapor oluşturmalısınız.", "error"); return; }
+    
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx;
+    
+    let wordChildren = [
+        new Paragraph({ text: "BİLGİ NOTU", heading: HeadingLevel.HEADING_2, alignment: AlignmentType.CENTER }),
+        new Paragraph({ text: "MERSİN İLİ KADASTRO GÜNCELLEME ÇALIŞMALARI\n(MRS-ANM II GÜNCELLEME İŞİ)\n", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
+        new Paragraph({
+            children: [
+                new TextRun("Mersin ili genelinde (MRS-ANM II Güncelleme İşi) yürütülen güncelleme çalışmaları kapsamında toplam "),
+                new TextRun({ text: `${computedReportData.totalBirim}`, bold: true }),
+                new TextRun(" adet birimde, "),
+                new TextRun({ text: `${computedReportData.totalIDO.toLocaleString('tr-TR')}`, bold: true }),
+                new TextRun(" adet İDÖ parseli ve "),
+                new TextRun({ text: `${computedReportData.totalIhaleParsel.toLocaleString('tr-TR')}`, bold: true }),
+                new TextRun(" adet parselde çalışmalar sürdürülmektedir.")
+            ],
+            spacing: { after: 400, line: 360 }
+        }),
+        new Paragraph({ text: "SÜREÇ ÖZETİ:", bold: true, spacing: { after: 200 } }),
+        
+        new Paragraph({
+            bullet: { level: 0 },
+            children: [
+                new TextRun({ text: "Bilgilendirme İlanı: ", bold: true }),
+                new TextRun(`Toplam ${computedReportData.stats.bilgilendirme.length} birimin bilgilendirme ilanı yapılmıştır.`)
+            ],
+            spacing: { after: 200, line: 360 }
+        }),
+        new Paragraph({
+            bullet: { level: 0 },
+            children: [
+                new TextRun({ text: "Komisyon Çalışmaları: ", bold: true }),
+                new TextRun(`Toplam ${computedReportData.stats.komisyon.length} birimin komisyon çalışmaları tamamlanmıştır.`)
+            ],
+            spacing: { after: 200, line: 360 }
+        }),
+        new Paragraph({
+            bullet: { level: 0 },
+            children: [
+                new TextRun({ text: "Kesin Askı İlanı: ", bold: true }),
+                new TextRun(`Toplam ${computedReportData.stats.kesinAski.length} birimin kesin askı ilanı gerçekleştirilmiştir.`)
+            ],
+            spacing: { after: 200, line: 360 }
+        }),
+        new Paragraph({
+            bullet: { level: 0 },
+            children: [
+                new TextRun({ text: "Değerlendirme Aşaması: ", bold: true }),
+                new TextRun(`Toplam ${computedReportData.stats.degerlendirme.length} birimde değerlendirme çalışmaları aktif olarak sürmektedir. ${computedReportData.stats.degerlendirme.length > 0 ? '(' + computedReportData.stats.degerlendirme.join(', ') + ')' : ''}`)
+            ],
+            spacing: { after: 200, line: 360 }
+        }),
+        new Paragraph({
+            bullet: { level: 0 },
+            children: [
+                new TextRun({ text: "Firmaya Teslim: ", bold: true }),
+                new TextRun(`Toplam ${computedReportData.stats.teslim.length} birim firmaya teslim edilmiş olup süreç takibindedir.`)
+            ],
+            spacing: { after: 200, line: 360 }
+        })
+    ];
+
+    if (Object.keys(computedReportData.stats.digerleri).length > 0) {
+        wordChildren.push(new Paragraph({
+            bullet: { level: 0 },
+            children: [
+                new TextRun({ text: "Diğer Çalışma Aşamasındaki Birimler: ", bold: true }),
+                new TextRun("Kalan birimlerin aşama durumları ve dağılımları aşağıda detaylandırılmıştır:")
+            ],
+            spacing: { after: 100, line: 360 }
+        }));
+        
+        for (const [durum, birimler] of Object.entries(computedReportData.stats.digerleri)) {
+            wordChildren.push(new Paragraph({
+                bullet: { level: 1 },
+                children: [
+                    new TextRun({ text: `${durum}: `, bold: true, size: 20 }),
+                    new TextRun({ text: birimler.join(', '), size: 20 })
+                ],
+                spacing: { after: 100, line: 360 }
+            }));
+        }
+    } else {
+        wordChildren.push(new Paragraph({
+            bullet: { level: 0 },
+            children: [
+                new TextRun({ text: "Diğer Çalışma Aşamasındaki Birimler: ", bold: true }),
+                new TextRun("Bulunmamaktadır.")
+            ],
+            spacing: { after: 200, line: 360 }
+        }));
+    }
+
+    const doc = new Document({
+        sections: [{ properties: {}, children: wordChildren }]
+    });
+
+    Packer.toBlob(doc).then(blob => {
+        saveAs(blob, `MRS_ANM_II_Bilgi_Notu_${new Date().toLocaleDateString('tr-TR')}.docx`);
+        showToast("Başarılı", "Word Belgesi başarıyla indirildi.", "success");
+    }).catch(err => {
+        showToast("Hata", "Word Belgesi oluşturulamadı.", "error");
     });
 }
 
+async function exportReportToPDF() {
+    if (!computedReportData || !computedReportData.totalBirim) {
+        showToast("Hata", "Önce rapor oluşturmalısınız.", "error");
+        return;
+    }
+
+    const container = document.getElementById('reportContentContainer');
+    showToast("Hazırlanıyor...", "PDF Raporu oluşturuluyor...", "info");
+
+    const originalHeight = container.style.height;
+    const originalMaxHeight = container.style.maxHeight;
+    const originalOverflow = container.style.overflow;
+    
+    container.style.height = 'auto';
+    container.style.maxHeight = 'none';
+    container.style.overflow = 'visible';
+
+    try {
+        const canvas = await html2canvas(container, {
+            scale: 2, 
+            useCORS: true,
+            backgroundColor: '#f8fafc'
+        });
+
+        const { jsPDF } = window.jspdf;
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        
+        const imgProps = pdf.getImageProperties(imgData);
+        const margin = 10;
+        const availableWidth = pdfWidth - (margin * 2);
+        
+        const ratio = availableWidth / imgProps.width;
+        const imgHeightInMm = imgProps.height * ratio;
+
+        let heightLeft = imgHeightInMm;
+        let position = margin;
+
+        pdf.addImage(imgData, 'JPEG', margin, position, availableWidth, imgHeightInMm);
+        heightLeft -= (pdfHeight - margin * 2);
+
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeightInMm + margin;
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', margin, position, availableWidth, imgHeightInMm);
+            heightLeft -= pdfHeight;
+        }
+
+        pdf.save(`Mersin_Kadastro_Raporu_${new Date().toLocaleDateString('tr-TR')}.pdf`);
+        showToast("Başarılı", "PDF başarıyla indirildi.", "success");
+    } catch (err) {
+        showToast("Hata", "PDF oluşturulamadı.", "error");
+    } finally {
+        container.style.height = originalHeight;
+        container.style.maxHeight = originalMaxHeight;
+        container.style.overflow = originalOverflow;
+    }
+}
+// =====================================================================
+
+// ====================== GELİŞMİŞ PDF YAZDIRMA (TABLO) ======================
 function openPdfModal() { document.getElementById('pdfModal').classList.remove('hidden'); }
 function closePdfModal() { document.getElementById('pdfModal').classList.add('hidden'); }
 
@@ -929,17 +1042,14 @@ function createPrintTable(items) {
     cols.forEach(c => html += `<th style="width:${c.w}px; background-color:#0f172a; color:white; padding:12px 6px; border:1px solid #64748b; text-align:center; font-weight:bold; overflow:hidden;">${c.n}</th>`);
     html += '</tr></thead><tbody>';
 
-    const getGenelDurumBadge = (val) => {
-        if(!val) val = "HERHANGİ BİRŞEY YAPILMADI";
-        const colorClass = getDurumColor(val);
-        const colors = tailwindColorMap[colorClass] || { bg: "#f1f5f9", text: "#475569" };
-        return `<span style="background-color:${colors.bg}; color:${colors.text}; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
-    };
-
-    const getNormalStatusBadge = (val) => {
-        if(val === "Yapıldı") return `<span style="background-color:#d1fae5; color:#047857; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
-        if(val === "Devam Ediyor") return `<span style="background-color:#fef3c7; color:#b45309; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
-        return `<span style="background-color:#f1f5f9; color:#475569; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val || 'Yapılmadı'}</span>`;
+    const getStatusBadge = (val, isGenelDurum = false) => {
+        if(!val || val === '-' || val === 'Yapılmadı' || val === 'HERHANGİ BİRŞEY YAPILMADI') return `<span style="background-color:#f1f5f9; color:#475569; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center; border: 1px solid #cbd5e1;">${val||'Yapılmadı'}</span>`;
+        if (isGenelDurum) {
+            const colors = getStringColorInfo(val);
+            return `<span style="background-color:${colors.bg}; color:${colors.text}; border: 1px solid ${colors.border}; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
+        }
+        if(val.includes('BİTTİ') || val.includes('YAPILDI') || val === 'Yapıldı') return `<span style="background-color:#d1fae5; color:#047857; border:1px solid #6ee7b7; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
+        return `<span style="background-color:#fef3c7; color:#b45309; border:1px solid #fcd34d; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
     };
 
     items.forEach(item => {
@@ -958,13 +1068,13 @@ function createPrintTable(items) {
             <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.kadastro_islem}</td>
             <td style="text-align:center; font-weight:900; font-size:14px; color:#047857; background:#ecfdf5; padding:8px 4px; border:1px solid #cbd5e1;">${item.parsel.toLocaleString('tr-TR')}</td>
             <td style="font-size:12px; color:#334155; padding:8px 6px; border:1px solid #cbd5e1;">${personeller}</td>
-            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getGenelDurumBadge(item.genel_durum)}</td>
-            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getNormalStatusBadge(item.altlik_durum)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.genel_durum, true)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.altlik_durum)}</td>
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getDateBadge(item.ucus_tarihi)}</td>
-            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getNormalStatusBadge(item.ucus_kiymet_durum)}</td>
-            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getNormalStatusBadge(item.degerlendirme_durum)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.ucus_kiymet_durum)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.degerlendirme_durum)}</td>
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getDateBadge(item.bilgilendirme_tarihi)}</td>
-            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getNormalStatusBadge(item.komisyon_durum)}</td>
+            <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.komisyon_durum)}</td>
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getDateBadge(item.kesin_aski_tarihi)}</td>
             <td style="font-size:11px; padding:8px 4px; border:1px solid #cbd5e1; overflow:hidden; text-overflow:ellipsis;">${item.notlar || '-'}</td>
         </tr>`;
@@ -1053,10 +1163,9 @@ async function exportToPDF(exportType) {
             pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight);
         }
 
-        pdf.save(`Ihale_Takip_${exportType}_${new Date().toLocaleDateString('tr-TR')}.pdf`);
+        pdf.save(`Ihale_Takip_Tablo_${exportType}_${new Date().toLocaleDateString('tr-TR')}.pdf`);
         showToast("Başarılı", "PDF başarıyla oluşturuldu.", "success");
     } catch (error) {
-        console.error(error);
         showToast("Hata", "PDF oluşturulamadı.", "error");
     } finally {
         document.body.removeChild(wrapper);
@@ -1064,25 +1173,19 @@ async function exportToPDF(exportType) {
         window.scrollTo(origScrollX, origScrollY);
     }
 }
+// =================================================================
 
-function openDocsModal() {
-    document.getElementById('docsModal').classList.remove('hidden');
-    fetchDocs();
-}
+function openDocsModal() { document.getElementById('docsModal').classList.remove('hidden'); fetchDocs(); }
 function closeDocsModal() { document.getElementById('docsModal').classList.add('hidden'); }
 
 async function fetchDocs() {
     try {
         const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${_docsPath}?t=${new Date().getTime()}`, {
-            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
-            cache: 'no-store'
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
-        if (res.ok) {
-            const files = await res.json();
-            renderDocs(files);
-        } else if (res.status === 404) {
-            renderDocs([]); 
-        } else throw new Error('Belgeler çekilemedi');
+        if (res.ok) renderDocs(await res.json());
+        else if (res.status === 404) renderDocs([]); 
+        else throw new Error('Belgeler çekilemedi');
     } catch (e) {
         document.getElementById('docsListContainer').innerHTML = `<div class="text-center text-red-500 text-xs py-4">Belgeler yüklenemedi.</div>`;
     }
@@ -1090,10 +1193,7 @@ async function fetchDocs() {
 
 function renderDocs(files) {
     const container = document.getElementById('docsListContainer');
-    if (files.length === 0) {
-        container.innerHTML = `<div class="text-center text-slate-400 text-xs py-4">Henüz belge yüklenmemiş.</div>`;
-        return;
-    }
+    if (files.length === 0) { container.innerHTML = `<div class="text-center text-slate-400 text-xs py-4">Henüz belge yüklenmemiş.</div>`; return; }
     let html = '<div class="flex flex-col gap-2">';
     files.forEach(file => {
         if(file.name.endsWith('.pdf')) {
@@ -1122,9 +1222,7 @@ async function handleDocUpload(event) {
         try {
             const body = { message: `Belge eklendi: ${safeName}`, content: base64Data };
             const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${_docsPath}/${safeName}`, {
-                method: 'PUT',
-                headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+                method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body)
             });
             if (res.ok) { showToast("Başarılı", "Belge sisteme yüklendi.", "success"); fetchDocs(); }
             else throw new Error("Yükleme hatası");
@@ -1135,56 +1233,16 @@ async function handleDocUpload(event) {
 }
 
 async function deleteDoc(path, sha) {
-    openConfirm("Belge Silme", "Bu belgeyi kalıcı olarak silmek istediğinize emin misiniz?", async () => {
-        showToast("Siliniyor...", "Belge kaldırılıyor.", "info");
-        try {
-            const body = { message: `Belge silindi: ${path}`, sha: sha };
-            const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${path}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            if(res.ok) { showToast("Silindi", "Belge başarıyla kaldırıldı.", "success"); fetchDocs(); }
-            else throw new Error("Silme hatası");
-        } catch(err) { showToast("Hata", "Belge silinemedi.", "error"); }
-    });
-}
-
-function openPersonnelModal() { renderPersonnelList(); document.getElementById('personnelModal').classList.remove('hidden'); }
-function closePersonnelModal() { document.getElementById('personnelModal').classList.add('hidden'); }
-
-function addPerson() {
-    const role = document.getElementById('newPersonRole').value;
-    const nameInput = document.getElementById('newPersonName');
-    const name = nameInput.value.trim().toLocaleUpperCase('tr-TR');
-    if (!name) return showToast("Uyarı", "Lütfen bir isim girin.", "error");
-    if (personnel[role].includes(name)) return showToast("Uyarı", "Bu personel zaten ekli.", "error");
-    personnel[role].push(name);
-    localStorage.setItem('customPersonnel', JSON.stringify(personnel));
-    nameInput.value = ""; renderPersonnelList(); renderTable();
-    showToast("Eklendi", `${name} listeye eklendi.`);
-}
-
-function removePerson(role, index) {
-    openConfirm("Personel Sil", "Bu personeli listeden silmek istediğinize emin misiniz?", () => {
-        personnel[role].splice(index, 1);
-        localStorage.setItem('customPersonnel', JSON.stringify(personnel));
-        renderPersonnelList(); renderTable();
-    });
-}
-
-const roleNames = { muhendis: "Mühendisler", tekniker: "Teknikerler", kadastro: "Kadastro Üyeleri", fen: "Fen Kontrol", tas: "Tas. Kontrol" };
-
-function renderPersonnelList() {
-    let html = "";
-    for (const [key, list] of Object.entries(personnel)) {
-        html += `<div class="mb-4"><h4 class="font-bold text-xs text-slate-500 mb-2 uppercase border-b border-slate-200 pb-1">${roleNames[key]}</h4><div class="flex flex-wrap gap-2">`;
-        list.forEach((name, idx) => {
-            html += `<span class="bg-white border border-slate-200 text-slate-700 text-xs font-semibold px-2.5 py-1.5 rounded shadow-sm flex items-center gap-2">${name} <i class="fas fa-times text-red-400 hover:text-red-600 cursor-pointer ml-1" onclick="removePerson('${key}', ${idx})"></i></span>`;
+    if(!confirm("Bu belgeyi kalıcı olarak silmek istediğinize emin misiniz?")) return;
+    showToast("Siliniyor...", "Belge kaldırılıyor.", "info");
+    try {
+        const body = { message: `Belge silindi: ${path}`, sha: sha };
+        const res = await fetch(`https://api.github.com/repos/${_repo}/contents/${path}`, {
+            method: 'DELETE', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body)
         });
-        html += `</div></div>`;
-    }
-    document.getElementById('personnelListContainer').innerHTML = html;
+        if(res.ok) { showToast("Silindi", "Belge başarıyla kaldırıldı.", "success"); fetchDocs(); }
+        else throw new Error("Silme hatası");
+    } catch(err) { showToast("Hata", "Belge silinemedi.", "error"); }
 }
 
 function toggleRegion(regionId) {
@@ -1212,8 +1270,7 @@ function clearAllFilters() {
 
 function togglePersonFilter(personName) {
     activePersonFilter = activePersonFilter === personName ? null : personName;
-    document.getElementById('globalSearch').value = "";
-    updateFilterBanner(); renderTable();
+    document.getElementById('globalSearch').value = ""; updateFilterBanner(); renderTable();
 }
 
 function setCardFilter(field, label, val) {
@@ -1228,6 +1285,42 @@ function toggleDropdown(sn) {
     else { el.classList.add('hidden'); el.classList.remove('flex'); openDropdowns.delete(sn); }
 }
 
+function openPersonnelModal() { renderPersonnelList(); document.getElementById('personnelModal').classList.remove('hidden'); }
+function closePersonnelModal() { document.getElementById('personnelModal').classList.add('hidden'); }
+
+function addPerson() {
+    const role = document.getElementById('newPersonRole').value;
+    const nameInput = document.getElementById('newPersonName');
+    const name = nameInput.value.trim().toLocaleUpperCase('tr-TR');
+    if (!name) return alert("Lütfen bir isim girin.");
+    if (personnel[role].includes(name)) return alert("Bu personel zaten ekli.");
+    personnel[role].push(name);
+    localStorage.setItem('customPersonnel', JSON.stringify(personnel));
+    nameInput.value = ""; renderPersonnelList(); renderTable(); showToast("Eklendi", `${name} listeye eklendi.`);
+}
+
+function removePerson(role, index) {
+    if(confirm("Bu personeli listeden silmek istediğinize emin misiniz?")) {
+        personnel[role].splice(index, 1);
+        localStorage.setItem('customPersonnel', JSON.stringify(personnel));
+        renderPersonnelList(); renderTable();
+    }
+}
+
+const roleNames = { muhendis: "Mühendisler", tekniker: "Teknikerler", kadastro: "Kadastro Üyeleri", fen: "Fen Kontrol", tas: "Tas. Kontrol" };
+
+function renderPersonnelList() {
+    let html = "";
+    for (const [key, list] of Object.entries(personnel)) {
+        html += `<div class="mb-4"><h4 class="font-bold text-xs text-slate-500 mb-2 uppercase border-b border-slate-200 pb-1">${roleNames[key]}</h4><div class="flex flex-wrap gap-2">`;
+        list.forEach((name, idx) => {
+            html += `<span class="bg-white border border-slate-200 text-slate-700 text-xs font-semibold px-2.5 py-1.5 rounded shadow-sm flex items-center gap-2">${name} <i class="fas fa-times text-red-400 hover:text-red-600 cursor-pointer ml-1" onclick="removePerson('${key}', ${idx})"></i></span>`;
+        });
+        html += `</div></div>`;
+    }
+    document.getElementById('personnelListContainer').innerHTML = html;
+}
+
 function createSelect(currentValue, list, sn, field, roleLabel) {
     const roleSpan = `<span class="text-[10px] text-slate-500 font-medium ml-1 shrink-0">(${roleLabel})</span>`;
     if (!isAdmin) return `<div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 rounded px-1"><span class="font-bold text-slate-700 text-[11px] truncate">${currentValue || '-'}</span> ${roleSpan}</div>`;
@@ -1239,30 +1332,25 @@ function createStatusSelect(val, sn, field) {
     const opts = ["Yapılmadı", "Devam Ediyor", "Yapıldı"];
     val = val || "Yapılmadı";
     let colorClass = "text-slate-600 bg-slate-100";
-    if(val === "Devam Ediyor") colorClass = "text-amber-700 bg-amber-100";
-    if(val === "Yapıldı") colorClass = "text-emerald-700 bg-emerald-100";
+    if(val === "Devam Ediyor") colorClass = "text-amber-700 bg-amber-100 border border-amber-200";
+    if(val === "Yapıldı") colorClass = "text-emerald-700 bg-emerald-100 border border-emerald-200";
 
     let options = opts.map(o => `<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
-    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">${options}</select>`;
+    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm">${options}</select>`;
 }
 
 function createGenelDurumSelect(val, sn, field) {
     val = val || "HERHANGİ BİRŞEY YAPILMADI";
-    let colorClass = getDurumColor(val);
+    const colors = getStringColorInfo(val);
 
-    let options = durumListesi.map(o => {
-        // Optionlar için de kendi renklerini gösterebiliriz (bazı tarayıcılar destekler)
-        return `<option value="${o}" ${o===val?'selected':''} class="${getDurumColor(o)} font-bold">${o}</option>`;
-    }).join('');
-    
-    // Select öğesine renk atanır.
-    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[10px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors whitespace-normal h-full shadow-sm border-none leading-tight">${options}</select>`;
+    let options = durumListesi.map(o => `<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
+    return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[10px] font-bold outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors whitespace-normal h-full shadow-sm leading-tight" style="background-color:${colors.bg}; color:${colors.text}; border: 1px solid ${colors.border};">${options}</select>`;
 }
 
 function createDateInput(val, sn, field) {
     val = val || "";
-    let colorClass = val ? "text-indigo-800 bg-indigo-200" : "text-slate-600 bg-slate-50";
-    return `<input type="date" value="${val}" onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm border-none">`;
+    let colorClass = val ? "text-indigo-800 bg-indigo-200 border border-indigo-300" : "text-slate-600 bg-slate-50";
+    return `<input type="date" value="${val}" onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm">`;
 }
 
 function createTextInput(val, sn, field) {
@@ -1278,8 +1366,7 @@ function reorderData(fromSn, toSn) {
     
     data.forEach((d, i) => d.sn = i + 1);
     localStorage.setItem('ihaleData', JSON.stringify(data));
-    setUnsavedState(true);
-    renderTable();
+    setUnsavedState(true); renderTable();
 }
 
 function renderTable() {
@@ -1321,7 +1408,7 @@ function renderTable() {
             row.addEventListener('dragstart', (e) => {
                 draggedSn = item.sn;
                 e.dataTransfer.effectAllowed = 'move';
-                row.classList.add('dragging');
+                row.classList.add('opacity-50', 'bg-slate-100');
             });
             row.addEventListener('dragover', (e) => { e.preventDefault(); row.classList.add('border-t-2', 'border-blue-500'); });
             row.addEventListener('dragleave', () => row.classList.remove('border-t-2', 'border-blue-500'));
@@ -1330,7 +1417,7 @@ function renderTable() {
                 row.classList.remove('border-t-2', 'border-blue-500');
                 if(draggedSn && draggedSn !== item.sn) reorderData(draggedSn, item.sn);
             });
-            row.addEventListener('dragend', () => { row.classList.remove('dragging'); draggedSn = null; });
+            row.addEventListener('dragend', () => { row.classList.remove('opacity-50', 'bg-slate-100'); draggedSn = null; });
         }
         
         row.innerHTML = `
@@ -1376,8 +1463,7 @@ function renderTable() {
         tableBody.appendChild(row);
     });
 
-    calculateStats();
-    calculateProgressStats();
+    calculateStats(); calculateProgressStats();
 }
 
 function calculateStats() {
@@ -1416,10 +1502,8 @@ function calculateStats() {
         document.getElementById(domId).innerHTML = html;
     };
 
-    buildCards(r1Eng, 'reg1-engStats');
-    buildCards(r1Tech, 'reg1-techStats');
-    buildCards(r2Eng, 'reg2-engStats');
-    buildCards(r2Tech, 'reg2-techStats');
+    buildCards(r1Eng, 'reg1-engStats'); buildCards(r1Tech, 'reg1-techStats');
+    buildCards(r2Eng, 'reg2-engStats'); buildCards(r2Tech, 'reg2-techStats');
 }
 
 function calculateProgressStats() {
@@ -1483,7 +1567,6 @@ function calculateProgressStats() {
 
 function updateValue(sn, field, newValue) {
     const adminOnlyFields = ['toplam_parsel', 'ido', 'yirmi_iki_a', 'ek_1', 'kadastro_islem', 'parsel', 'muhendis', 'tekniker', 'kadastro', 'fen', 'tas'];
-    
     if (!isAdmin && adminOnlyFields.includes(field)) return;
 
     const item = data.find(d => d.sn === sn);
@@ -1495,20 +1578,16 @@ function updateValue(sn, field, newValue) {
         localStorage.setItem('ihaleData', JSON.stringify(data));
         setUnsavedState(true);
         
-        if (!adminOnlyFields.includes(field)) {
-            if(field !== 'notlar') renderTable();
-        } else {
-            calculateStats();
-        }
+        if (!adminOnlyFields.includes(field)) { if(field !== 'notlar') renderTable(); } 
+        else { calculateStats(); }
         calculateProgressStats();
     }
 }
 
 function resetData() {
-    openConfirm("Sistemi Sıfırla", "Tüm yerel değişiklikler silinecek ve sistem buluttan yeniden çekilecek. Onaylıyor musunuz?", () => {
-        localStorage.removeItem('ihaleData');
-        fetchFromGithub(false);
-    });
+    if (confirm("Tüm yerel değişiklikler silinecek ve sistem sıfırlanacak. Onaylıyor musunuz?")) {
+        localStorage.removeItem('ihaleData'); fetchFromGithub(false);
+    }
 }
 
 function exportToExcel() {
