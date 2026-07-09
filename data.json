@@ -315,7 +315,8 @@
     "genel_durum": "UÇUŞ YAPILIYOR",
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Yapılmadı",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-07"
   },
   {
     "sn": 18,
@@ -354,7 +355,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ YAPILIYOR",
     "altlik_durum": "Yapıldı",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-07"
   },
   {
     "sn": 20,
@@ -373,7 +375,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ YAPILIYOR",
     "altlik_durum": "Yapıldı",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-07"
   },
   {
     "sn": 21,
@@ -821,7 +824,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ YAPILIYOR"
+    "genel_durum": "UÇUŞ YAPILIYOR",
+    "ucus_tarihi": "2026-07-09"
   },
   {
     "sn": 45,
@@ -857,7 +861,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ YAPILIYOR"
+    "genel_durum": "UÇUŞ YAPILIYOR",
+    "ucus_tarihi": "2026-07-09"
   },
   {
     "sn": 47,
