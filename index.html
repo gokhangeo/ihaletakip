@@ -1650,7 +1650,7 @@ function renderTable() {
                 row.classList.add('opacity-50', 'bg-slate-100');
             });
             row.addEventListener('dragover', (e) => { e.preventDefault(); row.classList.add('border-t-2', 'border-blue-500'); });
-            row.addEventListener('dragleave', () => row.classList.remove('border-t-2', 'border-blue-500'); });
+            row.addEventListener('dragleave', () => { row.classList.remove('border-t-2', 'border-blue-500'); });
             row.addEventListener('drop', (e) => {
                 e.preventDefault();
                 row.classList.remove('border-t-2', 'border-blue-500');
