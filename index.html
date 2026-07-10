@@ -240,22 +240,15 @@
             <!-- JS ile dolacak -->
         </div>
 
-        <!-- YENİ EKLENEN: İhale Yatırım Takip Bölümü -->
+        <!-- İhale Yatırım Takip Bölümü -->
         <div class="mb-4">
             <h3 class="font-extrabold text-sm text-slate-700 mb-3 uppercase tracking-wider ml-1">
                 <i class="fas fa-chart-pie text-blue-500 mr-1.5"></i> İhale Yatırım ve İlerleme Takibi
                 <span class="text-xs font-normal text-slate-400 normal-case ml-2">(Sözleşme Tarihi: 18.05.2026 - Bitiş: 10.08.2027)</span>
             </h3>
             
-            <!-- Finansal Kartlar -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3" id="finansalKartlar">
-                <!-- JavaScript ile Doldurulacak -->
-            </div>
-
-            <!-- İlerleme Çubukları -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3" id="ilerlemeCubuklari">
-                <!-- JavaScript ile Doldurulacak -->
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3" id="finansalKartlar"></div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3" id="ilerlemeCubuklari"></div>
         </div>
 
         <!-- Ana Tablo Bölümü -->
@@ -337,7 +330,7 @@
     </div>
 </div>
 
-<!-- Durum Yönetim Modalı (Sürükle Bırak) -->
+<!-- Durum Yönetim Modalı -->
 <div id="durumModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -507,7 +500,7 @@ let durumListesi = [...defaultDurumlar];
 let data = JSON.parse(localStorage.getItem('ihaleData')) || [];
 let currentFilteredData = data; 
 
-// Yatırım Verileri (Varsayılan olarak resimdeki veriler)
+// Yatırım Verileri
 let yatirimData = JSON.parse(localStorage.getItem('yatirimData')) || {
     sozlesme: 56880248,
     odenen: 5669990,
@@ -900,7 +893,7 @@ function generateDynamicReport() {
     let totalIhaleParsel = 0;
     
     let stats = {
-        bilgilendirme: [], komisyon: [], kesinAski: [], teslim: [], digerleri: {}
+        bilgilendirme: [], komisyon: [], kesinAski: [], teslim: [], degerlendirme: [], digerleri: {}
     };
 
     currentFilteredData.forEach(d => {
@@ -910,17 +903,20 @@ function generateDynamicReport() {
         const birimName = `${d.ilce}-${d.mahalle}`;
         
         // ANA BAŞLIKLAR
-        if (d.kesin_aski_tarihi || d.genel_durum === "KESİN ASKIDA" || d.genel_durum === "KESİN ASKIDAN İNDİ. BEKLEMEDE" || d.genel_durum === "TESCİLİ BİTTİ") {
-            stats.kesinAski.push(birimName);
+        if (d.bilgilendirme_tarihi) {
+            stats.bilgilendirme.push(birimName);
         }
         if (d.komisyon_durum === "Yapıldı" || d.genel_durum === "KOMİSYON YAPILDI") {
             stats.komisyon.push(birimName);
         }
-        if (d.bilgilendirme_tarihi) {
-            stats.bilgilendirme.push(birimName);
+        if (d.kesin_aski_tarihi || d.genel_durum === "KESİN ASKIDA" || d.genel_durum === "KESİN ASKIDAN İNDİ. BEKLEMEDE" || d.genel_durum === "TESCİLİ BİTTİ") {
+            stats.kesinAski.push(birimName);
         }
         if (d.genel_durum === "FİRMAYA TESLİM EDİLDİ") {
             stats.teslim.push(birimName);
+        }
+        if (d.degerlendirme_durum === "Devam Ediyor" || d.genel_durum === "DEĞERLENDİRMEDE") {
+            stats.degerlendirme.push(birimName);
         }
 
         // DİĞER AŞAMALAR
@@ -942,7 +938,7 @@ function generateDynamicReport() {
             hasAnyDiger = true;
         }
         if (d.ucus_kiymet_durum === "Devam Ediyor") {
-            addDiger("UÇUŞ KIYMETLENDİRME BEKLİYOR");
+            addDiger("UÇUŞ KIYMETLENDİRME BEKLEYENLER");
             hasAnyDiger = true;
         }
         if (d.degerlendirme_durum === "Yapıldı") {
@@ -965,18 +961,37 @@ function generateDynamicReport() {
         }
     });
 
-    computedReportData = { totalBirim, totalIDO, totalIhaleParsel, stats };
+    // Yatırım Hesaplamaları
+    const sozlesme = parseInt(yatirimData.sozlesme) || 0;
+    const odenen = parseInt(yatirimData.odenen) || 0;
+    const kalan = Math.max(0, sozlesme - odenen);
+    const fiziksel = parseFloat(yatirimData.fiziksel) || 0;
+    const nakdi = sozlesme > 0 ? ((odenen / sozlesme) * 100) : 0;
+    
+    const baslangic = new Date('2026-05-18T00:00:00');
+    const bitis = new Date('2027-08-10T00:00:00');
+    const bugun = new Date();
+    let sureYuzde = 0;
+    if (bugun >= bitis) sureYuzde = 100;
+    else if (bugun > baslangic) {
+        sureYuzde = ((bugun - baslangic) / (bitis - baslangic)) * 100;
+    }
+
+    computedReportData = { 
+        totalBirim, totalIDO, totalIhaleParsel, stats, 
+        yatirim: { sozlesme, odenen, kalan, fiziksel, nakdi, sureYuzde } 
+    };
 
     const formatArray = (arr) => arr.length > 0 ? arr.join(', ') : 'Bulunmamaktadır.';
     
     let digerleriHtml = '';
     if (Object.keys(stats.digerleri).length > 0) {
-        digerleriHtml = '<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-3">';
+        digerleriHtml = '<div class="mt-4">';
         
         const priority = { 
             "ALTLIK YAPILANLAR": 1,
             "UÇUŞ YAPILANLAR": 2, 
-            "UÇUŞ KIYMETLENDİRME BEKLİYOR": 3, 
+            "UÇUŞ KIYMETLENDİRME BEKLEYENLER": 3, 
             "DEĞERLENDİRMESİ BİTENLER": 4, 
             "DEĞERLENDİRME DEVAM EDENLER": 5 
         };
@@ -991,55 +1006,100 @@ function generateDynamicReport() {
         for (const durum of sortedKeys) {
             const birimler = stats.digerleri[durum];
             digerleriHtml += `
-                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
-                    <h4 class="font-bold text-[11px] text-slate-700 mb-2 border-b border-slate-100 pb-1.5 flex justify-between items-center">
-                        <span class="text-indigo-700"><i class="fas fa-layer-group mr-1.5 opacity-50"></i>${durum}</span>
-                        <span class="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md text-[10px] font-black border border-indigo-100">${birimler.length} Birim</span>
-                    </h4>
-                    <div class="text-[10px] text-slate-500 leading-relaxed font-medium">${birimler.join(', ')}</div>
+                <div class="mb-4 bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-100">
+                        <span class="font-bold text-[13px] text-slate-800 uppercase">${durum}</span>
+                        <span class="font-bold text-[13px] text-slate-800">${birimler.length} Birim</span>
+                    </div>
+                    <div class="text-[11px] text-slate-600 leading-relaxed font-medium uppercase">${birimler.join(', ')}</div>
                 </div>`;
         }
         digerleriHtml += '</div>';
     } else {
-        digerleriHtml = '<div class="text-xs text-slate-500 p-3 bg-white rounded-xl border border-slate-100 font-medium mt-2">Bulunmamaktadır.</div>';
+        digerleriHtml = '<div class="text-[13px] text-slate-500 mt-2 font-medium">Bulunmamaktadır.</div>';
     }
     
     const html = `
-        <div class="text-center mb-6">
-            <h2 class="text-indigo-700 font-bold text-sm tracking-widest mb-1">BİLGİ NOTU</h2>
+        <div class="text-center mb-8">
+            <h2 class="text-indigo-700 font-bold text-[13px] tracking-[0.2em] mb-2">BİLGİ NOTU</h2>
             <h1 class="text-xl md:text-2xl font-black text-slate-900 uppercase">MERSİN İLİ KADASTRO GÜNCELLEME ÇALIŞMALARI</h1>
-            <h2 class="text-sm md:text-md font-bold text-slate-500 mt-1 uppercase">(MRS-ANM II GÜNCELLEME İŞİ)</h2>
+            <h2 class="text-sm md:text-base font-bold text-slate-600 mt-1 uppercase">(MRS-ANM II GÜNCELLEME İŞİ)</h2>
         </div>
         
-        <div class="text-slate-700 text-sm leading-relaxed mb-6 bg-slate-100/50 p-4 rounded-xl border border-slate-200">
-            Güncel liste görünümünde yürütülen güncelleme çalışmaları kapsamında toplam <span class="font-bold text-indigo-700">${totalBirim}</span> adet birimde, <span class="font-bold text-indigo-700">${totalIDO.toLocaleString('tr-TR')}</span> adet İDÖ parseli ve <span class="font-bold text-indigo-700">${totalIhaleParsel.toLocaleString('tr-TR')}</span> adet parselde çalışmalar sürdürülmektedir.
+        <div class="text-slate-700 text-[13px] leading-relaxed mb-8">
+            Mersin ili genelinde (MRS-ANM II Güncelleme İşi) yürütülen güncelleme çalışmaları kapsamında toplam <strong class="text-indigo-700">${totalBirim}</strong> adet birimde, <strong class="text-indigo-700">${totalIDO.toLocaleString('tr-TR')}</strong> adet İDÖ parseli ve <strong class="text-indigo-700">${totalIhaleParsel.toLocaleString('tr-TR')}</strong> adet parselde çalışmalar sürdürülmektedir.
         </div>
 
-        <h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest mb-3">SÜREÇ ÖZETLERİ VE İLERLEME DURUMU</h3>
+        <h3 class="font-bold text-[13px] text-slate-400 uppercase tracking-widest mb-4">YATIRIM VE İLERLEME DURUMU</h3>
         
-        <div class="space-y-3">
-            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-teal-500">
-                <p class="text-sm text-slate-700"><i class="fas fa-bullhorn text-teal-600 w-5"></i> <strong>Bilgilendirme İlanı:</strong> Toplam <strong class="text-teal-600">${stats.bilgilendirme.length}</strong> birimin bilgilendirme ilanı yapılmıştır.</p>
-                ${stats.bilgilendirme.length > 0 ? `<div class="mt-2 text-xs text-slate-500 p-2 bg-slate-50 rounded">${formatArray(stats.bilgilendirme)}</div>` : ''}
+        <!-- Rapor İçi Yatırım Kartları -->
+        <div class="grid grid-cols-3 gap-3 mb-4">
+            <div class="bg-orange-50 border border-orange-200 p-3 rounded-lg text-center shadow-sm">
+                <div class="text-[10px] text-orange-600 font-bold uppercase mb-1">Sözleşme Tutarı</div>
+                <div class="text-sm md:text-base font-black text-orange-700">₺ ${sozlesme.toLocaleString('tr-TR')}</div>
             </div>
-            
-            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-blue-500">
-                <p class="text-sm text-slate-700"><i class="fas fa-gavel text-blue-600 w-5"></i> <strong>Komisyon Çalışmaları:</strong> Toplam <strong class="text-blue-600">${stats.komisyon.length}</strong> birimin komisyon çalışmaları tamamlanmıştır.</p>
+            <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg text-center shadow-sm">
+                <div class="text-[10px] text-blue-600 font-bold uppercase mb-1">Ödenen Hakediş</div>
+                <div class="text-sm md:text-base font-black text-blue-700">₺ ${odenen.toLocaleString('tr-TR')}</div>
             </div>
-            
-            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-indigo-500">
-                <p class="text-sm text-slate-700"><i class="fas fa-check-double text-indigo-600 w-5"></i> <strong>Kesin Askı İlanı:</strong> Toplam <strong class="text-indigo-600">${stats.kesinAski.length}</strong> birimin kesin askı ilanı gerçekleştirilmiştir.</p>
-            </div>
-            
-            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-pink-500">
-                <p class="text-sm text-slate-700"><i class="fas fa-truck text-pink-600 w-5"></i> <strong>Firmaya Teslim:</strong> Toplam <strong class="text-pink-600">${stats.teslim.length}</strong> birim firmaya teslim edilmiş olup süreç takibindedir.</p>
-            </div>
-            
-            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm">
-                <p class="text-sm text-slate-700 mb-2"><i class="fas fa-info-circle text-slate-500 w-5"></i> <strong>Diğer Çalışma Aşamasındaki Birimler:</strong> Kalan birimlerin aşama durumları (birden çok aşaması sürenler de dahil) aşağıda detaylandırılmıştır.</p>
-                ${digerleriHtml}
+            <div class="bg-green-50 border border-green-200 p-3 rounded-lg text-center shadow-sm">
+                <div class="text-[10px] text-green-600 font-bold uppercase mb-1">Kalan Hakediş</div>
+                <div class="text-sm md:text-base font-black text-green-700">₺ ${kalan.toLocaleString('tr-TR')}</div>
             </div>
         </div>
+
+        <!-- Rapor İçi İlerleme Çubukları -->
+        <div class="space-y-3 mb-8 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+            <div class="flex justify-between items-center text-[11px] font-bold text-slate-600">
+                <span class="w-1/3">Proje Süresi (%${sureYuzde.toFixed(0)})</span>
+                <div class="w-2/3 bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
+                    <div class="bg-orange-400 h-full" style="width: ${sureYuzde}%"></div>
+                </div>
+            </div>
+            <div class="flex justify-between items-center text-[11px] font-bold text-slate-600">
+                <span class="w-1/3">Fiziksel Tamamlanma (%${fiziksel.toFixed(0)})</span>
+                <div class="w-2/3 bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
+                    <div class="bg-green-400 h-full" style="width: ${fiziksel}%"></div>
+                </div>
+            </div>
+            <div class="flex justify-between items-center text-[11px] font-bold text-slate-600">
+                <span class="w-1/3">Nakdi Tamamlanma (%${nakdi.toFixed(0)})</span>
+                <div class="w-2/3 bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
+                    <div class="bg-blue-400 h-full" style="width: ${nakdi}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="font-bold text-[13px] text-slate-400 uppercase tracking-widest mb-4">SÜREÇ ÖZETLERİ</h3>
+        
+        <div class="space-y-3">
+            <div class="flex flex-col p-3 bg-slate-50 rounded-lg text-[13px]">
+                <div><i class="fas fa-bullhorn text-teal-600 w-5"></i> <strong>Bilgilendirme İlanı:</strong> Toplam <strong>${stats.bilgilendirme.length}</strong> birimin bilgilendirme ilanı yapılmıştır.</div>
+            </div>
+            
+            <div class="flex flex-col p-3 bg-slate-50 rounded-lg text-[13px]">
+                <div><i class="fas fa-gavel text-blue-600 w-5"></i> <strong>Komisyon Çalışmaları:</strong> Toplam <strong>${stats.komisyon.length}</strong> birimin komisyon çalışmaları tamamlanmıştır.</div>
+            </div>
+            
+            <div class="flex flex-col p-3 bg-slate-50 rounded-lg text-[13px]">
+                <div><i class="fas fa-check-double text-indigo-600 w-5"></i> <strong>Kesin Askı İlanı:</strong> Toplam <strong>${stats.kesinAski.length}</strong> birimin kesin askı ilanı gerçekleştirilmiştir.</div>
+            </div>
+
+            <div class="flex flex-col p-3 bg-slate-50 rounded-lg text-[13px]">
+                <div><i class="fas fa-list text-amber-600 w-5"></i> <strong>Değerlendirme Aşaması:</strong> Toplam <strong>${stats.degerlendirme.length}</strong> birimde değerlendirme çalışmaları aktif olarak sürmektedir.</div>
+                ${stats.degerlendirme.length > 0 ? `<div class="mt-2 text-[11px] text-slate-500 bg-white border border-slate-200 p-2 rounded">Değerlendirmedeki Birimler: ${formatArray(stats.degerlendirme)}</div>` : ''}
+            </div>
+            
+            <div class="flex flex-col p-3 bg-slate-50 rounded-lg text-[13px]">
+                <div><i class="fas fa-truck text-pink-600 w-5"></i> <strong>Firmaya Teslim:</strong> Toplam <strong>${stats.teslim.length}</strong> birim firmaya teslim edilmiş olup süreç takibindedir.</div>
+            </div>
+            
+            <div class="flex flex-col p-3 bg-slate-50 rounded-lg text-[13px] border-none shadow-none">
+                <div><i class="fas fa-info-circle text-slate-500 w-5"></i> <strong>Diğer Çalışma Aşamasındaki Birimler:</strong> Kalan birimlerin aşama durumları ve dağılımları aşağıda detaylandırılmıştır.</div>
+            </div>
+        </div>
+
+        ${digerleriHtml}
     `;
     
     document.getElementById('reportContentContainer').innerHTML = html;
@@ -1055,7 +1115,7 @@ function exportReportToWord() {
         new Paragraph({ text: "MERSİN İLİ KADASTRO GÜNCELLEME ÇALIŞMALARI\n(MRS-ANM II GÜNCELLEME İŞİ)\n", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
         new Paragraph({
             children: [
-                new TextRun("Güncel liste görünümünde yürütülen güncelleme çalışmaları kapsamında toplam "),
+                new TextRun("Mersin ili genelinde (MRS-ANM II Güncelleme İşi) yürütülen güncelleme çalışmaları kapsamında toplam "),
                 new TextRun({ text: `${computedReportData.totalBirim}`, bold: true }),
                 new TextRun(" adet birimde, "),
                 new TextRun({ text: `${computedReportData.totalIDO.toLocaleString('tr-TR')}`, bold: true }),
@@ -1065,6 +1125,33 @@ function exportReportToWord() {
             ],
             spacing: { after: 400, line: 360 }
         }),
+        
+        new Paragraph({ text: "YATIRIM VE İLERLEME DURUMU:", bold: true, spacing: { after: 200 } }),
+        new Paragraph({
+            bullet: { level: 0 },
+            children: [
+                new TextRun({ text: "Sözleşme Tutarı: ", bold: true }),
+                new TextRun(`₺ ${computedReportData.yatirim.sozlesme.toLocaleString('tr-TR')} `),
+                new TextRun({ text: "  |  Ödenen Hakediş: ", bold: true }),
+                new TextRun(`₺ ${computedReportData.yatirim.odenen.toLocaleString('tr-TR')} `),
+                new TextRun({ text: "  |  Kalan: ", bold: true }),
+                new TextRun(`₺ ${computedReportData.yatirim.kalan.toLocaleString('tr-TR')}`)
+            ],
+            spacing: { after: 100, line: 360 }
+        }),
+        new Paragraph({
+            bullet: { level: 0 },
+            children: [
+                new TextRun({ text: "Proje Süresi Kullanımı: ", bold: true }),
+                new TextRun(`%${computedReportData.yatirim.sureYuzde.toFixed(0)} `),
+                new TextRun({ text: "  |  Fiziksel Tamamlanma: ", bold: true }),
+                new TextRun(`%${computedReportData.yatirim.fiziksel.toFixed(0)} `),
+                new TextRun({ text: "  |  Nakdi Tamamlanma: ", bold: true }),
+                new TextRun(`%${computedReportData.yatirim.nakdi.toFixed(0)}`)
+            ],
+            spacing: { after: 400, line: 360 }
+        }),
+
         new Paragraph({ text: "SÜREÇ ÖZETİ:", bold: true, spacing: { after: 200 } }),
         
         new Paragraph({
@@ -1094,21 +1181,44 @@ function exportReportToWord() {
         new Paragraph({
             bullet: { level: 0 },
             children: [
+                new TextRun({ text: "Değerlendirme Aşaması: ", bold: true }),
+                new TextRun(`Toplam ${computedReportData.stats.degerlendirme.length} birimde değerlendirme çalışmaları aktif olarak sürmektedir.`)
+            ],
+            spacing: { after: 50, line: 360 }
+        })
+    ];
+
+    if (computedReportData.stats.degerlendirme.length > 0) {
+        wordChildren.push(new Paragraph({
+            children: [
+                new TextRun({ text: `Değerlendirmedeki Birimler: `, bold: true }),
+                new TextRun(computedReportData.stats.degerlendirme.join(', '))
+            ],
+            spacing: { after: 200, line: 360 }
+        }));
+    } else {
+        wordChildren.push(new Paragraph({ spacing: { after: 200, line: 360 } }));
+    }
+
+    wordChildren.push(
+        new Paragraph({
+            bullet: { level: 0 },
+            children: [
                 new TextRun({ text: "Firmaya Teslim: ", bold: true }),
                 new TextRun(`Toplam ${computedReportData.stats.teslim.length} birim firmaya teslim edilmiş olup süreç takibindedir.`)
             ],
             spacing: { after: 200, line: 360 }
         })
-    ];
+    );
 
     if (Object.keys(computedReportData.stats.digerleri).length > 0) {
         wordChildren.push(new Paragraph({
             bullet: { level: 0 },
             children: [
                 new TextRun({ text: "Diğer Çalışma Aşamasındaki Birimler: ", bold: true }),
-                new TextRun("Kalan birimlerin aşama durumları aşağıda detaylandırılmıştır:")
+                new TextRun("Kalan birimlerin aşama durumları ve dağılımları aşağıda detaylandırılmıştır:")
             ],
-            spacing: { after: 100, line: 360 }
+            spacing: { after: 300, line: 360 }
         }));
         
         const priority = { 
@@ -1128,13 +1238,19 @@ function exportReportToWord() {
 
         for (const durum of sortedKeys) {
             const birimler = computedReportData.stats.digerleri[durum];
+            
             wordChildren.push(new Paragraph({
-                bullet: { level: 1 },
                 children: [
-                    new TextRun({ text: `${durum}: `, bold: true, size: 20 }),
-                    new TextRun({ text: birimler.join(', '), size: 20 })
+                    new TextRun({ text: `${durum}\t\t\t\t\t\t\t\t${birimler.length} Birim`, bold: true, size: 24 })
                 ],
                 spacing: { after: 100, line: 360 }
+            }));
+
+            wordChildren.push(new Paragraph({
+                children: [
+                    new TextRun({ text: birimler.join(', '), size: 20 })
+                ],
+                spacing: { after: 300, line: 360 }
             }));
         }
     } else {
