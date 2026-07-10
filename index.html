@@ -59,6 +59,11 @@
         .print-table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; font-family: sans-serif; table-layout: auto; }
         .print-table th { background-color: #0f172a; color: white; padding: 12px 6px; border: 1px solid #64748b; text-align: center; font-weight: bold; }
         .print-table td { padding: 10px 6px; border: 1px solid #cbd5e1; vertical-align: middle; text-align: center; }
+
+        /* Admin Düzenlenebilir Veri Stili */
+        .editable-finance { min-width: 40px; display: inline-block; cursor: text; transition: all 0.2s; border-radius: 4px; border: 1px solid transparent; }
+        .editable-finance:hover { background-color: rgba(255,255,255,0.2); }
+        .editable-finance:focus { background-color: white; color: #1e293b; outline: none; border-color: #3b82f6; padding: 0 4px; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); }
     </style>
 </head>
 <body class="text-slate-800 h-screen w-screen overflow-hidden">
@@ -233,6 +238,24 @@
         <!-- Süreç İlerleme Özeti -->
         <div id="progressSummary" class="flex gap-4 overflow-x-auto pb-4 mb-4 snap-x">
             <!-- JS ile dolacak -->
+        </div>
+
+        <!-- YENİ EKLENEN: İhale Yatırım Takip Bölümü -->
+        <div class="mb-4">
+            <h3 class="font-extrabold text-sm text-slate-700 mb-3 uppercase tracking-wider ml-1">
+                <i class="fas fa-chart-pie text-blue-500 mr-1.5"></i> İhale Yatırım ve İlerleme Takibi
+                <span class="text-xs font-normal text-slate-400 normal-case ml-2">(Sözleşme Tarihi: 18.05.2026 - Bitiş: 10.08.2027)</span>
+            </h3>
+            
+            <!-- Finansal Kartlar -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3" id="finansalKartlar">
+                <!-- JavaScript ile Doldurulacak -->
+            </div>
+
+            <!-- İlerleme Çubukları -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3" id="ilerlemeCubuklari">
+                <!-- JavaScript ile Doldurulacak -->
+            </div>
         </div>
 
         <!-- Ana Tablo Bölümü -->
@@ -435,6 +458,7 @@ const _getToken = () => _p1 + _p2 + _p3 + _p4 + _p5 + _p6;
 const _repo = "gokhangeo/ihaletakip";
 const _path = "data.json";
 const _durumlarPath = "durumlar.json";
+const _yatirimPath = "yatirim.json";
 const _docsPath = "docs";
 
 let isAdmin = false;
@@ -482,6 +506,13 @@ let personnel = JSON.parse(localStorage.getItem('customPersonnel')) || JSON.pars
 let durumListesi = [...defaultDurumlar];
 let data = JSON.parse(localStorage.getItem('ihaleData')) || [];
 let currentFilteredData = data; 
+
+// Yatırım Verileri (Varsayılan olarak resimdeki veriler)
+let yatirimData = JSON.parse(localStorage.getItem('yatirimData')) || {
+    sozlesme: 56880248,
+    odenen: 5669990,
+    fiziksel: 10
+};
 
 const encodeBase64 = (str) => btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str)));
 const decodeBase64 = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
@@ -542,6 +573,7 @@ document.getElementById('titleContainer').addEventListener('click', () => {
                 document.getElementById('adminDocControls').classList.remove('hidden');
                 showToast("Admin Modu Aktif", "Değişiklik yapabilirsiniz.", "success");
                 renderTable();
+                renderYatirim();
             } else { alert("Hatalı şifre!"); }
         } else {
             isAdmin = false;
@@ -550,6 +582,7 @@ document.getElementById('titleContainer').addEventListener('click', () => {
             document.getElementById('adminDocControls').classList.add('hidden');
             showToast("İzleme Modu", "Admin yetkileri kapatıldı.", "info");
             renderTable();
+            renderYatirim();
         }
     }
 });
@@ -575,20 +608,20 @@ async function fetchFromGithub(isAuto = false) {
     try {
         if(!isAuto) showToast("Bağlanıyor...", "GitHub'dan veriler çekiliyor.", "info");
         
+        // 1. Tablo Verisi
         const resData = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
-        
         if (resData.ok) {
             const fileData = await resData.json();
             data = JSON.parse(decodeBase64(fileData.content));
             localStorage.setItem('ihaleData', JSON.stringify(data));
         }
 
+        // 2. Durum Listesi
         const resDurum = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
-        
         if (resDurum.ok) {
             const fileDurum = await resDurum.json();
             durumListesi = JSON.parse(decodeBase64(fileDurum.content));
@@ -596,14 +629,26 @@ async function fetchFromGithub(isAuto = false) {
             durumListesi = [...defaultDurumlar];
         }
 
+        // 3. Yatırım Verisi
+        const resYatirim = await fetch(`https://api.github.com/repos/${_repo}/contents/${_yatirimPath}?t=${new Date().getTime()}`, {
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
+        });
+        if (resYatirim.ok) {
+            const fileYatirim = await resYatirim.json();
+            yatirimData = JSON.parse(decodeBase64(fileYatirim.content));
+            localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+        }
+
         setUnsavedState(false);
         populateDurumFilter();
-        if(!isAuto) showToast("Başarılı", "Veriler güncellendi.", "success");
         renderTable();
+        renderYatirim();
+        if(!isAuto) showToast("Başarılı", "Veriler güncellendi.", "success");
     } catch (e) {
         if(!isAuto) showToast("Çevrimdışı Mod", "Güncel veriye ulaşılamadı. Yerel veri gösteriliyor.", "info");
         populateDurumFilter();
         renderTable();
+        renderYatirim();
     }
 }
 
@@ -611,7 +656,7 @@ async function saveToGithub(isAuto = false) {
     try {
         if(!isAuto) showToast("Kaydediliyor...", "GitHub'a gönderiliyor.", "info");
         
-        // Tablo Kaydı
+        // 1. Tablo Kaydı
         const getResData = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
@@ -624,7 +669,7 @@ async function saveToGithub(isAuto = false) {
             method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyData)
         });
 
-        // Durum Listesi Kaydı
+        // 2. Durum Listesi Kaydı
         const getResDurum = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
@@ -634,6 +679,18 @@ async function saveToGithub(isAuto = false) {
         if (currentShaDurum) bodyDurum.sha = currentShaDurum;
         await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}`, {
             method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyDurum)
+        });
+
+        // 3. Yatırım Verisi Kaydı
+        const getResYatirim = await fetch(`https://api.github.com/repos/${_repo}/contents/${_yatirimPath}?t=${new Date().getTime()}`, {
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
+        });
+        let currentShaYatirim = null;
+        if (getResYatirim.ok) currentShaYatirim = (await getResYatirim.json()).sha;
+        const bodyYatirim = { message: `Update Yatirim - ${new Date().toLocaleString()}`, content: encodeBase64(JSON.stringify(yatirimData, null, 2)) };
+        if (currentShaYatirim) bodyYatirim.sha = currentShaYatirim;
+        await fetch(`https://api.github.com/repos/${_repo}/contents/${_yatirimPath}`, {
+            method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyYatirim)
         });
 
         setUnsavedState(false);
@@ -664,6 +721,97 @@ function showToast(title, msg, type = "success") {
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
 }
+
+// ====================== YATIRIM TAKİP ======================
+function renderYatirim() {
+    const sozlesme = parseInt(yatirimData.sozlesme) || 0;
+    const odenen = parseInt(yatirimData.odenen) || 0;
+    const kalan = Math.max(0, sozlesme - odenen);
+    const fiziksel = parseFloat(yatirimData.fiziksel) || 0;
+    
+    const nakdi = sozlesme > 0 ? ((odenen / sozlesme) * 100) : 0;
+    
+    // Proje Süresi Hesaplama
+    const baslangic = new Date('2026-05-18T00:00:00');
+    const bitis = new Date('2027-08-10T00:00:00');
+    const bugun = new Date();
+    
+    let sureYuzde = 0;
+    if (bugun >= bitis) sureYuzde = 100;
+    else if (bugun <= baslangic) sureYuzde = 0;
+    else {
+        const toplamGun = (bitis - baslangic) / (1000 * 60 * 60 * 24);
+        const gecenGun = (bugun - baslangic) / (1000 * 60 * 60 * 24);
+        sureYuzde = (gecenGun / toplamGun) * 100;
+    }
+
+    const editableAttr = isAdmin ? 'contenteditable="true"' : '';
+    const spanClass = isAdmin ? "editable-finance" : "";
+
+    document.getElementById('finansalKartlar').innerHTML = `
+        <div class="bg-[#ea580c] text-white rounded-xl p-4 flex flex-col justify-center items-end shadow-md transition-transform">
+            <div class="text-[13px] font-medium mb-0.5 opacity-90">Sözleşme Tutarı</div>
+            <div class="text-2xl font-black tracking-tight flex items-center">
+                ₺ <span class="${spanClass} ml-1" ${editableAttr} onblur="updateYatirim('sozlesme', this.innerText)">${sozlesme.toLocaleString('tr-TR')}</span>
+            </div>
+        </div>
+        
+        <div class="bg-[#4d7c0f] text-white rounded-xl p-4 flex flex-col justify-center items-end shadow-md transition-transform">
+            <div class="text-[13px] font-medium mb-0.5 opacity-90">Kalan Hakediş Tutar</div>
+            <div class="text-2xl font-black tracking-tight">
+                ₺ <span class="ml-1">${kalan.toLocaleString('tr-TR')}</span>
+            </div>
+        </div>
+        
+        <div class="bg-[#1e3a8a] text-white rounded-xl p-4 flex flex-col justify-center items-end shadow-md transition-transform">
+            <div class="text-[13px] font-medium mb-0.5 opacity-90">Ödenen Hakediş Tutar</div>
+            <div class="text-2xl font-black tracking-tight flex items-center">
+                ₺ <span class="${spanClass} ml-1" ${editableAttr} onblur="updateYatirim('odenen', this.innerText)">${odenen.toLocaleString('tr-TR')}</span>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('ilerlemeCubuklari').innerHTML = `
+        <div class="relative w-full h-7 bg-white rounded border border-slate-300 overflow-hidden shadow-sm">
+            <div class="absolute left-0 top-0 h-full bg-[#fb923c] transition-all duration-1000" style="width: ${sureYuzde.toFixed(2)}%"></div>
+            <div class="absolute inset-0 flex justify-center items-center text-xs font-bold text-slate-800 z-10 pointer-events-none">
+                Proje Süresi (%${sureYuzde.toFixed(0)})
+            </div>
+        </div>
+        
+        <div class="relative w-full h-7 bg-white rounded border border-slate-300 overflow-hidden shadow-sm">
+            <div class="absolute left-0 top-0 h-full bg-[#86efac] transition-all duration-1000" style="width: ${fiziksel.toFixed(2)}%"></div>
+            <div class="absolute inset-0 flex justify-center items-center text-xs font-bold text-slate-800 z-10 pointer-events-none">
+                Fiziksel Tamamlanma Yüzdesi (%<span class="pointer-events-auto ${isAdmin ? 'bg-white/50 px-1 rounded cursor-text outline-none border border-slate-300 ml-0.5' : ''}" ${editableAttr} onblur="updateYatirim('fiziksel', this.innerText)">${fiziksel.toFixed(0)}</span>)
+            </div>
+        </div>
+        
+        <div class="relative w-full h-7 bg-white rounded border border-slate-300 overflow-hidden shadow-sm">
+            <div class="absolute left-0 top-0 h-full bg-[#7dd3fc] transition-all duration-1000" style="width: ${nakdi.toFixed(2)}%"></div>
+            <div class="absolute inset-0 flex justify-center items-center text-xs font-bold text-slate-800 z-10 pointer-events-none">
+                Nakdi Tamamlanma Yüzdesi (%${nakdi.toFixed(0)})
+            </div>
+        </div>
+    `;
+}
+
+function updateYatirim(field, value) {
+    if (!isAdmin) return;
+    
+    // Sadece sayıları al, virgülü noktaya çevir
+    let numStr = value.toString().replace(/\./g, '').replace(/,/g, '.').replace(/[^0-9.]/g, '');
+    let numVal = parseFloat(numStr);
+    
+    if (isNaN(numVal)) numVal = 0;
+    if (field === 'fiziksel') numVal = Math.min(100, Math.max(0, numVal));
+    
+    yatirimData[field] = numVal;
+    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+    setUnsavedState(true);
+    renderYatirim();
+}
+// ===========================================================
+
 
 // ====================== DURUM YÖNETİMİ ======================
 function openDurumModal() { renderDurumList(); document.getElementById('durumModal').classList.remove('hidden'); }
@@ -775,7 +923,7 @@ function generateDynamicReport() {
             stats.teslim.push(birimName);
         }
 
-        // DİĞER AŞAMALAR (Bağımsız If'ler: Bir birim birden çok listeye girebilir)
+        // DİĞER AŞAMALAR
         const addDiger = (desc) => {
             if (!stats.digerleri[desc]) stats.digerleri[desc] = [];
             if (!stats.digerleri[desc].includes(birimName)) {
@@ -806,7 +954,6 @@ function generateDynamicReport() {
             hasAnyDiger = true;
         }
 
-        // Eğer hiçbir koşula uymadıysa ve ana başlıklarda da yoksa genel durumu yansıt
         const inAnaBaslik = stats.kesinAski.includes(birimName) || stats.komisyon.includes(birimName) || stats.bilgilendirme.includes(birimName) || stats.teslim.includes(birimName);
         
         if (!hasAnyDiger && !inAnaBaslik) {
@@ -1034,7 +1181,7 @@ async function exportReportToPDF() {
         const canvas = await html2canvas(container, {
             scale: 2, 
             useCORS: true,
-            backgroundColor: '#f8fafc'
+            backgroundColor: '#ffffff'
         });
 
         const { jsPDF } = window.jspdf;
@@ -1485,7 +1632,7 @@ function renderTable() {
         return matchesSearch && matchesPerson && matchesStatus && matchesCard && matchesRegion;
     });
     
-    currentFilteredData = filtered; 
+    currentFilteredData = filtered; // EKLEDİĞİMİZ KISIM: Rapor için güncel filtreyi tutar
 
     const editableClass = isAdmin ? "editable-cell cursor-text hover:bg-slate-100" : "";
     const editableAttr = isAdmin ? 'contenteditable="true"' : '';
@@ -1503,7 +1650,7 @@ function renderTable() {
                 row.classList.add('opacity-50', 'bg-slate-100');
             });
             row.addEventListener('dragover', (e) => { e.preventDefault(); row.classList.add('border-t-2', 'border-blue-500'); });
-            row.addEventListener('dragleave', () => row.classList.remove('border-t-2', 'border-blue-500'));
+            row.addEventListener('dragleave', () => row.classList.remove('border-t-2', 'border-blue-500'); });
             row.addEventListener('drop', (e) => {
                 e.preventDefault();
                 row.classList.remove('border-t-2', 'border-blue-500');
