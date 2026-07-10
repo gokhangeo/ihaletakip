@@ -742,50 +742,56 @@ function renderYatirim() {
     const spanClass = isAdmin ? "editable-finance" : "";
 
     document.getElementById('finansalKartlar').innerHTML = `
-        <div class="bg-[#ea580c] text-white rounded-xl p-4 flex flex-col justify-center items-end shadow-md transition-transform">
-            <div class="text-[13px] font-medium mb-0.5 opacity-90">Sözleşme Tutarı</div>
-            <div class="text-2xl font-black tracking-tight flex items-center">
+        <div class="bg-[#ea580c] text-white rounded-lg p-2.5 flex flex-col justify-center items-end shadow-sm transition-transform">
+            <div class="text-[11px] font-medium opacity-90 leading-none mb-1">Sözleşme Tutarı</div>
+            <div class="text-lg font-black tracking-tight leading-none flex items-center">
                 ₺ <span class="${spanClass} ml-1" ${editableAttr} onblur="updateYatirim('sozlesme', this.innerText)">${sozlesme.toLocaleString('tr-TR')}</span>
             </div>
         </div>
         
-        <div class="bg-[#4d7c0f] text-white rounded-xl p-4 flex flex-col justify-center items-end shadow-md transition-transform">
-            <div class="text-[13px] font-medium mb-0.5 opacity-90">Kalan Hakediş Tutar</div>
-            <div class="text-2xl font-black tracking-tight">
+        <div class="bg-[#4d7c0f] text-white rounded-lg p-2.5 flex flex-col justify-center items-end shadow-sm transition-transform">
+            <div class="text-[11px] font-medium opacity-90 leading-none mb-1">Kalan Hakediş Tutar</div>
+            <div class="text-lg font-black tracking-tight leading-none">
                 ₺ <span class="ml-1">${kalan.toLocaleString('tr-TR')}</span>
             </div>
         </div>
         
-        <div class="bg-[#1e3a8a] text-white rounded-xl p-4 flex flex-col justify-center items-end shadow-md transition-transform">
-            <div class="text-[13px] font-medium mb-0.5 opacity-90">Ödenen Hakediş Tutar</div>
-            <div class="text-2xl font-black tracking-tight flex items-center">
+        <div class="bg-[#1e3a8a] text-white rounded-lg p-2.5 flex flex-col justify-center items-end shadow-sm transition-transform">
+            <div class="text-[11px] font-medium opacity-90 leading-none mb-1">Ödenen Hakediş Tutar</div>
+            <div class="text-lg font-black tracking-tight leading-none flex items-center">
                 ₺ <span class="${spanClass} ml-1" ${editableAttr} onblur="updateYatirim('odenen', this.innerText)">${odenen.toLocaleString('tr-TR')}</span>
             </div>
         </div>
     `;
 
+    // İç div padding ve gap değerleri daraltıldı, çubuk yükseklikleri (h-5) azaltıldı.
     document.getElementById('ilerlemeCubuklari').innerHTML = `
-        <div class="relative w-full h-7 bg-white rounded border border-slate-300 overflow-hidden shadow-sm">
+        <div class="relative w-full h-5 bg-white rounded border border-slate-300 overflow-hidden shadow-sm">
             <div class="absolute left-0 top-0 h-full bg-[#fb923c] transition-all duration-1000" style="width: ${sureYuzde.toFixed(2)}%"></div>
-            <div class="absolute inset-0 flex justify-center items-center text-xs font-bold text-slate-800 z-10 pointer-events-none">
+            <div class="absolute inset-0 flex justify-center items-center text-[10px] font-bold text-slate-800 z-10 pointer-events-none">
                 Proje Süresi (%${sureYuzde.toFixed(0)})
             </div>
         </div>
         
-        <div class="relative w-full h-7 bg-white rounded border border-slate-300 overflow-hidden shadow-sm">
+        <div class="relative w-full h-5 bg-white rounded border border-slate-300 overflow-hidden shadow-sm">
             <div class="absolute left-0 top-0 h-full bg-[#86efac] transition-all duration-1000" style="width: ${fiziksel.toFixed(2)}%"></div>
-            <div class="absolute inset-0 flex justify-center items-center text-xs font-bold text-slate-800 z-10 pointer-events-none">
+            <div class="absolute inset-0 flex justify-center items-center text-[10px] font-bold text-slate-800 z-10 pointer-events-none">
                 Fiziksel Tamamlanma Yüzdesi (%<span class="pointer-events-auto ${isAdmin ? 'bg-white/50 px-1 rounded cursor-text outline-none border border-slate-300 ml-0.5' : ''}" ${editableAttr} onblur="updateYatirim('fiziksel', this.innerText)">${fiziksel.toFixed(0)}</span>)
             </div>
         </div>
         
-        <div class="relative w-full h-7 bg-white rounded border border-slate-300 overflow-hidden shadow-sm">
+        <div class="relative w-full h-5 bg-white rounded border border-slate-300 overflow-hidden shadow-sm">
             <div class="absolute left-0 top-0 h-full bg-[#7dd3fc] transition-all duration-1000" style="width: ${nakdi.toFixed(2)}%"></div>
-            <div class="absolute inset-0 flex justify-center items-center text-xs font-bold text-slate-800 z-10 pointer-events-none">
+            <div class="absolute inset-0 flex justify-center items-center text-[10px] font-bold text-slate-800 z-10 pointer-events-none">
                 Nakdi Tamamlanma Yüzdesi (%${nakdi.toFixed(0)})
             </div>
         </div>
     `;
+    
+    // Konteyner divin padding ve boşluklarını güncellemek için ana HTML'deki sınıfları da değiştirmeliyiz.
+    // Bunun için ilerleme çubuklarını saran div'i de buraya ekleyerek güncelliyoruz.
+    const ilerlemeContainer = document.getElementById('ilerlemeCubuklari');
+    ilerlemeContainer.className = "bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-2";
 }
 
 function updateYatirim(field, value) {
