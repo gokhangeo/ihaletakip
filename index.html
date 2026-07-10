@@ -764,7 +764,6 @@ function renderYatirim() {
         </div>
     `;
 
-    // İç div padding ve gap değerleri daraltıldı, çubuk yükseklikleri (h-5) azaltıldı.
     document.getElementById('ilerlemeCubuklari').innerHTML = `
         <div class="relative w-full h-5 bg-white rounded border border-slate-300 overflow-hidden shadow-sm">
             <div class="absolute left-0 top-0 h-full bg-[#fb923c] transition-all duration-1000" style="width: ${sureYuzde.toFixed(2)}%"></div>
@@ -787,9 +786,6 @@ function renderYatirim() {
             </div>
         </div>
     `;
-    
-    // Konteyner divin padding ve boşluklarını güncellemek için ana HTML'deki sınıfları da değiştirmeliyiz.
-    // Bunun için ilerleme çubuklarını saran div'i de buraya ekleyerek güncelliyoruz.
     const ilerlemeContainer = document.getElementById('ilerlemeCubuklari');
     ilerlemeContainer.className = "bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-2";
 }
@@ -942,7 +938,12 @@ function generateDynamicReport() {
         if (d.ucus_tarihi) {
             addDiger("UÇUŞ YAPILANLAR");
             hasAnyDiger = true;
+        } else {
+             // If flight date is empty, it's pending flight
+             addDiger("UÇUŞ BEKLEYENLER");
+             hasAnyDiger = true;
         }
+        
         if (d.ucus_kiymet_durum === "Devam Ediyor") {
             addDiger("UÇUŞ KIYMETLENDİRME BEKLEYENLER");
             hasAnyDiger = true;
@@ -997,9 +998,10 @@ function generateDynamicReport() {
         const priority = { 
             "ALTLIK YAPILANLAR": 1,
             "UÇUŞ YAPILANLAR": 2, 
-            "UÇUŞ KIYMETLENDİRME BEKLEYENLER": 3, 
-            "DEĞERLENDİRMESİ BİTENLER": 4, 
-            "DEĞERLENDİRME DEVAM EDENLER": 5 
+            "UÇUŞ BEKLEYENLER": 3,
+            "UÇUŞ KIYMETLENDİRME BEKLEYENLER": 4, 
+            "DEĞERLENDİRMESİ BİTENLER": 5, 
+            "DEĞERLENDİRME DEVAM EDENLER": 6 
         };
 
         const sortedKeys = Object.keys(stats.digerleri).sort((a, b) => {
@@ -1230,9 +1232,10 @@ function exportReportToWord() {
         const priority = { 
             "ALTLIK YAPILANLAR": 1,
             "UÇUŞ YAPILANLAR": 2, 
-            "UÇUŞ KIYMETLENDİRME BEKLİYOR": 3, 
-            "DEĞERLENDİRMESİ BİTENLER": 4, 
-            "DEĞERLENDİRME DEVAM EDENLER": 5 
+            "UÇUŞ BEKLEYENLER": 3,
+            "UÇUŞ KIYMETLENDİRME BEKLEYENLER": 4, 
+            "DEĞERLENDİRMESİ BİTENLER": 5, 
+            "DEĞERLENDİRME DEVAM EDENLER": 6 
         };
 
         const sortedKeys = Object.keys(computedReportData.stats.digerleri).sort((a, b) => {
