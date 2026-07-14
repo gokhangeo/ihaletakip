@@ -58,7 +58,8 @@
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-06-20"
+    "ucus_tarihi": "2026-06-20",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)"
   },
   {
     "sn": 4,
@@ -360,7 +361,7 @@
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-07",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Tekn.)"
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)"
   },
   {
     "sn": 20,
@@ -381,7 +382,7 @@
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-07",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Tekn.)"
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)"
   },
   {
     "sn": 21,
@@ -470,7 +471,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-06-05",
     "altlik_durum": "Yapıldı",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Tekn.)"
   },
   {
     "sn": 26,
@@ -559,7 +561,7 @@
     "ucus_tarihi": "2026-06-07",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "notlar": "Mustafa Baysal değerlendirme devam ediyor",
+    "notlar": "[09.07.2026] Uçuş bir kısmı eksik. Değerlendirme devam ediyor(Tekn.)",
     "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
