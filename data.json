@@ -36,7 +36,8 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-20",
     "degerlendirme_durum": "Devam Ediyor",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)"
   },
   {
     "sn": 3,
@@ -316,7 +317,8 @@
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Yapılmadı",
     "degerlendirme_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-07"
+    "ucus_tarihi": "2026-07-07",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)"
   },
   {
     "sn": 18,
@@ -575,7 +577,8 @@
     "genel_durum": "DEĞERLENDİRMEDE",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "notlar": "[09.07.2026] Arazi ölçüsü teslim edildi, birkaç parsel kontrol edilecek"
   },
   {
     "sn": 32,
