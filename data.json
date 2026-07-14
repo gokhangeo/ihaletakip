@@ -338,7 +338,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor"
   },
   {
     "sn": 19,
@@ -358,7 +359,8 @@
     "genel_durum": "UÇUŞ YAPILIYOR",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-07"
+    "ucus_tarihi": "2026-07-07",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Tekn.)"
   },
   {
     "sn": 20,
@@ -378,7 +380,8 @@
     "genel_durum": "UÇUŞ YAPILIYOR",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-07"
+    "ucus_tarihi": "2026-07-07",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Tekn.)"
   },
   {
     "sn": 21,
@@ -599,7 +602,7 @@
     "ucus_tarihi": "2026-06-08",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "notlar": "BARIŞ değerlendirme devam ediyor.",
+    "notlar": "[14.07.2026] Değerlendirme devam ediyor.(Tekn.)",
     "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
