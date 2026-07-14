@@ -358,7 +358,7 @@
                     </h4>
                     <button onclick="insertDateToFirmaNote()" class="text-[10px] bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-700 px-2 py-1.5 rounded-lg font-bold transition flex items-center shadow-sm whitespace-nowrap"><i class="fas fa-calendar-plus mr-1"></i>Tarih Ekle</button>
                 </div>
-                <textarea id="firmaNoteTextarea" rows="4" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Firma için genel görev ve notları buraya yazın..." oninput="setUnsavedState(true)"></textarea>
+                <textarea id="firmaNoteTextarea" rows="4" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Firma için genel görev ve notları buraya yazın..." oninput="setUnsavedState(true)" onblur="saveFirmaNote()"></textarea>
             </div>
 
             <!-- Birim Notları Raporu -->
@@ -486,6 +486,14 @@
     </div>
 </div>
 
+<div id="toast" class="fixed bottom-5 right-5 md:right-10 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50">
+    <div id="toastIcon" class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center"><i class="fas fa-check"></i></div>
+    <div class="flex flex-col">
+        <span id="toastTitle" class="font-bold text-sm">Başarılı</span>
+        <span id="toastMsg" class="text-xs text-slate-300">İşlem tamamlandı.</span>
+    </div>
+</div>
+
 <script>
 window.addEventListener('beforeunload', function (e) {
     if (hasUnsavedChanges) {
@@ -494,12 +502,23 @@ window.addEventListener('beforeunload', function (e) {
     }
 });
 
-// UTF-8 Uyumlu Base64 Dönüştürücüler
+// UTF-8 ve büyük verilerle uyumlu Güvenli Base64 Dönüştürücüler
 function encodeBase64(str) {
-    return btoa(unescape(encodeURIComponent(str)));
+    const bytes = new TextEncoder().encode(str);
+    let binString = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binString += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binString);
 }
-function decodeBase64(str) {
-    return decodeURIComponent(escape(atob(str)));
+
+function decodeBase64(b64) {
+    const binString = atob(b64);
+    const bytes = new Uint8Array(binString.length);
+    for (let i = 0; i < binString.length; i++) {
+        bytes[i] = binString.charCodeAt(i);
+    }
+    return new TextDecoder().decode(bytes);
 }
 
 const _p1 = "ghp_";
@@ -687,7 +706,7 @@ async function fetchFromGithub(isAuto = false) {
         const resData = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
-        if (resData.ok) {
+        if (resData.status === 200) {
             const fileData = await resData.json();
             data = JSON.parse(decodeBase64(fileData.content));
             localStorage.setItem('ihaleData', JSON.stringify(data));
@@ -697,7 +716,7 @@ async function fetchFromGithub(isAuto = false) {
         const resDurum = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
-        if (resDurum.ok) {
+        if (resDurum.status === 200) {
             const fileDurum = await resDurum.json();
             durumListesi = JSON.parse(decodeBase64(fileDurum.content));
         } else {
@@ -708,7 +727,7 @@ async function fetchFromGithub(isAuto = false) {
         const resYatirim = await fetch(`https://api.github.com/repos/${_repo}/contents/${_yatirimPath}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
-        if (resYatirim.ok) {
+        if (resYatirim.status === 200) {
             const fileYatirim = await resYatirim.json();
             yatirimData = JSON.parse(decodeBase64(fileYatirim.content));
             localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
@@ -731,36 +750,52 @@ async function saveToGithub(isAuto = false) {
     try {
         if(!isAuto) showToast("Kaydediliyor...", "GitHub'a gönderiliyor.", "info");
         
-        // Tekrarlı işlemler için ortak yardımcı fonksiyon
-        const pushFile = async (path, contentObj, messageStr) => {
-            const getRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${path}?t=${new Date().getTime()}`, {
-                headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
-            });
-            let sha = null;
-            if (getRes.ok) sha = (await getRes.json()).sha;
-            
-            const bodyData = { message: messageStr, content: encodeBase64(JSON.stringify(contentObj, null, 2)) };
-            if (sha) bodyData.sha = sha;
-            
-            const putRes = await fetch(`https://api.github.com/repos/${_repo}/contents/${path}`, {
-                method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyData)
-            });
-            if (!putRes.ok) throw new Error("Bulut kaydı yapılamadı");
-        };
-
-        // Tablodaki verilerin sırasını (S.N.) düzenle
+        // 1. Tablo Kaydı
         data.forEach((d, i) => d.sn = i + 1);
+        const bodyData = { message: `Update Data - ${new Date().toLocaleString()}`, content: encodeBase64(JSON.stringify(data, null, 2)) };
+        
+        const getResData = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}?t=${new Date().getTime()}`, {
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
+        });
+        if (getResData.status === 200) {
+            const d = await getResData.json();
+            bodyData.sha = d.sha;
+        }
+        await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
+            method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyData)
+        });
 
-        // Her dosyayı ayrı ayrı gönder
-        await pushFile(_path, data, `Update Data - ${new Date().toLocaleString()}`);
-        await pushFile(_durumlarPath, durumListesi, `Update Durum - ${new Date().toLocaleString()}`);
-        await pushFile(_yatirimPath, yatirimData, `Update Yatirim - ${new Date().toLocaleString()}`);
+        // 2. Durum Listesi Kaydı
+        const bodyDurum = { message: `Update Durum - ${new Date().toLocaleString()}`, content: encodeBase64(JSON.stringify(durumListesi, null, 2)) };
+        const getResDurum = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}?t=${new Date().getTime()}`, {
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
+        });
+        if (getResDurum.status === 200) {
+            const d = await getResDurum.json();
+            bodyDurum.sha = d.sha;
+        }
+        await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}`, {
+            method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyDurum)
+        });
+
+        // 3. Yatırım Verisi Kaydı (Firma Notları dahil)
+        const bodyYatirim = { message: `Update Yatirim - ${new Date().toLocaleString()}`, content: encodeBase64(JSON.stringify(yatirimData, null, 2)) };
+        const getResYatirim = await fetch(`https://api.github.com/repos/${_repo}/contents/${_yatirimPath}?t=${new Date().getTime()}`, {
+            headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
+        });
+        if (getResYatirim.status === 200) {
+            const d = await getResYatirim.json();
+            bodyYatirim.sha = d.sha;
+        }
+        await fetch(`https://api.github.com/repos/${_repo}/contents/${_yatirimPath}`, {
+            method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyYatirim)
+        });
 
         setUnsavedState(false);
         if(!isAuto) showToast("Kaydedildi", "Tüm veriler buluta başarıyla aktarıldı.", "success");
     } catch (e) {
-        setUnsavedState(false);
-        if(!isAuto) showToast("Yerel Kayıt", "Buluta ulaşılamadı, bilgiler cihazınıza kaydedildi.", "info");
+        console.error("Kayıt Hatası:", e);
+        if(!isAuto) showToast("Hata", "Buluta kaydedilemedi! Lütfen tekrar deneyin.", "error");
     }
 }
 
@@ -2148,7 +2183,7 @@ function updateValue(sn, field, newValue) {
         localStorage.setItem('ihaleData', JSON.stringify(data));
         setUnsavedState(true);
         
-        if (!adminOnlyFields.includes(field)) { if(field !== 'notlar') renderTable(); } 
+        if (!adminOnlyFields.includes(field)) { renderTable(); } 
         else { calculateStats(); }
         calculateProgressStats();
     }
@@ -2161,11 +2196,10 @@ function resetData() {
 }
 
 function exportToExcel() {
-    let csv = "S.N;İlçe;Mahalle;Toplam Parsel;İDÖ;22-A;EK-1;Kadastro İşlem;İhale Parseli;Mühendis;Tekniker;Kadastro Üyesi;Fen Kontrol;Tas. Kontrol;Genel Durum;Altlık Durum;Uçuş Tarihi;Uçuş Kıymetlendirme Durum;Değerlendirme Durum;Bilgilendirme İlanı Tarihi;Komisyon Durum;Kesin Askı Tarihi;Notlar\n";
+    let csv = "S.N;İlçe;Mahalle;Toplam Parsel;İDÖ;22-A;EK-1;Kadastro İşlem;İhale Parseli;Mühendis;Tekniker;Kadastro Üyesi;Fen Kontrol;Tas. Kontrol;Genel Durum;Altlık Durum;Uçuş Tarihi;Uçuş Kıymetlendirme Durum;Değerlendirme Durum;Bilgilendirme İlanı Tarihi;Komisyon Durum;Kesin Askı Tarihi\n";
     data.forEach(r => {
         const trDate = (val) => val ? new Date(val).toLocaleDateString('tr-TR') : '';
-        const notlar = (r.notlar || '').replace(/\n/g, ' / ');
-        csv += `${r.sn || ''};${r.ilce || ''};${r.mahalle || ''};${r.toplam_parsel || 0};${r.ido || 0};${r.yirmi_iki_a || 0};${r.ek_1 || 0};${r.kadastro_islem || 0};${r.parsel || 0};${r.muhendis || ''};${r.tekniker || ''};${r.kadastro || ''};${r.fen || ''};${r.tas || ''};${r.genel_durum || 'HERHANGİ BİRŞEY YAPILMADI'};${r.altlik_durum || 'Yapılmadı'};${trDate(r.ucus_tarihi)};${r.ucus_kiymet_durum || 'Yapılmadı'};${r.degerlendirme_durum || 'Yapılmadı'};${trDate(r.bilgilendirme_tarihi)};${r.komisyon_durum || 'Yapılmadı'};${trDate(r.kesin_aski_tarihi)};${notlar}\n`;
+        csv += `${r.sn || ''};${r.ilce || ''};${r.mahalle || ''};${r.toplam_parsel || 0};${r.ido || 0};${r.yirmi_iki_a || 0};${r.ek_1 || 0};${r.kadastro_islem || 0};${r.parsel || 0};${r.muhendis || ''};${r.tekniker || ''};${r.kadastro || ''};${r.fen || ''};${r.tas || ''};${r.genel_durum || 'HERHANGİ BİRŞEY YAPILMADI'};${r.altlik_durum || 'Yapılmadı'};${trDate(r.ucus_tarihi)};${r.ucus_kiymet_durum || 'Yapılmadı'};${r.degerlendirme_durum || 'Yapılmadı'};${trDate(r.bilgilendirme_tarihi)};${r.komisyon_durum || 'Yapılmadı'};${trDate(r.kesin_aski_tarihi)}\n`;
     });
     const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
