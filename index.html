@@ -248,7 +248,7 @@
             </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3" id="finansalKartlar"></div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3" id="ilerlemeCubuklari"></div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-2" id="ilerlemeCubuklari"></div>
         </div>
 
         <!-- Ana Tablo Bölümü -->
@@ -263,6 +263,9 @@
                 </div>
                 
                 <div class="flex gap-2">
+                    <button onclick="openNotesReportModal()" class="bg-amber-500 text-white px-3 py-1.5 rounded-lg hover:bg-amber-600 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
+                        <i class="fas fa-comments"></i> Not Raporu
+                    </button>
                     <button onclick="openReportModal()" class="bg-cyan-600 text-white px-3 py-1.5 rounded-lg hover:bg-cyan-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
                         <i class="fas fa-file-invoice"></i> Rapor Oluştur
                     </button>
@@ -288,7 +291,7 @@
                             <th class="p-3 font-bold text-center whitespace-nowrap">EK-1</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap" title="Kadastro Yönüyle İşleme Tabi Parsel Sayısı">Kad. İşlem</th>
                             <th class="p-4 font-bold text-center bg-emerald-700/40 whitespace-nowrap" title="İhaleye Çıkılacak Toplam Parsel Sayısı">İhale Parsel</th>
-                            <th class="p-4 font-bold bg-slate-800/80 whitespace-nowrap text-center">Görevli Personeller</th>
+                            <th class="p-4 font-bold bg-slate-800/80 whitespace-nowrap text-center">Görevliler & Not</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap border-l border-slate-700 bg-slate-800">Genel Durum</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap border-l border-slate-700">Altlık Durum</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap">Uçuş Tarihi</th>
@@ -297,7 +300,6 @@
                             <th class="p-3 font-bold text-center whitespace-nowrap">Bilgilendirme Tar.</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap">Komisyon Durum</th>
                             <th class="p-3 font-bold text-center whitespace-nowrap">Kesin Askı Tar.</th>
-                            <th class="p-3 font-bold text-left whitespace-nowrap min-w-[150px]">Not</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
@@ -330,6 +332,26 @@
     </div>
 </div>
 
+<!-- Not Raporu Modalı -->
+<div id="notesReportModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-amber-50">
+            <h3 class="font-extrabold text-xl text-amber-900 flex items-center gap-2">
+                <i class="fas fa-comments text-amber-500"></i> Tüm Notlar Raporu
+            </h3>
+            <div class="flex items-center gap-2 md:gap-3">
+                <button onclick="exportNotesToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 md:px-4 py-2 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 transition-all">
+                    <i class="fas fa-file-excel text-sm"></i> <span class="hidden md:inline">Excel İndir</span><span class="md:hidden">Excel</span>
+                </button>
+                <button onclick="closeNotesReportModal()" class="text-slate-400 hover:text-red-500 transition ml-1"><i class="fas fa-times text-xl"></i></button>
+            </div>
+        </div>
+        <div class="p-6 overflow-y-auto flex-1 bg-slate-50 space-y-4" id="notesReportContentContainer">
+            <!-- Dinamik Not Raporu Buraya Enjekte Edilecek -->
+        </div>
+    </div>
+</div>
+
 <!-- Durum Yönetim Modalı -->
 <div id="durumModal" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
@@ -346,6 +368,27 @@
         </div>
         <div class="p-4 overflow-y-auto flex-1 bg-slate-50 border-t border-slate-100">
             <div id="durumListContainer" class="flex flex-col gap-2"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Not Ekleme Modalı -->
+<div id="noteModal" class="fixed inset-0 bg-slate-900/50 z-[80] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
+        <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-amber-50">
+            <h3 class="font-bold text-lg text-amber-800"><i class="fas fa-sticky-note text-amber-500 mr-2"></i>Birim Notları</h3>
+            <button onclick="closeNoteModal()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-5 flex flex-col gap-3">
+            <div class="flex justify-between items-center">
+                <p class="text-[11px] text-slate-500 font-medium">Her satıra bir not yazabilirsiniz. PDF ve Excel'de maddelendirilir.</p>
+                <button onclick="insertDateToNote()" class="text-[10px] bg-white border border-amber-200 hover:bg-amber-50 text-amber-700 px-2 py-1.5 rounded-lg font-bold transition flex items-center shadow-sm whitespace-nowrap"><i class="fas fa-calendar-plus mr-1"></i>Tarih Ekle</button>
+            </div>
+            <textarea id="noteTextarea" rows="6" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-amber-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Buraya yazın..."></textarea>
+            <div class="flex justify-end gap-2 mt-2">
+                <button onclick="closeNoteModal()" class="px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">İptal</button>
+                <button onclick="saveNote()" class="px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition shadow-md">Notu Kaydet</button>
+            </div>
         </div>
     </div>
 </div>
@@ -465,6 +508,7 @@ let hasUnsavedChanges = false;
 let openDropdowns = new Set();
 let draggedSn = null;
 let computedReportData = null; 
+let currentNoteSn = null;
 
 const defaultPersonnel = {
     muhendis: ["TEVFİK YILDIZ", "HİLMİ MÜFTÜOĞLU", "HİKMET GÜLCAN", "MEHTAP AKDOĞAN", "VOLKAN İZCİ"],
@@ -692,6 +736,102 @@ async function saveToGithub(isAuto = false) {
         if(!isAuto) showToast("Hata", "Buluta kaydedilemedi! Çevrimdışı kayıt yapıldı.", "error");
     }
 }
+
+// ====================== NOT MODALI VE RAPORU ======================
+function openNoteModal(sn) {
+    currentNoteSn = sn;
+    const item = data.find(d => d.sn === sn);
+    document.getElementById('noteTextarea').value = item.notlar || '';
+    document.getElementById('noteModal').classList.remove('hidden');
+}
+
+function closeNoteModal() {
+    document.getElementById('noteModal').classList.add('hidden');
+    currentNoteSn = null;
+}
+
+function saveNote() {
+    if (currentNoteSn === null) return;
+    const textarea = document.getElementById('noteTextarea');
+    updateValue(currentNoteSn, 'notlar', textarea.value);
+    closeNoteModal();
+}
+
+function insertDateToNote() {
+    const textarea = document.getElementById('noteTextarea');
+    const today = new Date().toLocaleDateString('tr-TR');
+    const dateStr = `[${today}] `;
+    
+    const startPos = textarea.selectionStart;
+    const endPos = textarea.selectionEnd;
+    const text = textarea.value;
+    
+    textarea.value = text.substring(0, startPos) + dateStr + text.substring(endPos);
+    textarea.selectionStart = textarea.selectionEnd = startPos + dateStr.length;
+    textarea.focus();
+}
+
+function openNotesReportModal() {
+    generateNotesReport();
+    document.getElementById('notesReportModal').classList.remove('hidden');
+}
+
+function closeNotesReportModal() {
+    document.getElementById('notesReportModal').classList.add('hidden');
+}
+
+function generateNotesReport() {
+    const container = document.getElementById('notesReportContentContainer');
+    const notesData = currentFilteredData.filter(d => d.notlar && d.notlar.trim() !== '');
+    
+    if (notesData.length === 0) {
+        container.innerHTML = '<div class="text-center text-slate-500 py-10 font-medium">Bu görünüme ait not bulunamadı.</div>';
+        return;
+    }
+
+    let html = '';
+    notesData.forEach(d => {
+        const notlarList = d.notlar.split('\n').filter(n => n.trim() !== '').map(n => `<li class="mb-2 flex items-start gap-2"><i class="fas fa-check text-amber-500 mt-0.5"></i> <span>${n}</span></li>`).join('');
+        
+        html += `
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between md:items-center border-b border-slate-100 pb-3 mb-3 gap-3">
+                    <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-map-marker-alt text-blue-500"></i> <span class="text-blue-700">${d.ilce}</span> - ${d.mahalle}
+                    </h4>
+                    <div class="flex flex-wrap gap-3 text-[11px] font-bold text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+                        <span class="flex items-center gap-1.5"><i class="fas fa-user-tie text-blue-400"></i> ${d.muhendis || 'Atanmadı'}</span>
+                        <span class="flex items-center gap-1.5"><i class="fas fa-tools text-purple-400"></i> ${d.tekniker || 'Atanmadı'}</span>
+                    </div>
+                </div>
+                <ul class="text-xs text-slate-700 font-medium pl-1">
+                    ${notlarList}
+                </ul>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function exportNotesToExcel() {
+    const notesData = currentFilteredData.filter(d => d.notlar && d.notlar.trim() !== '');
+    if (notesData.length === 0) return showToast("Hata", "İndirilecek not bulunamadı.", "error");
+
+    let csv = "S.N;İlçe;Mahalle;Mühendis;Tekniker;Notlar\n";
+    notesData.forEach(d => {
+        const cleanNotes = (d.notlar || '').replace(/\n/g, ' / ').replace(/;/g, ',');
+        csv += `${d.sn};${d.ilce};${d.mahalle};${d.muhendis || '-'};${d.tekniker || '-'};${cleanNotes}\n`;
+    });
+    
+    const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Not_Raporu_${new Date().toLocaleDateString('tr-TR')}.csv`;
+    a.click();
+}
+// =========================================================
 
 function populateDurumFilter() {
     const filterSelect = document.getElementById('statusFilter');
@@ -1369,7 +1509,7 @@ function createPrintTable(items) {
         {n: "Altlık Durum", w: 140}, {n: "Uçuş Tarihi", w: 130},
         {n: "Uçuş Kıymet.", w: 140}, {n: "Değerlendirme", w: 140},
         {n: "Bilgilendirme", w: 130}, {n: "Komisyon", w: 140},
-        {n: "Kesin Askı", w: 130}, {n: "Not", w: 180}
+        {n: "Kesin Askı", w: 130}, {n: "Notlar", w: 180}
     ];
     
     cols.forEach(c => html += `<th style="width:${c.w}px; background-color:#0f172a; color:white; padding:12px 6px; border:1px solid #64748b; text-align:center; font-weight:bold; overflow:hidden;">${c.n}</th>`);
@@ -1383,6 +1523,11 @@ function createPrintTable(items) {
         }
         if(val.includes('BİTTİ') || val.includes('YAPILDI') || val === 'Yapıldı') return `<span style="background-color:#d1fae5; color:#047857; border:1px solid #6ee7b7; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
         return `<span style="background-color:#fef3c7; color:#b45309; border:1px solid #fcd34d; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
+    };
+
+    const formatNotlar = (text) => {
+        if (!text) return '-';
+        return text.split('\n').filter(n => n.trim() !== '').map(line => `• ${line.trim()}`).join('<br>');
     };
 
     items.forEach(item => {
@@ -1409,7 +1554,7 @@ function createPrintTable(items) {
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getDateBadge(item.bilgilendirme_tarihi)}</td>
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.komisyon_durum)}</td>
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getDateBadge(item.kesin_aski_tarihi)}</td>
-            <td style="font-size:11px; padding:8px 4px; border:1px solid #cbd5e1; overflow:hidden; text-overflow:ellipsis;">${item.notlar || '-'}</td>
+            <td style="font-size:11px; padding:8px 4px; border:1px solid #cbd5e1; overflow:hidden; text-align:left;">${formatNotlar(item.notlar)}</td>
         </tr>`;
     });
     html += '</tbody></table>';
@@ -1714,11 +1859,6 @@ function createDateInput(val, sn, field) {
     return `<input type="date" value="${val}" onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-bold ${colorClass} outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors shadow-sm">`;
 }
 
-function createTextInput(val, sn, field) {
-    val = val || "";
-    return `<input type="text" value="${val}" placeholder="Not ekle..." onblur="updateValue(${sn}, '${field}', this.value)" class="w-full text-[11px] font-medium text-slate-700 bg-transparent outline-none p-1 rounded focus:bg-white hover:bg-slate-100 min-w-[150px]">`;
-}
-
 function reorderData(fromSn, toSn) {
     const fromIndex = data.findIndex(d => d.sn === fromSn);
     const toIndex = data.findIndex(d => d.sn === toSn);
@@ -1757,7 +1897,7 @@ function renderTable() {
         return matchesSearch && matchesPerson && matchesStatus && matchesCard && matchesRegion;
     });
     
-    currentFilteredData = filtered; // EKLEDİĞİMİZ KISIM: Rapor için güncel filtreyi tutar
+    currentFilteredData = filtered;
 
     const editableClass = isAdmin ? "editable-cell cursor-text hover:bg-slate-100" : "";
     const editableAttr = isAdmin ? 'contenteditable="true"' : '';
@@ -1801,16 +1941,23 @@ function renderTable() {
             <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'kadastro_islem', this.innerText)">${item.kadastro_islem}</td>
             <td class="p-4 text-center font-black text-slate-800 bg-emerald-50 ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'parsel', this.innerText)">${item.parsel.toLocaleString('tr-TR')}</td>
             
-            <td class="p-2 align-top bg-slate-50/40 min-w-[200px]">
-                <button onclick="toggleDropdown(${item.sn})" class="w-full text-left px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 rounded flex justify-between items-center text-[10px] font-bold text-slate-600 transition-colors shadow-sm">
-                    <span class="truncate mr-2"><i class="fas fa-users text-blue-500 mr-1.5"></i> ${item.muhendis || 'Atanmadı'} & ${item.tekniker || 'Atanmadı'}</span><i class="fas fa-chevron-down text-slate-400"></i>
-                </button>
-                <div id="pers-${item.sn}" class="${openDropdowns.has(item.sn) ? 'flex' : 'hidden'} flex-col gap-1 mt-2 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
-                    ${createSelect(item.muhendis, personnel.muhendis, item.sn, 'muhendis', 'Mühendis')}
-                    ${createSelect(item.tekniker, personnel.tekniker, item.sn, 'tekniker', 'Tekniker')}
-                    ${createSelect(item.kadastro, personnel.kadastro, item.sn, 'kadastro', 'Kad. Üyesi')}
-                    ${createSelect(item.fen, personnel.fen, item.sn, 'fen', 'Fen Kon.')}
-                    ${createSelect(item.tas, personnel.tas, item.sn, 'tas', 'Tas. Kon.')}
+            <td class="p-2 align-top bg-slate-50/40 min-w-[240px]">
+                <div class="flex items-start gap-1">
+                    <div class="flex-1">
+                        <button onclick="toggleDropdown(${item.sn})" class="w-full text-left px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 rounded flex justify-between items-center text-[10px] font-bold text-slate-600 transition-colors shadow-sm">
+                            <span class="truncate mr-2"><i class="fas fa-users text-blue-500 mr-1.5"></i> ${item.muhendis || 'Atanmadı'} & ${item.tekniker || 'Atanmadı'}</span><i class="fas fa-chevron-down text-slate-400"></i>
+                        </button>
+                        <div id="pers-${item.sn}" class="${openDropdowns.has(item.sn) ? 'flex' : 'hidden'} flex-col gap-1 mt-2 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
+                            ${createSelect(item.muhendis, personnel.muhendis, item.sn, 'muhendis', 'Mühendis')}
+                            ${createSelect(item.tekniker, personnel.tekniker, item.sn, 'tekniker', 'Tekniker')}
+                            ${createSelect(item.kadastro, personnel.kadastro, item.sn, 'kadastro', 'Kad. Üyesi')}
+                            ${createSelect(item.fen, personnel.fen, item.sn, 'fen', 'Fen Kon.')}
+                            ${createSelect(item.tas, personnel.tas, item.sn, 'tas', 'Tas. Kon.')}
+                        </div>
+                    </div>
+                    <button onclick="openNoteModal(${item.sn})" class="flex-shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors shadow-sm ${item.notlar ? 'bg-amber-100 text-amber-600 border-amber-300 hover:bg-amber-200' : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50'}" title="Notlar">
+                        <i class="fas fa-comment-dots"></i>
+                    </button>
                 </div>
             </td>
 
@@ -1822,7 +1969,6 @@ function renderTable() {
             <td class="p-2 text-center bg-white/50">${createDateInput(item.bilgilendirme_tarihi, item.sn, 'bilgilendirme_tarihi')}</td>
             <td class="p-2 text-center bg-slate-50/50">${createStatusSelect(item.komisyon_durum, item.sn, 'komisyon_durum')}</td>
             <td class="p-2 text-center bg-white/50">${createDateInput(item.kesin_aski_tarihi, item.sn, 'kesin_aski_tarihi')}</td>
-            <td class="p-2 bg-yellow-50/30">${createTextInput(item.notlar, item.sn, 'notlar')}</td>
         `;
         tableBody.appendChild(row);
     });
@@ -1955,10 +2101,11 @@ function resetData() {
 }
 
 function exportToExcel() {
-    let csv = "S.N;İlçe;Mahalle;Toplam Parsel;İDÖ;22-A;EK-1;Kadastro İşlem;İhale Parseli;Mühendis;Tekniker;Kadastro Üyesi;Fen Kontrol;Tas. Kontrol;Genel Durum;Altlık Durum;Uçuş Tarihi;Uçuş Kıymetlendirme Durum;Değerlendirme Durum;Bilgilendirme İlanı Tarihi;Komisyon Durum;Kesin Askı Tarihi;Not\n";
+    let csv = "S.N;İlçe;Mahalle;Toplam Parsel;İDÖ;22-A;EK-1;Kadastro İşlem;İhale Parseli;Mühendis;Tekniker;Kadastro Üyesi;Fen Kontrol;Tas. Kontrol;Genel Durum;Altlık Durum;Uçuş Tarihi;Uçuş Kıymetlendirme Durum;Değerlendirme Durum;Bilgilendirme İlanı Tarihi;Komisyon Durum;Kesin Askı Tarihi;Notlar\n";
     data.forEach(r => {
         const trDate = (val) => val ? new Date(val).toLocaleDateString('tr-TR') : '';
-        csv += `${r.sn};${r.ilce};${r.mahalle};${r.toplam_parsel};${r.ido};${r.yirmi_iki_a};${r.ek_1};${r.kadastro_islem};${r.parsel};${r.muhendis};${r.tekniker};${r.kadastro};${r.fen};${r.tas};${r.genel_durum || 'HERHANGİ BİRŞEY YAPILMADI'};${r.altlik_durum || 'Yapılmadı'};${trDate(r.ucus_tarihi)};${r.ucus_kiymet_durum || 'Yapılmadı'};${r.degerlendirme_durum || 'Yapılmadı'};${trDate(r.bilgilendirme_tarihi)};${r.komisyon_durum || 'Yapılmadı'};${trDate(r.kesin_aski_tarihi)};${r.notlar || ''}\n`;
+        const notlar = (r.notlar || '').replace(/\n/g, ' / ').replace(/;/g, ',');
+        csv += `${r.sn};${r.ilce};${r.mahalle};${r.toplam_parsel};${r.ido};${r.yirmi_iki_a};${r.ek_1};${r.kadastro_islem};${r.parsel};${r.muhendis};${r.tekniker};${r.kadastro};${r.fen};${r.tas};${r.genel_durum || 'HERHANGİ BİRŞEY YAPILMADI'};${r.altlik_durum || 'Yapılmadı'};${trDate(r.ucus_tarihi)};${r.ucus_kiymet_durum || 'Yapılmadı'};${r.degerlendirme_durum || 'Yapılmadı'};${trDate(r.bilgilendirme_tarihi)};${r.komisyon_durum || 'Yapılmadı'};${trDate(r.kesin_aski_tarihi)};${notlar}\n`;
     });
     const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
