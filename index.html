@@ -10,11 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- PDF, Ekran Görüntüsü ve Word Kütüphaneleri -->
+    <!-- PDF, Ekran Görüntüsü, Word ve Excel Kütüphaneleri -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Çok Sayfalı (Multi-sheet) Excel Çıktısı İçin SheetJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
@@ -267,7 +269,7 @@
                         <i class="fas fa-comments"></i> Not Raporu
                     </button>
                     <button onclick="openReportModal()" class="bg-cyan-600 text-white px-3 py-1.5 rounded-lg hover:bg-cyan-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
-                        <i class="fas fa-file-invoice"></i> Rapor Oluştur
+                        <i class="fas fa-file-invoice"></i> Bilgi Notu
                     </button>
                     <button onclick="openPdfModal()" class="bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
                         <i class="fas fa-file-pdf"></i> Tablo PDF İndir
@@ -332,12 +334,12 @@
     </div>
 </div>
 
-<!-- Not Raporu Modalı -->
+<!-- Not Raporu Modalı (İhale Firması & Birim Notları) -->
 <div id="notesReportModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
         <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-amber-50">
             <h3 class="font-extrabold text-xl text-amber-900 flex items-center gap-2">
-                <i class="fas fa-comments text-amber-500"></i> Tüm Notlar Raporu
+                <i class="fas fa-comments text-amber-500"></i> Genel Not Raporu
             </h3>
             <div class="flex items-center gap-2 md:gap-3">
                 <button onclick="exportNotesToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 md:px-4 py-2 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 transition-all">
@@ -346,8 +348,24 @@
                 <button onclick="closeNotesReportModal()" class="text-slate-400 hover:text-red-500 transition ml-1"><i class="fas fa-times text-xl"></i></button>
             </div>
         </div>
-        <div class="p-6 overflow-y-auto flex-1 bg-slate-50 space-y-4" id="notesReportContentContainer">
-            <!-- Dinamik Not Raporu Buraya Enjekte Edilecek -->
+        <div class="p-6 overflow-y-auto flex-1 bg-slate-50 flex flex-col gap-6">
+            
+            <!-- İhale Firması Genel Notları -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-building text-indigo-500"></i> İhale Firması Görev ve Notları
+                    </h4>
+                    <button onclick="insertDateToFirmaNote()" class="text-[10px] bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-700 px-2 py-1.5 rounded-lg font-bold transition flex items-center shadow-sm whitespace-nowrap"><i class="fas fa-calendar-plus mr-1"></i>Tarih Ekle</button>
+                </div>
+                <textarea id="firmaNoteTextarea" rows="4" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Firma için genel görev ve notları buraya yazın..." onblur="saveFirmaNote()"></textarea>
+            </div>
+
+            <!-- Birim Notları Raporu -->
+            <div>
+                <h4 class="font-bold text-xs text-slate-400 uppercase mb-3 tracking-widest ml-1">Birim Notları</h4>
+                <div id="notesReportContentContainer" class="space-y-4"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -372,7 +390,7 @@
     </div>
 </div>
 
-<!-- Not Ekleme Modalı -->
+<!-- Not Ekleme Modalı (Tablodaki Birim İçin) -->
 <div id="noteModal" class="fixed inset-0 bg-slate-900/50 z-[80] hidden flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-amber-50">
@@ -468,14 +486,6 @@
     </div>
 </div>
 
-<div id="toast" class="fixed bottom-5 right-5 md:right-10 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50">
-    <div id="toastIcon" class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center"><i class="fas fa-check"></i></div>
-    <div class="flex flex-col">
-        <span id="toastTitle" class="font-bold text-sm">Başarılı</span>
-        <span id="toastMsg" class="text-xs text-slate-300">İşlem tamamlandı.</span>
-    </div>
-</div>
-
 <script>
 window.addEventListener('beforeunload', function (e) {
     if (hasUnsavedChanges) {
@@ -544,15 +554,27 @@ let durumListesi = [...defaultDurumlar];
 let data = JSON.parse(localStorage.getItem('ihaleData')) || [];
 let currentFilteredData = data; 
 
-// Yatırım Verileri
+// Yatırım & Firma Not Verileri
 let yatirimData = JSON.parse(localStorage.getItem('yatirimData')) || {
     sozlesme: 56880248,
     odenen: 5669990,
-    fiziksel: 10
+    fiziksel: 10,
+    firmaNotlari: ""
 };
 
 const encodeBase64 = (str) => btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str)));
 const decodeBase64 = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
+
+function populateDurumFilter() {
+    const filterSelect = document.getElementById('statusFilter');
+    filterSelect.innerHTML = '<option value="">Tüm Durumlar</option>';
+    durumListesi.forEach(durum => {
+        const opt = document.createElement('option');
+        opt.value = durum;
+        opt.innerText = durum;
+        filterSelect.appendChild(opt);
+    });
+}
 
 function getStringColorInfo(str) {
     if(!str) return colorPalette[0];
@@ -563,6 +585,17 @@ function getStringColorInfo(str) {
     for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
     const index = Math.abs(hash) % colorPalette.length;
     return colorPalette[index];
+}
+
+function showToast(title, msg, type = "success") {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastTitle').innerText = title;
+    document.getElementById('toastMsg').innerText = msg;
+    const icon = document.getElementById('toastIcon');
+    icon.className = `w-8 h-8 rounded-full flex items-center justify-center ${type === 'error' ? 'bg-red-500' : type === 'info' ? 'bg-blue-500' : 'bg-emerald-500'}`;
+    icon.innerHTML = `<i class="fas ${type === 'error' ? 'fa-times' : type === 'info' ? 'fa-info' : 'fa-check'}"></i>`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 function handleLogin() {
@@ -666,7 +699,7 @@ async function fetchFromGithub(isAuto = false) {
             durumListesi = [...defaultDurumlar];
         }
 
-        // 3. Yatırım Verisi
+        // 3. Yatırım Verisi (Firma Notları dahil)
         const resYatirim = await fetch(`https://api.github.com/repos/${_repo}/contents/${_yatirimPath}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
@@ -718,7 +751,7 @@ async function saveToGithub(isAuto = false) {
             method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyDurum)
         });
 
-        // 3. Yatırım Verisi Kaydı
+        // 3. Yatırım Verisi Kaydı (Firma Notları dahil)
         const getResYatirim = await fetch(`https://api.github.com/repos/${_repo}/contents/${_yatirimPath}?t=${new Date().getTime()}`, {
             headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json' }, cache: 'no-store'
         });
@@ -772,6 +805,7 @@ function insertDateToNote() {
 }
 
 function openNotesReportModal() {
+    document.getElementById('firmaNoteTextarea').value = yatirimData.firmaNotlari || '';
     generateNotesReport();
     document.getElementById('notesReportModal').classList.remove('hidden');
 }
@@ -780,26 +814,47 @@ function closeNotesReportModal() {
     document.getElementById('notesReportModal').classList.add('hidden');
 }
 
+function insertDateToFirmaNote() {
+    const textarea = document.getElementById('firmaNoteTextarea');
+    const today = new Date().toLocaleDateString('tr-TR');
+    const dateStr = `[${today}] `;
+    
+    const startPos = textarea.selectionStart;
+    const endPos = textarea.selectionEnd;
+    const text = textarea.value;
+    
+    textarea.value = text.substring(0, startPos) + dateStr + text.substring(endPos);
+    textarea.selectionStart = textarea.selectionEnd = startPos + dateStr.length;
+    textarea.focus();
+    saveFirmaNote();
+}
+
+function saveFirmaNote() {
+    yatirimData.firmaNotlari = document.getElementById('firmaNoteTextarea').value;
+    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+    setUnsavedState(true);
+}
+
 function generateNotesReport() {
     const container = document.getElementById('notesReportContentContainer');
-    const notesData = currentFilteredData.filter(d => d.notlar && d.notlar.trim() !== '');
+    const notesData = currentFilteredData.filter(d => (d.notlar || '').trim() !== '');
     
     if (notesData.length === 0) {
-        container.innerHTML = '<div class="text-center text-slate-500 py-10 font-medium">Bu görünüme ait not bulunamadı.</div>';
+        container.innerHTML = '<div class="text-center text-slate-500 py-10 font-medium bg-white rounded-xl border border-slate-200">Bu görünüme ait birim notu bulunamadı.</div>';
         return;
     }
 
     let html = '';
     notesData.forEach(d => {
-        const notlarList = d.notlar.split('\n').filter(n => n.trim() !== '').map(n => `<li class="mb-2 flex items-start gap-2"><i class="fas fa-check text-amber-500 mt-0.5"></i> <span>${n}</span></li>`).join('');
+        const notlarList = (d.notlar || '').split('\n').filter(n => n.trim() !== '').map(n => `<li class="mb-2 flex items-start gap-2"><i class="fas fa-check text-amber-500 mt-0.5"></i> <span>${n}</span></li>`).join('');
         
         html += `
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                 <div class="flex flex-col md:flex-row justify-between md:items-center border-b border-slate-100 pb-3 mb-3 gap-3">
                     <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
-                        <i class="fas fa-map-marker-alt text-blue-500"></i> <span class="text-blue-700">${d.ilce}</span> - ${d.mahalle}
+                        <i class="fas fa-map-marker-alt text-blue-500"></i> <span class="text-blue-700">${d.ilce || ''}</span> - ${d.mahalle || ''}
                     </h4>
-                    <div class="flex flex-wrap gap-3 text-[11px] font-bold text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+                    <div class="flex flex-wrap gap-2 text-[10px] font-bold text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
                         <span class="flex items-center gap-1.5"><i class="fas fa-user-tie text-blue-400"></i> ${d.muhendis || 'Atanmadı'}</span>
                         <span class="flex items-center gap-1.5"><i class="fas fa-tools text-purple-400"></i> ${d.tekniker || 'Atanmadı'}</span>
                     </div>
@@ -815,45 +870,50 @@ function generateNotesReport() {
 }
 
 function exportNotesToExcel() {
-    const notesData = currentFilteredData.filter(d => d.notlar && d.notlar.trim() !== '');
-    if (notesData.length === 0) return showToast("Hata", "İndirilecek not bulunamadı.", "error");
+    const notesData = currentFilteredData.filter(d => (d.notlar || '').trim() !== '');
+    const firmaNotu = yatirimData.firmaNotlari || "";
 
-    let csv = "S.N;İlçe;Mahalle;Mühendis;Tekniker;Notlar\n";
+    if (notesData.length === 0 && firmaNotu.trim() === "") {
+        return showToast("Hata", "İndirilecek not bulunamadı.", "error");
+    }
+
+    const wb = XLSX.utils.book_new();
+
+    // 1. Sayfa: İhale Firması Notları
+    if (firmaNotu.trim() !== "") {
+        const firmaRows = [
+            ["İhale Firması Görev ve Notları"],
+            ...firmaNotu.split('\n').filter(n => n.trim() !== '').map(line => [line])
+        ];
+        const ws1 = XLSX.utils.aoa_to_sheet(firmaRows);
+        ws1['!cols'] = [{ wch: 100 }];
+        XLSX.utils.book_append_sheet(wb, ws1, "Firma Notları");
+    } else {
+         const ws1 = XLSX.utils.aoa_to_sheet([["Not bulunmamaktadır."]]);
+         XLSX.utils.book_append_sheet(wb, ws1, "Firma Notları");
+    }
+
+    // 2. Sayfa: Birim Notları
+    const birimRows = [
+        ["S.N", "İlçe", "Mahalle", "Mühendis", "Tekniker", "Notlar"]
+    ];
     notesData.forEach(d => {
-        const cleanNotes = (d.notlar || '').replace(/\n/g, ' / ').replace(/;/g, ',');
-        csv += `${d.sn};${d.ilce};${d.mahalle};${d.muhendis || '-'};${d.tekniker || '-'};${cleanNotes}\n`;
+        const cleanNotes = (d.notlar || '').replace(/\n/g, ' / ');
+        birimRows.push([d.sn || '', d.ilce || '', d.mahalle || '', d.muhendis || '-', d.tekniker || '-', cleanNotes]);
     });
-    
-    const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Not_Raporu_${new Date().toLocaleDateString('tr-TR')}.csv`;
-    a.click();
+
+    if (notesData.length > 0) {
+        const ws2 = XLSX.utils.aoa_to_sheet(birimRows);
+        ws2['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 80 }];
+        XLSX.utils.book_append_sheet(wb, ws2, "Birim Notları");
+    } else {
+        const ws2 = XLSX.utils.aoa_to_sheet([["Birim notu bulunmamaktadır."]]);
+        XLSX.utils.book_append_sheet(wb, ws2, "Birim Notları");
+    }
+
+    XLSX.writeFile(wb, `Genel_Not_Raporu_${new Date().toLocaleDateString('tr-TR')}.xlsx`);
 }
 // =========================================================
-
-function populateDurumFilter() {
-    const filterSelect = document.getElementById('statusFilter');
-    filterSelect.innerHTML = '<option value="">Tüm Durumlar</option>';
-    durumListesi.forEach(durum => {
-        const opt = document.createElement('option');
-        opt.value = durum;
-        opt.innerText = durum;
-        filterSelect.appendChild(opt);
-    });
-}
-
-function showToast(title, msg, type = "success") {
-    const toast = document.getElementById('toast');
-    document.getElementById('toastTitle').innerText = title;
-    document.getElementById('toastMsg').innerText = msg;
-    const icon = document.getElementById('toastIcon');
-    icon.className = `w-8 h-8 rounded-full flex items-center justify-center ${type === 'error' ? 'bg-red-500' : type === 'info' ? 'bg-blue-500' : 'bg-emerald-500'}`;
-    icon.innerHTML = `<i class="fas ${type === 'error' ? 'fa-times' : type === 'info' ? 'fa-info' : 'fa-check'}"></i>`;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
 
 // ====================== YATIRIM TAKİP ======================
 function renderYatirim() {
@@ -933,7 +993,6 @@ function renderYatirim() {
 function updateYatirim(field, value) {
     if (!isAdmin) return;
     
-    // Sadece sayıları al, virgülü noktaya çevir
     let numStr = value.toString().replace(/\./g, '').replace(/,/g, '.').replace(/[^0-9.]/g, '');
     let numVal = parseFloat(numStr);
     
@@ -1042,7 +1101,7 @@ function generateDynamicReport() {
         totalIDO += parseInt(d.ido) || 0;
         totalIhaleParsel += parseInt(d.parsel) || 0;
         
-        const birimName = `${d.ilce}-${d.mahalle}`;
+        const birimName = `${d.ilce || ''}-${d.mahalle || ''}`;
         
         // ANA BAŞLIKLAR
         if (d.bilgilendirme_tarihi) {
@@ -1079,7 +1138,6 @@ function generateDynamicReport() {
             addDiger("UÇUŞ YAPILANLAR");
             hasAnyDiger = true;
         } else {
-             // If flight date is empty, it's pending flight
              addDiger("UÇUŞ BEKLEYENLER");
              hasAnyDiger = true;
         }
@@ -1100,15 +1158,15 @@ function generateDynamicReport() {
         const inAnaBaslik = stats.kesinAski.includes(birimName) || stats.komisyon.includes(birimName) || stats.bilgilendirme.includes(birimName) || stats.teslim.includes(birimName);
         
         if (!hasAnyDiger && !inAnaBaslik) {
-            if (d.genel_durum && d.genel_durum !== "HERHANGİ BİRŞEY YAPILMADI") {
-                addDiger(d.genel_durum);
+            let gd = (d.genel_durum || "HERHANGİ BİRŞEY YAPILMADI").trim();
+            if (gd && gd !== "HERHANGİ BİRŞEY YAPILMADI") {
+                addDiger(gd);
             } else {
                 addDiger("ÇALIŞMA BEKLİYOR");
             }
         }
     });
 
-    // Yatırım Hesaplamaları
     const sozlesme = parseInt(yatirimData.sozlesme) || 0;
     const odenen = parseInt(yatirimData.odenen) || 0;
     const kalan = Math.max(0, sozlesme - odenen);
@@ -1536,15 +1594,15 @@ function createPrintTable(items) {
         const getDateBadge = (val) => val ? `<span style="background-color:#e0e7ff; color:#3730a3; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${trDate(val)}</span>` : '-';
         
         html += `<tr>
-            <td style="text-align:center; font-weight:bold; font-size:14px; padding:8px 4px; border:1px solid #cbd5e1;">${item.sn}</td>
-            <td style="font-weight:bold; font-size:13px; padding:8px 4px; border:1px solid #cbd5e1;">${item.ilce}</td>
-            <td style="font-weight:bold; color:#2563eb; font-size:13px; padding:8px 4px; border:1px solid #cbd5e1;">${item.mahalle}</td>
-            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.toplam_parsel}</td>
-            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.ido}</td>
-            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.yirmi_iki_a}</td>
-            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.ek_1}</td>
-            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.kadastro_islem}</td>
-            <td style="text-align:center; font-weight:900; font-size:14px; color:#047857; background:#ecfdf5; padding:8px 4px; border:1px solid #cbd5e1;">${item.parsel.toLocaleString('tr-TR')}</td>
+            <td style="text-align:center; font-weight:bold; font-size:14px; padding:8px 4px; border:1px solid #cbd5e1;">${item.sn || ''}</td>
+            <td style="font-weight:bold; font-size:13px; padding:8px 4px; border:1px solid #cbd5e1;">${item.ilce || ''}</td>
+            <td style="font-weight:bold; color:#2563eb; font-size:13px; padding:8px 4px; border:1px solid #cbd5e1;">${item.mahalle || ''}</td>
+            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.toplam_parsel || 0}</td>
+            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.ido || 0}</td>
+            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.yirmi_iki_a || 0}</td>
+            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.ek_1 || 0}</td>
+            <td style="text-align:center; font-size:12px; padding:8px 4px; border:1px solid #cbd5e1;">${item.kadastro_islem || 0}</td>
+            <td style="text-align:center; font-weight:900; font-size:14px; color:#047857; background:#ecfdf5; padding:8px 4px; border:1px solid #cbd5e1;">${(Number(item.parsel) || 0).toLocaleString('tr-TR')}</td>
             <td style="font-size:12px; color:#334155; padding:8px 6px; border:1px solid #cbd5e1;">${personeller}</td>
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.genel_durum, true)}</td>
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.altlik_durum)}</td>
@@ -1846,10 +1904,15 @@ function createStatusSelect(val, sn, field) {
 }
 
 function createGenelDurumSelect(val, sn, field) {
-    val = val || "HERHANGİ BİRŞEY YAPILMADI";
+    val = (val || "HERHANGİ BİRŞEY YAPILMADI").trim();
     const colors = getStringColorInfo(val);
 
-    let options = durumListesi.map(o => `<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
+    let mevcutDurumlar = [...durumListesi];
+    if(val && val !== "HERHANGİ BİRŞEY YAPILMADI" && !mevcutDurumlar.includes(val)){
+        mevcutDurumlar.unshift(val);
+    }
+
+    let options = mevcutDurumlar.map(o => `<option value="${o}" ${o.trim() === val ? 'selected' : ''}>${o}</option>`).join('');
     return `<select onchange="updateValue(${sn}, '${field}', this.value)" class="w-full text-[10px] font-bold outline-none cursor-pointer p-1.5 rounded-md hover:opacity-90 text-center transition-colors whitespace-normal h-full shadow-sm leading-tight" style="background-color:${colors.bg}; color:${colors.text}; border: 1px solid ${colors.border};">${options}</select>`;
 }
 
@@ -1877,9 +1940,9 @@ function renderTable() {
     tableBody.innerHTML = "";
 
     const filtered = data.filter(item => {
-        const matchesSearch = item.ilce.toLowerCase().includes(searchText) || item.mahalle.toLowerCase().includes(searchText);
+        const matchesSearch = (item.ilce || '').toLowerCase().includes(searchText) || (item.mahalle || '').toLowerCase().includes(searchText);
         const matchesPerson = !activePersonFilter || [item.muhendis, item.tekniker, item.kadastro, item.fen, item.tas].includes(activePersonFilter);
-        const matchesStatus = !statusText || (item.genel_durum || "HERHANGİ BİRŞEY YAPILMADI") === statusText;
+        const matchesStatus = !statusText || (item.genel_durum || "HERHANGİ BİRŞEY YAPILMADI").trim() === statusText.trim();
         const matchesRegion = !activeRegionFilter || activeRegionFilter.includes(item.ilce);
         
         let matchesCard = true;
@@ -1923,23 +1986,26 @@ function renderTable() {
             });
             row.addEventListener('dragend', () => { row.classList.remove('opacity-50', 'bg-slate-100'); draggedSn = null; });
         }
+
+        const parselNum = Number(item.parsel) || 0;
+        const hasNote = (item.notlar || '').trim() !== '';
         
         row.innerHTML = `
             <td class="p-3 text-slate-400 font-medium text-center">${canDrag ? '<i class="fas fa-grip-vertical drag-handle mr-2" title="Sıralamayı değiştirmek için sürükle"></i>' : ''}${item.sn}</td>
-            <td class="p-3 font-bold text-slate-700">${item.ilce}</td>
+            <td class="p-3 font-bold text-slate-700">${item.ilce || ''}</td>
             <td class="p-3 font-semibold text-blue-600">
-                <div class="flex items-center gap-2" title="${item.mahalle}">
-                    <span class="truncate max-w-[130px]">${item.mahalle}</span>
-                    <a href="https://maps.google.com/?q=${encodeURIComponent(item.mahalle + ' Mahallesi, ' + item.ilce + ', Mersin')}&t=k" target="_blank" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-map-marker-alt"></i></a>
+                <div class="flex items-center gap-2" title="${item.mahalle || ''}">
+                    <span class="truncate max-w-[130px]">${item.mahalle || ''}</span>
+                    <a href="https://maps.google.com/?q=${encodeURIComponent((item.mahalle || '') + ' Mahallesi, ' + (item.ilce || '') + ', Mersin')}&t=k" target="_blank" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-map-marker-alt"></i></a>
                 </div>
             </td>
             
-            <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'toplam_parsel', this.innerText)">${item.toplam_parsel}</td>
-            <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'ido', this.innerText)">${item.ido}</td>
-            <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'yirmi_iki_a', this.innerText)">${item.yirmi_iki_a}</td>
-            <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'ek_1', this.innerText)">${item.ek_1}</td>
-            <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'kadastro_islem', this.innerText)">${item.kadastro_islem}</td>
-            <td class="p-4 text-center font-black text-slate-800 bg-emerald-50 ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'parsel', this.innerText)">${item.parsel.toLocaleString('tr-TR')}</td>
+            <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'toplam_parsel', this.innerText)">${item.toplam_parsel || 0}</td>
+            <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'ido', this.innerText)">${item.ido || 0}</td>
+            <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'yirmi_iki_a', this.innerText)">${item.yirmi_iki_a || 0}</td>
+            <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'ek_1', this.innerText)">${item.ek_1 || 0}</td>
+            <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'kadastro_islem', this.innerText)">${item.kadastro_islem || 0}</td>
+            <td class="p-4 text-center font-black text-slate-800 bg-emerald-50 ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'parsel', this.innerText)">${parselNum.toLocaleString('tr-TR')}</td>
             
             <td class="p-2 align-top bg-slate-50/40 min-w-[240px]">
                 <div class="flex items-start gap-1">
@@ -1955,7 +2021,7 @@ function renderTable() {
                             ${createSelect(item.tas, personnel.tas, item.sn, 'tas', 'Tas. Kon.')}
                         </div>
                     </div>
-                    <button onclick="openNoteModal(${item.sn})" class="flex-shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors shadow-sm ${item.notlar ? 'bg-amber-100 text-amber-600 border-amber-300 hover:bg-amber-200' : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50'}" title="Notlar">
+                    <button onclick="openNoteModal(${item.sn})" class="flex-shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors shadow-sm ${hasNote ? 'bg-amber-100 text-amber-600 border-amber-300 hover:bg-amber-200' : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50'}" title="Notlar">
                         <i class="fas fa-comment-dots"></i>
                     </button>
                 </div>
@@ -1984,7 +2050,7 @@ function calculateStats() {
 
     data.forEach(item => {
         const p = parseInt(item.parsel) || 0;
-        const dist = item.ilce;
+        const dist = item.ilce || 'BİLMEYEN';
         const updateMap = (map, person) => {
             if (!person) return;
             if (!map[person]) map[person] = { total: 0, details: {} };
@@ -2104,8 +2170,8 @@ function exportToExcel() {
     let csv = "S.N;İlçe;Mahalle;Toplam Parsel;İDÖ;22-A;EK-1;Kadastro İşlem;İhale Parseli;Mühendis;Tekniker;Kadastro Üyesi;Fen Kontrol;Tas. Kontrol;Genel Durum;Altlık Durum;Uçuş Tarihi;Uçuş Kıymetlendirme Durum;Değerlendirme Durum;Bilgilendirme İlanı Tarihi;Komisyon Durum;Kesin Askı Tarihi;Notlar\n";
     data.forEach(r => {
         const trDate = (val) => val ? new Date(val).toLocaleDateString('tr-TR') : '';
-        const notlar = (r.notlar || '').replace(/\n/g, ' / ').replace(/;/g, ',');
-        csv += `${r.sn};${r.ilce};${r.mahalle};${r.toplam_parsel};${r.ido};${r.yirmi_iki_a};${r.ek_1};${r.kadastro_islem};${r.parsel};${r.muhendis};${r.tekniker};${r.kadastro};${r.fen};${r.tas};${r.genel_durum || 'HERHANGİ BİRŞEY YAPILMADI'};${r.altlik_durum || 'Yapılmadı'};${trDate(r.ucus_tarihi)};${r.ucus_kiymet_durum || 'Yapılmadı'};${r.degerlendirme_durum || 'Yapılmadı'};${trDate(r.bilgilendirme_tarihi)};${r.komisyon_durum || 'Yapılmadı'};${trDate(r.kesin_aski_tarihi)};${notlar}\n`;
+        const notlar = (r.notlar || '').replace(/\n/g, ' / ');
+        csv += `${r.sn || ''};${r.ilce || ''};${r.mahalle || ''};${r.toplam_parsel || 0};${r.ido || 0};${r.yirmi_iki_a || 0};${r.ek_1 || 0};${r.kadastro_islem || 0};${r.parsel || 0};${r.muhendis || ''};${r.tekniker || ''};${r.kadastro || ''};${r.fen || ''};${r.tas || ''};${r.genel_durum || 'HERHANGİ BİRŞEY YAPILMADI'};${r.altlik_durum || 'Yapılmadı'};${trDate(r.ucus_tarihi)};${r.ucus_kiymet_durum || 'Yapılmadı'};${r.degerlendirme_durum || 'Yapılmadı'};${trDate(r.bilgilendirme_tarihi)};${r.komisyon_durum || 'Yapılmadı'};${trDate(r.kesin_aski_tarihi)};${notlar}\n`;
     });
     const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
