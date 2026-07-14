@@ -37,7 +37,7 @@
     "ucus_tarihi": "2026-06-20",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)"
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)\n[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek(Firma)"
   },
   {
     "sn": 3,
@@ -184,7 +184,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "notlar": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek(Firma)"
   },
   {
     "sn": 11,
@@ -221,7 +222,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-06-25",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "notlar": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek(Firma)"
   },
   {
     "sn": 13,
@@ -277,7 +279,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-06-25",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "notlar": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek(Firma)"
   },
   {
     "sn": 16,
@@ -297,7 +300,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "notlar": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek(Firma)"
   },
   {
     "sn": 17,
@@ -340,7 +344,7 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor"
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor\n[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek(Firma)"
   },
   {
     "sn": 19,
