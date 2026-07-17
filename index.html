@@ -66,6 +66,20 @@
         .editable-finance { min-width: 40px; display: inline-block; cursor: text; transition: all 0.2s; border-radius: 4px; border: 1px solid transparent; }
         .editable-finance:hover { background-color: rgba(255,255,255,0.2); }
         .editable-finance:focus { background-color: white; color: #1e293b; outline: none; border-color: #3b82f6; padding: 0 4px; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); }
+
+        @media (max-width: 640px) {
+            #mainTable { min-width: 1100px; }
+            #notesReportModal { padding: 8px; }
+            #notesReportModal > div { max-height: 96vh; border-radius: 16px; }
+            #notesReportModal > div > div:first-child { padding: 14px; }
+            #notesReportModal h3 { font-size: 16px; }
+            #notesReportModal h3 + div button { padding: 8px 10px; }
+            #notesReportPrintable { padding: 12px; gap: 14px; }
+            #notesReportSummary { gap: 8px; }
+            #notesReportSummary > div { padding: 10px 6px; }
+            #notesReportSummary .text-2xl { font-size: 20px; }
+            #firmaNotesPreview .text-xs { font-size: 12px; line-height: 1.35; }
+        }
     </style>
 </head>
 <body class="text-slate-800 h-screen w-screen overflow-hidden">
@@ -590,8 +604,10 @@ let yatirimData = JSON.parse(localStorage.getItem('yatirimData')) || {
     sozlesme: 56880248,
     odenen: 5669990,
     fiziksel: 10,
-    firmaNotlari: ""
+    firmaNotlari: "",
+    firmaNotlariTamamlandi: []
 };
+if (!Array.isArray(yatirimData.firmaNotlariTamamlandi)) yatirimData.firmaNotlariTamamlandi = [];
 
 function populateDurumFilter() {
     const filterSelect = document.getElementById('statusFilter');
@@ -909,15 +925,23 @@ function insertDateToFirmaNote() {
 
 function saveFirmaNote() {
     yatirimData.firmaNotlari = document.getElementById('firmaNoteTextarea').value;
+    const lineCount = yatirimData.firmaNotlari.split('\n').length;
+    yatirimData.firmaNotlariTamamlandi = (yatirimData.firmaNotlariTamamlandi || []).slice(0, lineCount);
     localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
     setUnsavedState(true);
 }
 
-function renderFirmaNotesPreview() {
-    const container = document.getElementById('firmaNotesPreview');
-    const textarea = document.getElementById('firmaNoteTextarea');
-    if (!container || !textarea) return;
-    const entries = textarea.value.split('\n').map((line, index) => {
+function toggleFirmaNoteComplete(index) {
+    const states = yatirimData.firmaNotlariTamamlandi || [];
+    states[index] = states[index] !== true;
+    yatirimData.firmaNotlariTamamlandi = states;
+    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+    setUnsavedState(true);
+    renderFirmaNotesPreview();
+}
+
+function getFirmaNoteEntries(text) {
+    const entries = String(text || '').split('\n').map((line, index) => {
         const match = line.match(/^\s*\[(\d{2})\.(\d{2})\.(\d{4})\]\s*(.*)$/);
         return {
             line: line.trim(), index,
@@ -926,8 +950,18 @@ function renderFirmaNotesPreview() {
             sortKey: match ? new Date(`${match[3]}-${match[2]}-${match[1]}`).getTime() : Number.MAX_SAFE_INTEGER
         };
     }).filter(entry => entry.text);
-    entries.sort((a, b) => a.sortKey - b.sortKey || a.index - b.index);
-    container.innerHTML = entries.length ? entries.map((entry, position) => `<div class="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm hover:border-indigo-200 transition"><div class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-black">${position + 1}</div><div class="flex-1 min-w-0"><div class="flex flex-wrap items-center gap-2 mb-1">${entry.date ? `<span class="text-[10px] font-black text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-md px-2 py-1"><i class="fas fa-calendar-day mr-1"></i>${entry.date}</span>` : '<span class="text-[10px] font-bold text-slate-400">Tarihsiz not</span>'}</div><div class="text-xs font-semibold text-slate-700 break-words">${escapeNoteHtml(entry.text)}</div></div></div>`).join('') : '<div class="rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400">Henüz firma görevi veya notu eklenmedi.</div>';
+    return entries.sort((a, b) => a.sortKey - b.sortKey || a.index - b.index);
+}
+
+function renderFirmaNotesPreview() {
+    const container = document.getElementById('firmaNotesPreview');
+    const textarea = document.getElementById('firmaNoteTextarea');
+    if (!container || !textarea) return;
+    const entries = getFirmaNoteEntries(textarea.value);
+    const states = yatirimData.firmaNotlariTamamlandi || [];
+    const completed = entries.filter(entry => states[entry.index] === true).length;
+    const summary = `<div class="flex items-center justify-between mb-2 text-[10px] font-bold"><span class="text-slate-400">${entries.length} kayıt</span><span class="${completed === entries.length && entries.length ? 'text-emerald-600' : 'text-indigo-600'}">${completed}/${entries.length} tamamlandı</span></div>`;
+    container.innerHTML = entries.length ? summary + entries.map((entry, position) => { const done = states[entry.index] === true; return `<div class="flex items-start gap-3 rounded-xl border ${done ? 'border-emerald-200 bg-emerald-50/50 opacity-60' : 'border-slate-200 bg-white'} p-3 shadow-sm hover:border-indigo-200 transition"><button onclick="toggleFirmaNoteComplete(${entry.index})" class="flex-shrink-0 w-7 h-7 rounded-full border flex items-center justify-center ${done ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : 'bg-white text-slate-400 border-slate-300 hover:text-emerald-600'}" title="${done ? 'Tamamlanmadı yap' : 'Tamamlandı yap'}"><i class="fas fa-check text-xs"></i></button><div class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-black">${position + 1}</div><div class="flex-1 min-w-0"><div class="flex flex-wrap items-center gap-2 mb-1">${entry.date ? `<span class="text-[10px] font-black text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-md px-2 py-1"><i class="fas fa-calendar-day mr-1"></i>${entry.date}</span>` : '<span class="text-[10px] font-bold text-slate-400">Tarihsiz not</span>'}</div><div class="text-xs font-semibold text-slate-700 break-words ${done ? 'line-through' : ''}">${escapeNoteHtml(entry.text)}</div></div></div>`; }).join('') : '<div class="rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400">Henüz firma görevi veya notu eklenmedi.</div>';
 }
 
 function generateNotesReport() {
@@ -1044,12 +1078,14 @@ function exportNotesToExcel() {
 
     // 1. Sayfa: İhale Firması Notları
     if (firmaNotu.trim() !== "") {
-        const firmaRows = [
-            ["İhale Firması Görev ve Notları"],
-            ...firmaNotu.split('\n').filter(n => n.trim() !== '').map(line => [line])
-        ];
+        const firmaEntries = getFirmaNoteEntries(firmaNotu);
+        const firmaStates = yatirimData.firmaNotlariTamamlandi || [];
+        const firmaRows = [["Sıra", "Tarih", "Görev / Not", "Durum"]];
+        firmaEntries.forEach((entry, index) => firmaRows.push([index + 1, entry.date || '-', entry.text, firmaStates[entry.index] === true ? 'Tamamlandı' : 'Bekliyor']));
         const ws1 = XLSX.utils.aoa_to_sheet(firmaRows);
-        ws1['!cols'] = [{ wch: 100 }];
+        ws1['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 80 }, { wch: 16 }];
+        ws1['!autofilter'] = { ref: `A1:D${firmaRows.length}` };
+        ws1['!freeze'] = { xSplit: 0, ySplit: 1 };
         XLSX.utils.book_append_sheet(wb, ws1, "Firma Notları");
     } else {
          const ws1 = XLSX.utils.aoa_to_sheet([["Not bulunmamaktadır."]]);
@@ -1071,6 +1107,8 @@ function exportNotesToExcel() {
     if (notesData.length > 0) {
         const ws2 = XLSX.utils.aoa_to_sheet(birimRows);
         ws2['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 20 }, { wch: 12 }, { wch: 20 }, { wch: 20 }, { wch: 80 }, { wch: 15 }];
+        ws2['!autofilter'] = { ref: `A1:H${birimRows.length}` };
+        ws2['!freeze'] = { xSplit: 0, ySplit: 1 };
         XLSX.utils.book_append_sheet(wb, ws2, "Birim Notları");
     } else {
         const ws2 = XLSX.utils.aoa_to_sheet([["Birim notu bulunmamaktadır."]]);
