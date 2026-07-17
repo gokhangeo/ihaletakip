@@ -348,7 +348,8 @@
                 <button onclick="closeNotesReportModal()" class="text-slate-400 hover:text-red-500 transition ml-1"><i class="fas fa-times text-xl"></i></button>
             </div>
         </div>
-        <div class="p-6 overflow-y-auto flex-1 bg-slate-50 flex flex-col gap-6">
+        <div id="notesReportPrintable" class="p-6 overflow-y-auto flex-1 bg-slate-50 flex flex-col gap-6">
+            <div id="notesReportSummary" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
             
             <!-- İhale Firması Genel Notları -->
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
@@ -358,7 +359,9 @@
                     </h4>
                     <button onclick="insertDateToFirmaNote()" class="text-[10px] bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-700 px-2 py-1.5 rounded-lg font-bold transition flex items-center shadow-sm whitespace-nowrap"><i class="fas fa-calendar-plus mr-1"></i>Tarih Ekle</button>
                 </div>
-                <textarea id="firmaNoteTextarea" rows="4" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Firma için genel görev ve notları buraya yazın..." oninput="setUnsavedState(true)" onblur="saveFirmaNote()"></textarea>
+                <textarea id="firmaNoteTextarea" rows="3" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Her satıra bir görev veya not yazın..." oninput="renderFirmaNotesPreview(); setUnsavedState(true)" onblur="saveFirmaNote()"></textarea>
+                <div class="mt-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400"><i class="fas fa-list-ol text-indigo-400"></i> Düzenli Görev Listesi</div>
+                <div id="firmaNotesPreview" class="mt-2 space-y-2"></div>
             </div>
 
             <!-- Birim Notları Raporu -->
@@ -402,7 +405,8 @@
                 <p class="text-[11px] text-slate-500 font-medium">Her satıra bir not yazabilirsiniz. PDF ve Excel'de maddelendirilir.</p>
                 <button onclick="insertDateToNote()" class="text-[10px] bg-white border border-amber-200 hover:bg-amber-50 text-amber-700 px-2 py-1.5 rounded-lg font-bold transition flex items-center shadow-sm whitespace-nowrap"><i class="fas fa-calendar-plus mr-1"></i>Tarih Ekle</button>
             </div>
-            <textarea id="noteTextarea" rows="6" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-amber-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Buraya yazın..."></textarea>
+            <textarea id="noteTextarea" rows="6" oninput="renderNoteChecklist()" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-amber-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Buraya yazın..."></textarea>
+            <div id="noteChecklist" class="max-h-48 overflow-y-auto space-y-1"></div>
             <div class="flex justify-end gap-2 mt-2">
                 <button onclick="closeNoteModal()" class="px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">İptal</button>
                 <button onclick="saveNote()" class="px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition shadow-md">Notu Kaydet</button>
@@ -804,6 +808,7 @@ function openNoteModal(sn) {
     currentNoteSn = sn;
     const item = data.find(d => d.sn === sn);
     document.getElementById('noteTextarea').value = item.notlar || '';
+    renderNoteChecklist();
     document.getElementById('noteModal').classList.remove('hidden');
 }
 
@@ -815,8 +820,50 @@ function closeNoteModal() {
 function saveNote() {
     if (currentNoteSn === null) return;
     const textarea = document.getElementById('noteTextarea');
+    const item = data.find(d => d.sn === currentNoteSn);
+    if (item) item.notlar_tamamlandi = getNoteCompletionStates(item, getNoteLines(textarea.value).length);
     updateValue(currentNoteSn, 'notlar', textarea.value);
     closeNoteModal();
+}
+
+function getNoteLines(text) {
+    return String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+}
+
+function getNoteCompletionStates(item, lineCount) {
+    if (Array.isArray(item.notlar_tamamlandi)) {
+        return Array.from({ length: lineCount }, (_, index) => item.notlar_tamamlandi[index] === true);
+    }
+    return item.notlar_tamamlandi === true ? Array(lineCount).fill(true) : Array(lineCount).fill(false);
+}
+
+function escapeNoteHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+}
+
+function renderNoteChecklist() {
+    const container = document.getElementById('noteChecklist');
+    if (!container || currentNoteSn === null) return;
+    const item = data.find(d => d.sn === currentNoteSn);
+    const lines = getNoteLines(document.getElementById('noteTextarea').value);
+    const states = getNoteCompletionStates(item || {}, lines.length);
+    container.innerHTML = lines.length ? `<div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Not satırlarını tek tek tamamla</div>${lines.map((line, index) => `<div class="flex items-center gap-2 p-2 rounded-lg border ${states[index] ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200'}"><button onclick="toggleNoteLineComplete(${currentNoteSn}, ${index})" class="w-6 h-6 rounded border flex items-center justify-center ${states[index] ? 'bg-emerald-100 text-emerald-600 border-emerald-300' : 'bg-white text-slate-300 border-slate-300'}"><i class="fas fa-check text-[10px]"></i></button><span class="text-xs text-slate-700 ${states[index] ? 'line-through' : ''}">${escapeNoteHtml(line)}</span></div>`).join('')}` : '<div class="text-[11px] text-slate-400">Not satırı eklediğinizde burada tamamlanma kutusu görünür.</div>';
+}
+
+function toggleNoteLineComplete(sn, index) {
+    const item = data.find(d => d.sn === sn);
+    if (!item) return;
+    const textarea = document.getElementById('noteTextarea');
+    if (currentNoteSn === sn && textarea) item.notlar = textarea.value;
+    const lines = getNoteLines(item.notlar);
+    const states = getNoteCompletionStates(item, lines.length);
+    if (index < states.length) states[index] = !states[index];
+    item.notlar_tamamlandi = states;
+    localStorage.setItem('ihaleData', JSON.stringify(data));
+    setUnsavedState(true);
+    renderTable();
+    generateNotesReport();
+    renderNoteChecklist();
 }
 
 function insertDateToNote() {
@@ -835,6 +882,7 @@ function insertDateToNote() {
 
 function openNotesReportModal() {
     document.getElementById('firmaNoteTextarea').value = yatirimData.firmaNotlari || '';
+    renderFirmaNotesPreview();
     generateNotesReport();
     document.getElementById('notesReportModal').classList.remove('hidden');
 }
@@ -855,6 +903,7 @@ function insertDateToFirmaNote() {
     textarea.value = text.substring(0, startPos) + dateStr + text.substring(endPos);
     textarea.selectionStart = textarea.selectionEnd = startPos + dateStr.length;
     textarea.focus();
+    renderFirmaNotesPreview();
     saveFirmaNote();
 }
 
@@ -864,9 +913,46 @@ function saveFirmaNote() {
     setUnsavedState(true);
 }
 
+function renderFirmaNotesPreview() {
+    const container = document.getElementById('firmaNotesPreview');
+    const textarea = document.getElementById('firmaNoteTextarea');
+    if (!container || !textarea) return;
+    const entries = textarea.value.split('\n').map((line, index) => {
+        const match = line.match(/^\s*\[(\d{2})\.(\d{2})\.(\d{4})\]\s*(.*)$/);
+        return {
+            line: line.trim(), index,
+            date: match ? `${match[1]}.${match[2]}.${match[3]}` : '',
+            text: match ? match[4] : line.trim(),
+            sortKey: match ? new Date(`${match[3]}-${match[2]}-${match[1]}`).getTime() : Number.MAX_SAFE_INTEGER
+        };
+    }).filter(entry => entry.text);
+    entries.sort((a, b) => a.sortKey - b.sortKey || a.index - b.index);
+    container.innerHTML = entries.length ? entries.map((entry, position) => `<div class="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm hover:border-indigo-200 transition"><div class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-black">${position + 1}</div><div class="flex-1 min-w-0"><div class="flex flex-wrap items-center gap-2 mb-1">${entry.date ? `<span class="text-[10px] font-black text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-md px-2 py-1"><i class="fas fa-calendar-day mr-1"></i>${entry.date}</span>` : '<span class="text-[10px] font-bold text-slate-400">Tarihsiz not</span>'}</div><div class="text-xs font-semibold text-slate-700 break-words">${escapeNoteHtml(entry.text)}</div></div></div>`).join('') : '<div class="rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400">Henüz firma görevi veya notu eklenmedi.</div>';
+}
+
 function generateNotesReport() {
     const container = document.getElementById('notesReportContentContainer');
     const notesData = currentFilteredData.filter(d => (d.notlar || '').trim() !== '');
+    const total22A = currentFilteredData.reduce((sum, d) => sum + (parseInt(d.yirmi_iki_a) || 0), 0);
+    const totalNoteLines = notesData.reduce((sum, d) => sum + getNoteLines(d.notlar).length, 0);
+    const completedNoteLines = notesData.reduce((sum, d) => sum + getNoteCompletionStates(d, getNoteLines(d.notlar).length).filter(Boolean).length, 0);
+    document.getElementById('notesReportSummary').innerHTML = `
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-emerald-700">Toplam 22-A Parsel</div>
+            <div class="text-2xl font-black text-emerald-800 mt-1">${total22A.toLocaleString('tr-TR')}</div>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-blue-700">Birim Sayısı</div>
+            <div class="text-2xl font-black text-blue-800 mt-1">${currentFilteredData.length.toLocaleString('tr-TR')}</div>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-amber-700">Not Satırı</div>
+            <div class="text-2xl font-black text-amber-800 mt-1">${totalNoteLines.toLocaleString('tr-TR')}</div>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-emerald-700">Tamamlanan Satır</div>
+            <div class="text-2xl font-black text-emerald-800 mt-1">${completedNoteLines.toLocaleString('tr-TR')}</div>
+        </div>`;
     
     if (notesData.length === 0) {
         container.innerHTML = '<div class="text-center text-slate-500 py-10 font-medium bg-white rounded-xl border border-slate-200">Bu görünüme ait birim notu bulunamadı.</div>';
@@ -875,7 +961,9 @@ function generateNotesReport() {
 
     let html = '';
     notesData.forEach(d => {
-        const notlarList = (d.notlar || '').split('\n').filter(n => n.trim() !== '').map(n => `<li class="mb-2 flex items-start gap-2"><i class="fas fa-check text-amber-500 mt-0.5"></i> <span>${n}</span></li>`).join('');
+        const noteLines = getNoteLines(d.notlar);
+        const noteStates = getNoteCompletionStates(d, noteLines.length);
+        const notlarList = noteLines.map((line, index) => `<li class="mb-2 flex items-start gap-2"><button onclick="toggleNoteLineComplete(${d.sn}, ${index})" class="flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center ${noteStates[index] ? 'bg-emerald-100 text-emerald-600 border-emerald-300' : 'bg-white text-slate-300 border-slate-300 hover:text-emerald-600'}"><i class="fas fa-check text-[10px]"></i></button><span class="${noteStates[index] ? 'line-through text-slate-400' : ''}">${escapeNoteHtml(line)}</span></li>`).join('');
         
         html += `
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
@@ -884,6 +972,7 @@ function generateNotesReport() {
                         <i class="fas fa-map-marker-alt text-blue-500"></i> <span class="text-blue-700">${d.ilce || ''}</span> - ${d.mahalle || ''}
                     </h4>
                     <div class="flex flex-wrap gap-2 text-[10px] font-bold text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+                        <span class="flex items-center gap-1.5"><i class="fas fa-layer-group text-emerald-500"></i> 22-A: ${d.yirmi_iki_a || 0}</span>
                         <span class="flex items-center gap-1.5"><i class="fas fa-user-tie text-blue-400"></i> ${d.muhendis || 'Atanmadı'}</span>
                         <span class="flex items-center gap-1.5"><i class="fas fa-tools text-purple-400"></i> ${d.tekniker || 'Atanmadı'}</span>
                     </div>
@@ -896,6 +985,51 @@ function generateNotesReport() {
     });
     
     container.innerHTML = html;
+}
+
+async function exportNotesToPDF() {
+    const printable = document.getElementById('notesReportPrintable');
+    saveFirmaNote();
+    showToast("Hazırlanıyor...", "Not Raporu PDF olarak oluşturuluyor...", "info");
+
+    const originalHeight = printable.style.height;
+    const originalMaxHeight = printable.style.maxHeight;
+    const originalOverflow = printable.style.overflow;
+    printable.style.height = 'auto';
+    printable.style.maxHeight = 'none';
+    printable.style.overflow = 'visible';
+
+    try {
+        const canvas = await html2canvas(printable, { scale: 2, useCORS: true, backgroundColor: '#f8fafc' });
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const margin = 8;
+        const imageWidth = pdfWidth - (margin * 2);
+        const imageHeight = (canvas.height * imageWidth) / canvas.width;
+        let heightLeft = imageHeight;
+        let position = margin;
+        const image = canvas.toDataURL('image/jpeg', 0.95);
+
+        pdf.addImage(image, 'JPEG', margin, position, imageWidth, imageHeight);
+        heightLeft -= (pdfHeight - margin * 2);
+        while (heightLeft > 0) {
+            position = margin - (imageHeight - heightLeft);
+            pdf.addPage();
+            pdf.addImage(image, 'JPEG', margin, position, imageWidth, imageHeight);
+            heightLeft -= (pdfHeight - margin * 2);
+        }
+        pdf.save(`Genel_Not_Raporu_${new Date().toLocaleDateString('tr-TR')}.pdf`);
+        showToast("Başarılı", "Not Raporu PDF olarak indirildi.", "success");
+    } catch (err) {
+        console.error('Not Raporu PDF hatası:', err);
+        showToast("Hata", "Not Raporu PDF oluşturulamadı.", "error");
+    } finally {
+        printable.style.height = originalHeight;
+        printable.style.maxHeight = originalMaxHeight;
+        printable.style.overflow = originalOverflow;
+    }
 }
 
 function exportNotesToExcel() {
@@ -924,16 +1058,19 @@ function exportNotesToExcel() {
 
     // 2. Sayfa: Birim Notları
     const birimRows = [
-        ["S.N", "İlçe", "Mahalle", "Mühendis", "Tekniker", "Notlar"]
+        ["S.N", "İlçe", "Mahalle", "22-A Parsel", "Mühendis", "Tekniker", "Not", "Durum"]
     ];
     notesData.forEach(d => {
-        const cleanNotes = (d.notlar || '').replace(/\n/g, ' / ');
-        birimRows.push([d.sn || '', d.ilce || '', d.mahalle || '', d.muhendis || '-', d.tekniker || '-', cleanNotes]);
+        const lines = getNoteLines(d.notlar);
+        const states = getNoteCompletionStates(d, lines.length);
+        lines.forEach((line, index) => {
+            birimRows.push([d.sn || '', d.ilce || '', d.mahalle || '', d.yirmi_iki_a || 0, d.muhendis || '-', d.tekniker || '-', line, states[index] ? 'Tamamlandı' : 'Bekliyor']);
+        });
     });
 
     if (notesData.length > 0) {
         const ws2 = XLSX.utils.aoa_to_sheet(birimRows);
-        ws2['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 80 }];
+        ws2['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 20 }, { wch: 12 }, { wch: 20 }, { wch: 20 }, { wch: 80 }, { wch: 15 }];
         XLSX.utils.book_append_sheet(wb, ws2, "Birim Notları");
     } else {
         const ws2 = XLSX.utils.aoa_to_sheet([["Birim notu bulunmamaktadır."]]);
@@ -2018,6 +2155,8 @@ function renderTable() {
 
         const parselNum = Number(item.parsel) || 0;
         const hasNote = (item.notlar || '').trim() !== '';
+        const noteLineCount = getNoteLines(item.notlar).length;
+        const allNotesComplete = hasNote && getNoteCompletionStates(item, noteLineCount).every(Boolean);
         
         row.innerHTML = `
             <td class="p-3 text-slate-400 font-medium text-center">${canDrag ? '<i class="fas fa-grip-vertical drag-handle mr-2" title="Sıralamayı değiştirmek için sürükle"></i>' : ''}${item.sn}</td>
@@ -2052,6 +2191,9 @@ function renderTable() {
                     </div>
                     <button onclick="openNoteModal(${item.sn})" class="flex-shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors shadow-sm ${hasNote ? 'bg-amber-100 text-amber-600 border-amber-300 hover:bg-amber-200' : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50'}" title="Notlar">
                         <i class="fas fa-comment-dots"></i>
+                    </button>
+                    <button onclick="openNoteModal(${item.sn})" ${hasNote ? '' : 'disabled'} class="flex-shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors shadow-sm ${allNotesComplete ? 'bg-emerald-100 text-emerald-600 border-emerald-300 hover:bg-emerald-200' : hasNote ? 'bg-white text-slate-400 border-slate-200 hover:bg-emerald-50 hover:text-emerald-600' : 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed'}" title="Not satırlarını tek tek tamamla">
+                        <i class="fas fa-check"></i>
                     </button>
                 </div>
             </td>
