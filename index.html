@@ -1415,6 +1415,48 @@ function generateDynamicReport() {
     };
 
     const formatArray = (arr) => arr.length > 0 ? arr.join(', ') : 'Bulunmamaktadır.';
+
+    // Bilgi notundaki birimleri ilçe bazında, sabit renklerle düzenli gösterir.
+    const ilceRenkleri = {
+        'ANAMUR':   { bg: '#eff6ff', border: '#93c5fd', title: '#1d4ed8', chip: '#dbeafe' },
+        'BOZYAZI':  { bg: '#ecfdf5', border: '#86efac', title: '#047857', chip: '#dcfce7' },
+        'SİLİFKE':  { bg: '#fffbeb', border: '#fcd34d', title: '#b45309', chip: '#fef3c7' },
+        'GÜLNAR':   { bg: '#faf5ff', border: '#d8b4fe', title: '#7e22ce', chip: '#f3e8ff' },
+        'AYDINCIK': { bg: '#fff1f2', border: '#fda4af', title: '#be123c', chip: '#ffe4e6' }
+    };
+
+    const escapeReportHtml = value => String(value || '').replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    }[ch]));
+
+    const renderBirimlerByIlce = (birimler) => {
+        const gruplar = {};
+        birimler.forEach(birim => {
+            const ayirac = birim.indexOf('-');
+            const ilce = (ayirac > -1 ? birim.slice(0, ayirac) : 'DİĞER').trim().toLocaleUpperCase('tr-TR');
+            const mahalle = (ayirac > -1 ? birim.slice(ayirac + 1) : birim).trim();
+            if (!gruplar[ilce]) gruplar[ilce] = [];
+            gruplar[ilce].push(mahalle);
+        });
+
+        const ilceSirasi = ['ANAMUR', 'BOZYAZI', 'SİLİFKE', 'GÜLNAR', 'AYDINCIK'];
+        const siraliIlceler = Object.keys(gruplar).sort((a, b) => {
+            const ai = ilceSirasi.indexOf(a), bi = ilceSirasi.indexOf(b);
+            return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi) || a.localeCompare(b, 'tr');
+        });
+
+        return `<div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">${siraliIlceler.map(ilce => {
+            const renk = ilceRenkleri[ilce] || { bg: '#f8fafc', border: '#cbd5e1', title: '#475569', chip: '#e2e8f0' };
+            const mahalleler = gruplar[ilce].sort((a, b) => a.localeCompare(b, 'tr'));
+            return `<div style="background:${renk.bg};border:1px solid ${renk.border};border-radius:8px;padding:9px 10px;break-inside:avoid;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid ${renk.border};">
+                    <span style="font-size:10px;font-weight:800;color:${renk.title};letter-spacing:.06em;">${escapeReportHtml(ilce)}</span>
+                    <span style="font-size:9px;font-weight:800;color:${renk.title};background:white;padding:2px 6px;border-radius:999px;border:1px solid ${renk.border};">${mahalleler.length} Birim</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;">${mahalleler.map(mahalle => `<span style="display:inline-block;background:${renk.chip};color:#334155;border-radius:5px;padding:3px 6px;font-size:9px;font-weight:700;line-height:1.25;">${escapeReportHtml(mahalle)}</span>`).join('')}</div>
+            </div>`;
+        }).join('')}</div>`;
+    };
     
     let digerleriHtml = '';
     if (Object.keys(stats.digerleri).length > 0) {
@@ -1439,12 +1481,12 @@ function generateDynamicReport() {
         for (const durum of sortedKeys) {
             const birimler = stats.digerleri[durum];
             digerleriHtml += `
-                <div class="mb-4 bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+                <div class="report-stage-card mb-4 bg-white border border-slate-200 rounded-lg p-4 shadow-sm" style="break-inside:avoid;page-break-inside:avoid;">
                     <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-100">
                         <span class="font-bold text-[13px] text-slate-800 uppercase">${durum}</span>
                         <span class="font-bold text-[13px] text-slate-800">${birimler.length} Birim</span>
                     </div>
-                    <div class="text-[11px] text-slate-600 leading-relaxed font-medium uppercase">${birimler.join(', ')}</div>
+                    ${renderBirimlerByIlce(birimler)}
                 </div>`;
         }
         digerleriHtml += '</div>';
@@ -1453,6 +1495,7 @@ function generateDynamicReport() {
     }
     
     const html = `
+        <div id="reportIntroSection">
         <div class="text-center mb-8">
             <h2 class="text-indigo-700 font-bold text-[13px] tracking-[0.2em] mb-2">BİLGİ NOTU</h2>
             <h1 class="text-xl md:text-2xl font-black text-slate-900 uppercase">MERSİN İLİ KADASTRO GÜNCELLEME ÇALIŞMALARI</h1>
@@ -1531,8 +1574,9 @@ function generateDynamicReport() {
                 <div><i class="fas fa-info-circle text-slate-500 w-5"></i> <strong>Diğer Çalışma Aşamasındaki Birimler:</strong> Kalan birimlerin aşama durumları ve dağılımları aşağıda detaylandırılmıştır.</div>
             </div>
         </div>
+        </div>
 
-        ${digerleriHtml}
+        <div id="reportStagesSection">${digerleriHtml}</div>
     `;
     
     document.getElementById('reportContentContainer').innerHTML = html;
@@ -1717,53 +1761,118 @@ async function exportReportToPDF() {
     }
 
     const container = document.getElementById('reportContentContainer');
+    const introSection = document.getElementById('reportIntroSection');
+    const stageCards = Array.from(container.querySelectorAll('.report-stage-card'));
     showToast("Hazırlanıyor...", "PDF Raporu oluşturuluyor...", "info");
 
     const originalHeight = container.style.height;
     const originalMaxHeight = container.style.maxHeight;
     const originalOverflow = container.style.overflow;
-    
+
     container.style.height = 'auto';
     container.style.maxHeight = 'none';
     container.style.overflow = 'visible';
 
     try {
-        const canvas = await html2canvas(container, {
-            scale: 2, 
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 10;
+        const gap = 4;
+        const usableWidth = pageWidth - (margin * 2);
+        const usableHeight = pageHeight - (margin * 2);
+        let cursorY = margin;
+        let hasContent = false;
+
+        const renderElement = element => html2canvas(element, {
+            scale: 2,
             useCORS: true,
-            backgroundColor: '#ffffff'
+            backgroundColor: '#ffffff',
+            logging: false,
+            scrollX: 0,
+            scrollY: -window.scrollY
         });
 
-        const { jsPDF } = window.jspdf;
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
-        
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        
-        const imgProps = pdf.getImageProperties(imgData);
-        const margin = 10;
-        const availableWidth = pdfWidth - (margin * 2);
-        
-        const ratio = availableWidth / imgProps.width;
-        const imgHeightInMm = imgProps.height * ratio;
+        const addCanvasAcrossPages = canvas => {
+            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const naturalHeight = canvas.height * (usableWidth / canvas.width);
+            let sourceY = 0;
+            let remainingHeight = naturalHeight;
 
-        let heightLeft = imgHeightInMm;
-        let position = margin;
+            while (remainingHeight > 0.1) {
+                if (hasContent && cursorY >= pageHeight - margin - 0.1) {
+                    pdf.addPage();
+                    cursorY = margin;
+                }
 
-        pdf.addImage(imgData, 'JPEG', margin, position, availableWidth, imgHeightInMm);
-        heightLeft -= (pdfHeight - margin * 2);
+                const availableHeight = pageHeight - margin - cursorY;
+                const sliceHeightMm = Math.min(remainingHeight, availableHeight);
+                const sliceHeightPx = Math.max(1, Math.round(sliceHeightMm / naturalHeight * canvas.height));
 
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeightInMm + margin;
-            pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', margin, position, availableWidth, imgHeightInMm);
-            heightLeft -= pdfHeight;
+                const sliceCanvas = document.createElement('canvas');
+                sliceCanvas.width = canvas.width;
+                sliceCanvas.height = Math.min(sliceHeightPx, canvas.height - sourceY);
+                const ctx = sliceCanvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+                ctx.drawImage(canvas, 0, sourceY, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+
+                const actualHeightMm = sliceCanvas.height * (usableWidth / sliceCanvas.width);
+                pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 1.0), 'JPEG', margin, cursorY, usableWidth, actualHeightMm);
+                cursorY += actualHeightMm;
+                sourceY += sliceCanvas.height;
+                remainingHeight -= actualHeightMm;
+                hasContent = true;
+
+                if (remainingHeight > 0.1) {
+                    pdf.addPage();
+                    cursorY = margin;
+                }
+            }
+        };
+
+        // Başlık ve süreç özetleri gerektiğinde normal şekilde sayfalara yayılabilir.
+        if (introSection) {
+            const introCanvas = await renderElement(introSection);
+            addCanvasAcrossPages(introCanvas);
+        }
+
+        // Her aşama kartı tek parça olarak yerleştirilir; iki sayfaya bölünmez.
+        for (const card of stageCards) {
+            const cardCanvas = await renderElement(card);
+            const imgData = cardCanvas.toDataURL('image/jpeg', 1.0);
+            let drawWidth = usableWidth;
+            let drawHeight = cardCanvas.height * (drawWidth / cardCanvas.width);
+
+            // Kart tek başına bir A4 içerik alanından yüksekse, tamamı aynı sayfaya sığacak kadar küçült.
+            if (drawHeight > usableHeight) {
+                const fitScale = usableHeight / drawHeight;
+                drawWidth *= fitScale;
+                drawHeight = usableHeight;
+            }
+
+            const neededHeight = (cursorY > margin ? gap : 0) + drawHeight;
+            const remainingOnPage = pageHeight - margin - cursorY;
+
+            // Kalan alana tam sığmıyorsa kartın tamamını yeni sayfaya taşı.
+            if (hasContent && neededHeight > remainingOnPage + 0.1) {
+                pdf.addPage();
+                cursorY = margin;
+            } else if (cursorY > margin) {
+                cursorY += gap;
+            }
+
+            const drawX = (pageWidth - drawWidth) / 2;
+            pdf.addImage(imgData, 'JPEG', drawX, cursorY, drawWidth, drawHeight);
+            cursorY += drawHeight;
+            hasContent = true;
         }
 
         pdf.save(`Mersin_Kadastro_Raporu_${new Date().toLocaleDateString('tr-TR')}.pdf`);
         showToast("Başarılı", "PDF başarıyla indirildi.", "success");
     } catch (err) {
+        console.error('PDF oluşturma hatası:', err);
         showToast("Hata", "PDF oluşturulamadı.", "error");
     } finally {
         container.style.height = originalHeight;
@@ -1771,6 +1880,7 @@ async function exportReportToPDF() {
         container.style.overflow = originalOverflow;
     }
 }
+
 // =====================================================================
 
 // ====================== GELİŞMİŞ PDF YAZDIRMA (TABLO) ======================
