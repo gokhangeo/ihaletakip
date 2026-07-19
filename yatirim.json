@@ -2,5 +2,70 @@
   "sozlesme": 56880248,
   "odenen": 5669990,
   "fiziksel": 10,
-  "firmaNotlari": "[09.07.2026] BOZDOĞAN: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] KALINÖREN: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] KAALARBAHŞİŞ: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] MALAKLAR: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] NASRADDİN: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] ORTAKÖY: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] Tutanak taramaları alınacak.(ANAMUR)"
+  "firmaNotlari": "[09.07.2026] BOZDOĞAN: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] KALINÖREN: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] KAALARBAHŞİŞ: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] MALAKLAR: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] NASRADDİN: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] ORTAKÖY: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] Tutanak taramaları alınacak.(ANAMUR)",
+  "firmaNotKayitlari": [
+    {
+      "id": "legacy_1784479673056_6",
+      "kapsam": "genel",
+      "birimSn": null,
+      "tarih": "09.07.2026",
+      "metin": "Tutanak taramaları alınacak.(ANAMUR)",
+      "tamamlandi": false,
+      "createdAt": 1784479673062
+    },
+    {
+      "id": "note_1784479715417_zzqxf",
+      "kapsam": "birim",
+      "birimSn": 18,
+      "tarih": "19.07.2026",
+      "metin": "Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": 1784479715417
+    },
+    {
+      "id": "note_1784479728704_exak4",
+      "kapsam": "birim",
+      "birimSn": 16,
+      "tarih": "19.07.2026",
+      "metin": "Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": 1784479728704
+    },
+    {
+      "id": "note_1784479753624_wmuv5",
+      "kapsam": "birim",
+      "birimSn": 15,
+      "tarih": "19.07.2026",
+      "metin": "Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": 1784479753624
+    },
+    {
+      "id": "note_1784479768919_mlnrc",
+      "kapsam": "birim",
+      "birimSn": 12,
+      "tarih": "19.07.2026",
+      "metin": "Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": 1784479768919
+    },
+    {
+      "id": "note_1784479785112_uviw8",
+      "kapsam": "birim",
+      "birimSn": 10,
+      "tarih": "19.07.2026",
+      "metin": "Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": 1784479785112
+    },
+    {
+      "id": "note_1784479798087_bai2y",
+      "kapsam": "birim",
+      "birimSn": 2,
+      "tarih": "19.07.2026",
+      "metin": "Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": 1784479798087
+    }
+  ]
 }
