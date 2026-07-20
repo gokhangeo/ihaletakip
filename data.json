@@ -703,9 +703,9 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor",
-    "altlik_durum": "Devam Ediyor"
+    "genel_durum": "VERİLER ELEKTRONİK ORTAMDA HAZIRLANDI",
+    "ucus_kiymet_durum": "Yapıldı",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 38,
@@ -723,9 +723,9 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor",
-    "altlik_durum": "Devam Ediyor"
+    "genel_durum": "VERİLER ELEKTRONİK ORTAMDA HAZIRLANDI",
+    "ucus_kiymet_durum": "Yapıldı",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 39,
@@ -780,7 +780,7 @@
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "ALTLIK HAZIRLANIYOR",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Devam Ediyor"
   },
   {
@@ -818,8 +818,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "genel_durum": "YER TESLİMİ YAPILDI",
+    "ucus_kiymet_durum": "Yapıldı"
   },
   {
     "sn": 44,
@@ -999,7 +999,7 @@
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "ALTLIK HAZIRLANIYOR",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Devam Ediyor"
   },
   {
