@@ -37,7 +37,7 @@
     "ucus_tarihi": "2026-06-20",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)\n[22.07.2026] Değerlendirme tamam, Ormancı kontrol için verilecek(Müh.)",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)\n[22.07.2026] Değerlendirme tamam, Ormancı kontrol için verilecek(Müh.) Firmaya 07.08.2026 tarihine kadar teslim edilip, firma tarafından 21.07.2026 tarihine kadar askıya hazır edecek.",
     "notlar_tamamlandi": [
       false,
       false
@@ -332,7 +332,7 @@
     "ucus_kiymet_durum": "Devam Ediyor",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-07",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)\n[22.07.2026] Arazi kontrolü yapılacak(23-24.07) (Müh.)",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)\n[22.07.2026] Arazi kontrolü yapılacak(23-27.07) (Tekn.) 10.07.2026 firma askıya hazır edecek.",
     "notlar_tamamlandi": [
       false,
       false
@@ -620,7 +620,7 @@
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Arazi ölçüsü teslim edildi, bazı parseller kontrol edilecek\n[22.07.2026] Arazi kontrolü yapılacak(Tekn.)",
+    "notlar": "[09.07.2026] Arazi ölçüsü teslim edildi, bazı parseller kontrol edilecek\n[22.07.2026] Arazi kontrolü yapılacak(Tekn.) 31.07.2026 firma askıya hazır edecek.",
     "ucus_tarihi": "2026-07-22",
     "notlar_tamamlandi": [
       false,
