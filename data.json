@@ -725,7 +725,11 @@
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "VERİLER ELEKTRONİK ORTAMDA HAZIRLANDI",
     "ucus_kiymet_durum": "Yapıldı",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[22.07.2026] Değerlendimeye başlanıldı"
   },
   {
     "sn": 39,
