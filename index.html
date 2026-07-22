@@ -67,15 +67,6 @@
         .editable-finance:hover { background-color: rgba(255,255,255,0.2); }
         .editable-finance:focus { background-color: white; color: #1e293b; outline: none; border-color: #3b82f6; padding: 0 4px; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); }
 
-        /* Not raporu PDF mahalle başlıklarının kırpılmasını önler */
-        .mahalle-pdf-title {
-            min-height: 1.45em;
-            overflow: visible !important;
-            text-overflow: clip !important;
-            white-space: normal !important;
-            transform: translateZ(0);
-        }
-
         @media (max-width: 640px) {
             #mainTable { min-width: 1100px; }
             #notesReportModal { padding: 8px; }
@@ -365,9 +356,6 @@
                 <i class="fas fa-comments text-amber-500"></i> Genel Not Raporu
             </h3>
             <div class="flex items-center gap-2 md:gap-3">
-                <button onclick="exportNotesToPDF()" class="bg-red-600 hover:bg-red-700 text-white px-3 md:px-4 py-2 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 transition-all">
-                    <i class="fas fa-file-pdf text-sm"></i> <span class="hidden md:inline">PDF İndir</span><span class="md:hidden">PDF</span>
-                </button>
                 <button onclick="exportNotesToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 md:px-4 py-2 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 transition-all">
                     <i class="fas fa-file-excel text-sm"></i> <span class="hidden md:inline">Excel İndir</span><span class="md:hidden">Excel</span>
                 </button>
@@ -375,36 +363,32 @@
             </div>
         </div>
         <div id="notesReportPrintable" class="p-6 overflow-y-auto flex-1 bg-slate-50 flex flex-col gap-6">
-            <div id="notesReportSummary" class="notes-pdf-card grid grid-cols-2 md:grid-cols-4 gap-3" style="break-inside:avoid;page-break-inside:avoid;"></div>
+            <div id="notesReportSummary" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
             
             <!-- İhale Firması Genel Notları -->
-            <div id="firmaNotesCard" class="notes-pdf-card bg-white p-4 rounded-xl shadow-sm border border-slate-200" style="break-inside:avoid;page-break-inside:avoid;">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                 <div class="flex justify-between items-center mb-3">
                     <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
                         <i class="fas fa-building text-indigo-500"></i> İhale Firması Görev ve Notları
                     </h4>
                     <button onclick="insertDateToFirmaNote()" class="text-[10px] bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-700 px-2 py-1.5 rounded-lg font-bold transition flex items-center shadow-sm whitespace-nowrap"><i class="fas fa-calendar-plus mr-1"></i>Tarih Ekle</button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2 notes-interactive">
-                    <select id="firmaNoteScope" onchange="toggleFirmaBirimSelect()" class="border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <div id="firmaNotesPreview" class="mb-4 space-y-2"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                    <select id="firmaNoteScope" onchange="renderFirmaNotesPreview()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="genel">Genel Not</option>
                         <option value="birim">Birim Notu</option>
                     </select>
-                    <select id="firmaNoteBirim" class="hidden border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
-                        <option value="">Birim seçin...</option>
-                    </select>
+                    <select id="firmaNoteUnit" onchange="renderFirmaNotesPreview()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500"></select>
                 </div>
-                <div class="flex gap-2 notes-interactive">
-                    <textarea id="firmaNoteTextarea" rows="3" class="flex-1 border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Notunuzu yazın..."></textarea>
-                    <button type="button" onclick="addFirmaNoteRecord()" class="self-stretch bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-xl font-bold text-sm shadow-sm transition"><i class="fas fa-plus mr-1"></i>Ekle</button>
+                <div class="flex gap-2">
+                    <textarea id="firmaNoteTextarea" rows="3" class="flex-1 min-w-0 border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Yeni notunuzu yazın..."></textarea>
+                    <button onclick="addFirmaNote()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-xl text-sm font-bold shadow-sm transition whitespace-nowrap"><i class="fas fa-plus mr-1"></i>Ekle</button>
                 </div>
-                <p class="notes-interactive mt-2 text-[10px] text-slate-400 font-semibold"><i class="fas fa-info-circle text-indigo-400 mr-1"></i>Genel notlar tüm raporu, birim notları yalnız seçilen ilçe-mahalleyi ilgilendirir.</p>
-                <button type="button" onclick="toggleFirmaNotesPreview()" class="mt-4 w-full flex items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 rounded-lg px-3 py-2 transition-colors">
-                    <span class="flex items-center gap-2"><i class="fas fa-list-ol text-indigo-400"></i> Düzenli Görev Listesi</span>
-                    <i id="firmaNotesToggleIcon" class="fas fa-chevron-down transition-transform"></i>
-                </button>
-                <div id="firmaNotesPreviewWrapper" class="hidden">
-                    <div id="firmaNotesPreview" class="mt-2 space-y-2"></div>
+                <p class="mt-2 text-[10px] text-slate-400 font-medium"><i class="fas fa-info-circle mr-1"></i>Genel notlar tüm rapora, birim notları yalnızca seçilen ilçe-mahalleyi ilgilendirir.</p>
+                <div class="mt-5 pt-4 border-t border-slate-100">
+                    <h5 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-list-ul text-indigo-400 mr-1"></i>Firma Tüm Notları</h5>
+                    <div id="firmaAllNotes" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
                 </div>
             </div>
 
@@ -635,10 +619,45 @@ let yatirimData = JSON.parse(localStorage.getItem('yatirimData')) || {
     odenen: 5669990,
     fiziksel: 10,
     firmaNotlari: "",
-    firmaNotlariTamamlandi: []
+    firmaNotlariTamamlandi: [],
+    firmaNotKayitlari: [],
+    firmaNotlariSilinen: []
 };
-if (!Array.isArray(yatirimData.firmaNotlariTamamlandi)) yatirimData.firmaNotlariTamamlandi = [];
-if (!Array.isArray(yatirimData.firmaNotKayitlari)) yatirimData.firmaNotKayitlari = [];
+
+function normalizeFirmaNoteData() {
+    if (!yatirimData || typeof yatirimData !== 'object') yatirimData = {};
+    if (!Array.isArray(yatirimData.firmaNotlariTamamlandi)) yatirimData.firmaNotlariTamamlandi = [];
+    if (!Array.isArray(yatirimData.firmaNotlariSilinen)) yatirimData.firmaNotlariSilinen = [];
+    if (!Array.isArray(yatirimData.firmaNotKayitlari)) {
+        yatirimData.firmaNotKayitlari = Array.isArray(yatirimData.firmaNotlari) ? yatirimData.firmaNotlari : [];
+    }
+    yatirimData.firmaNotKayitlari = yatirimData.firmaNotKayitlari.map((rawNote, index) => {
+        const note = typeof rawNote === 'string' ? { text: rawNote } : (rawNote || {});
+        const rawType = String(note.tur || note.scope || note.type || 'genel').toLocaleLowerCase('tr-TR');
+        const type = rawType.includes('birim') || rawType.includes('unit') ? 'birim' : 'genel';
+        return {
+            ...note,
+            id: note.id || `firma-${index}`,
+            tur: type,
+            birimSn: note.birimSn ?? note.unitSn ?? note.sn ?? note.birim ?? null,
+            text: String(note.text ?? note.note ?? note.not ?? note.content ?? '').trim(),
+            tamamlandi: note.tamamlandi === true || note.completed === true,
+            createdAt: note.createdAt || note.tarih || ''
+        };
+    }).filter(note => note.text);
+    const legacySource = typeof yatirimData.firmaNotlari === 'string' ? yatirimData.firmaNotlari : '';
+    const legacyLines = legacySource.split('\n').map(text => text.trim()).filter(Boolean);
+    legacyLines.forEach((text, index) => {
+        const legacyId = `legacy-${index}`;
+        const alreadyDeleted = yatirimData.firmaNotlariSilinen.includes(legacyId);
+        const alreadyExists = yatirimData.firmaNotKayitlari.some(note => note.tur === 'genel' && String(note.text || '').trim() === text);
+        if (!alreadyDeleted && !alreadyExists) yatirimData.firmaNotKayitlari.push({
+            id: legacyId, tur: 'genel', birimSn: null, text, tamamlandi: yatirimData.firmaNotlariTamamlandi[index] === true, createdAt: ''
+        });
+    });
+    yatirimData.firmaNotlariAktarildi = true;
+}
+normalizeFirmaNoteData();
 
 function populateDurumFilter() {
     const filterSelect = document.getElementById('statusFilter');
@@ -652,23 +671,14 @@ function populateDurumFilter() {
 }
 
 function getStringColorInfo(str) {
-    const value = String(str || '').trim();
-    if (!value) return { bg: '#f1f5f9', text: '#475569', border: '#cbd5e1' };
-
-    // Her genel durum için listede sabit ve birbirinden ayrışan bir renk üretir.
-    let index = durumListesi.findIndex(durum => String(durum).trim() === value);
-    if (index < 0) {
-        let hash = 0;
-        for (let i = 0; i < value.length; i++) hash = value.charCodeAt(i) + ((hash << 5) - hash);
-        index = Math.abs(hash);
-    }
-
-    const hue = Math.round((index * 137.508) % 360);
-    return {
-        bg: `hsl(${hue} 78% 93%)`,
-        text: `hsl(${hue} 62% 28%)`,
-        border: `hsl(${hue} 58% 74%)`
-    };
+    if(!str) return colorPalette[0];
+    if(str.includes("BİTTİ") || str.includes("YAPILDI") || str === "Yapıldı") return { bg: '#d1fae5', text: '#047857', border: '#6ee7b7' };
+    if(str.includes("DEVAM") || str.includes("AŞAMASINDA") || str.includes("HAZIRLANIYOR") || str.includes("DEĞERLENDİRMEDE")) return { bg: '#fef3c7', text: '#b45309', border: '#fcd34d' };
+    
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
+    const index = Math.abs(hash) % colorPalette.length;
+    return colorPalette[index];
 }
 
 function showToast(title, msg, type = "success") {
@@ -790,6 +800,7 @@ async function fetchFromGithub(isAuto = false) {
         if (resYatirim.status === 200) {
             const fileYatirim = await resYatirim.json();
             yatirimData = JSON.parse(decodeBase64(fileYatirim.content));
+            normalizeFirmaNoteData();
             localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
         }
 
@@ -936,40 +947,11 @@ function insertDateToNote() {
     textarea.focus();
 }
 
-function migrateFirmaNotesToRecords() {
-    if (!Array.isArray(yatirimData.firmaNotKayitlari)) yatirimData.firmaNotKayitlari = [];
-    if (yatirimData.firmaNotKayitlari.length || !(yatirimData.firmaNotlari || '').trim()) return;
-    const oldStates = yatirimData.firmaNotlariTamamlandi || [];
-    getFirmaNoteEntries(yatirimData.firmaNotlari).forEach(entry => {
-        yatirimData.firmaNotKayitlari.push({
-            id: `legacy_${Date.now()}_${entry.index}`,
-            kapsam: 'genel',
-            birimSn: null,
-            tarih: entry.date || '',
-            metin: entry.text,
-            tamamlandi: oldStates[entry.index] === true,
-            createdAt: Date.now() + entry.index
-        });
-    });
-    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
-}
-
-function populateFirmaBirimSelect() {
-    const select = document.getElementById('firmaNoteBirim');
-    if (!select) return;
-    const old = select.value;
-    const rows = [...data].sort((a,b) => String(a.ilce || '').localeCompare(String(b.ilce || ''), 'tr') || String(a.mahalle || '').localeCompare(String(b.mahalle || ''), 'tr'));
-    select.innerHTML = '<option value="">Birim seçin...</option>' + rows.map(d => `<option value="${d.sn}">${escapeNoteHtml(d.ilce || '')} — ${escapeNoteHtml(d.mahalle || '')}</option>`).join('');
-    if ([...select.options].some(o => o.value === old)) select.value = old;
-}
-
 function openNotesReportModal() {
-    migrateFirmaNotesToRecords();
-    populateFirmaBirimSelect();
-    document.getElementById('firmaNoteTextarea').value = '';
-    document.getElementById('firmaNoteScope').value = 'genel';
-    toggleFirmaBirimSelect();
+    normalizeFirmaNoteData();
+    populateFirmaNoteUnits();
     renderFirmaNotesPreview();
+    renderFirmaAllNotes();
     generateNotesReport();
     document.getElementById('notesReportModal').classList.remove('hidden');
 }
@@ -978,107 +960,157 @@ function closeNotesReportModal() {
     document.getElementById('notesReportModal').classList.add('hidden');
 }
 
-function toggleFirmaBirimSelect() {
-    const scope = document.getElementById('firmaNoteScope')?.value || 'genel';
-    document.getElementById('firmaNoteBirim')?.classList.toggle('hidden', scope !== 'birim');
-}
-
 function insertDateToFirmaNote() {
     const textarea = document.getElementById('firmaNoteTextarea');
     const today = new Date().toLocaleDateString('tr-TR');
     const dateStr = `[${today}] `;
+    
     const startPos = textarea.selectionStart;
     const endPos = textarea.selectionEnd;
-    textarea.value = textarea.value.substring(0, startPos) + dateStr + textarea.value.substring(endPos);
+    const text = textarea.value;
+    
+    textarea.value = text.substring(0, startPos) + dateStr + text.substring(endPos);
     textarea.selectionStart = textarea.selectionEnd = startPos + dateStr.length;
     textarea.focus();
 }
 
-function addFirmaNoteRecord() {
-    migrateFirmaNotesToRecords();
-    const textarea = document.getElementById('firmaNoteTextarea');
-    const scope = document.getElementById('firmaNoteScope').value;
-    const birimSn = scope === 'birim' ? Number(document.getElementById('firmaNoteBirim').value) : null;
-    let raw = textarea.value.trim();
-    if (!raw) return showToast('Uyarı', 'Lütfen not metni yazın.', 'info');
-    if (scope === 'birim' && !birimSn) return showToast('Uyarı', 'Lütfen birim seçin.', 'info');
-    const match = raw.match(/^\s*\[(\d{2}\.\d{2}\.\d{4})\]\s*(.*)$/s);
-    const tarih = match ? match[1] : new Date().toLocaleDateString('tr-TR');
-    const metin = (match ? match[2] : raw).trim();
-    yatirimData.firmaNotKayitlari.push({
-        id: `note_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
-        kapsam: scope,
-        birimSn,
-        tarih,
-        metin,
-        tamamlandi: false,
-        createdAt: Date.now()
-    });
-    textarea.value = '';
-    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
-    setUnsavedState(true);
-    renderFirmaNotesPreview();
-    generateNotesReport();
-    showToast('Eklendi', scope === 'genel' ? 'Genel not eklendi.' : 'Birim notu eklendi.', 'success');
+function getFirmaNoteDate(text) {
+    const match = String(text || '').match(/^\s*\[(\d{2}\.\d{2}\.\d{4})\]/);
+    return match ? match[1] : '';
 }
 
-function saveFirmaNote() {
-    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+function populateFirmaNoteUnits() {
+    const unitSelect = document.getElementById('firmaNoteUnit');
+    if (!unitSelect) return;
+    const previousValue = unitSelect.value;
+    unitSelect.innerHTML = data.map(item => `<option value="${item.sn}">${escapeNoteHtml(item.ilce || '')} — ${escapeNoteHtml(item.mahalle || '')}</option>`).join('');
+    if (previousValue && data.some(item => String(item.sn) === previousValue)) unitSelect.value = previousValue;
 }
 
-function toggleFirmaNoteComplete(id) {
-    const rec = (yatirimData.firmaNotKayitlari || []).find(x => x.id === id);
-    if (!rec) return;
-    rec.tamamlandi = !rec.tamamlandi;
-    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
-    setUnsavedState(true);
-    renderFirmaNotesPreview();
-}
-
-function deleteFirmaNoteRecord(id) {
-    if (!confirm('Bu not silinsin mi?')) return;
-    yatirimData.firmaNotKayitlari = (yatirimData.firmaNotKayitlari || []).filter(x => x.id !== id);
-    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
-    setUnsavedState(true);
-    renderFirmaNotesPreview();
-    generateNotesReport();
-}
-
-function getFirmaNoteEntries(text) {
-    return String(text || '').split('\n').map((line, index) => {
-        const match = line.match(/^\s*\[(\d{2})\.(\d{2})\.(\d{4})\]\s*(.*)$/);
-        return { line: line.trim(), index, date: match ? `${match[1]}.${match[2]}.${match[3]}` : '', text: match ? match[4] : line.trim() };
-    }).filter(entry => entry.text);
-}
-
-function toggleFirmaNotesPreview() {
-    const wrapper = document.getElementById('firmaNotesPreviewWrapper');
-    const icon = document.getElementById('firmaNotesToggleIcon');
-    if (!wrapper) return;
-    const willOpen = wrapper.classList.contains('hidden');
-    wrapper.classList.toggle('hidden', !willOpen);
-    if (icon) icon.classList.toggle('rotate-180', willOpen);
-}
-
-function getFirmaRecordUnit(rec) {
-    return rec.kapsam === 'birim' ? data.find(d => Number(d.sn) === Number(rec.birimSn)) : null;
+function getSelectedFirmaNotes() {
+    const scope = document.getElementById('firmaNoteScope')?.value || 'genel';
+    const unitSn = document.getElementById('firmaNoteUnit')?.value || '';
+    return (yatirimData.firmaNotKayitlari || []).filter(note => scope === 'genel' ? note.tur === 'genel' : note.tur === 'birim' && String(note.birimSn) === unitSn);
 }
 
 function renderFirmaNotesPreview() {
     const container = document.getElementById('firmaNotesPreview');
+    const scopeSelect = document.getElementById('firmaNoteScope');
+    const unitSelect = document.getElementById('firmaNoteUnit');
+    if (!container || !scopeSelect || !unitSelect) return;
+    const isGeneral = scopeSelect.value === 'genel';
+    unitSelect.disabled = isGeneral;
+    unitSelect.classList.toggle('hidden', isGeneral);
+    const notes = getSelectedFirmaNotes().sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')));
+    const completed = notes.filter(note => note.tamamlandi).length;
+    const scopeLabel = isGeneral ? 'Genel Notlar' : unitSelect.options[unitSelect.selectedIndex]?.text || 'Birim Notları';
+    const header = `<div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider"><span class="text-indigo-600"><i class="fas fa-history mr-1"></i>${escapeNoteHtml(scopeLabel)} — Eski Notlar</span><span class="text-emerald-600">${completed}/${notes.length} tamamlandı</span></div>`;
+    const cards = notes.length ? notes.map((note, index) => `<div class="flex items-start gap-3 rounded-xl border ${note.tamamlandi ? 'border-emerald-200 bg-emerald-50/50 opacity-60' : 'border-slate-200 bg-slate-50'} p-3"><button onclick="toggleFirmaNoteComplete('${note.id}')" class="flex-shrink-0 w-7 h-7 rounded-full border flex items-center justify-center ${note.tamamlandi ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : 'bg-white text-slate-400 border-slate-300 hover:text-emerald-600'}" title="${note.tamamlandi ? 'Tamamlanmadı yap' : 'Tamamlandı yap'}"><i class="fas fa-check text-xs"></i></button><div class="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center text-xs font-black">${index + 1}</div><div class="flex-1 min-w-0"><span class="text-[10px] font-black text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-md px-2 py-1">${getFirmaNoteDate(note.text) || 'Tarihsiz'}</span><div class="text-xs font-semibold text-slate-700 break-words mt-2 ${note.tamamlandi ? 'line-through' : ''}">${escapeNoteHtml(note.text)}</div></div><div class="flex gap-1"><button onclick="editFirmaNote('${note.id}')" class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100" title="Notu düzenle"><i class="fas fa-pen text-[10px]"></i></button><button onclick="deleteFirmaNote('${note.id}')" class="w-7 h-7 rounded-lg bg-red-50 text-red-500 hover:bg-red-100" title="Notu sil"><i class="fas fa-trash text-[10px]"></i></button></div></div>`).join('') : '<div class="rounded-xl border border-dashed border-slate-200 p-3 text-center text-xs text-slate-400">Bu seçime ait eski not bulunmuyor. Yeni not aşağıya eklenecek.</div>';
+    container.innerHTML = header + `<div class="mt-2 space-y-2 max-h-56 overflow-y-auto pr-1">${cards}</div>`;
+}
+
+function renderFirmaAllNotes() {
+    const container = document.getElementById('firmaAllNotes');
     if (!container) return;
-    migrateFirmaNotesToRecords();
-    const records = [...(yatirimData.firmaNotKayitlari || [])].sort((a,b) => (a.tamamlandi === b.tamamlandi ? (b.createdAt || 0) - (a.createdAt || 0) : a.tamamlandi - b.tamamlandi));
-    const completed = records.filter(r => r.tamamlandi).length;
-    const generalCount = records.filter(r => r.kapsam === 'genel').length;
-    const unitCount = records.length - generalCount;
-    const summary = `<div class="grid grid-cols-3 gap-2 mb-3 text-center"><div class="rounded-lg bg-slate-50 border border-slate-200 p-2"><div class="text-[9px] font-bold text-slate-400">TOPLAM</div><div class="font-black text-slate-700">${records.length}</div></div><div class="rounded-lg bg-indigo-50 border border-indigo-100 p-2"><div class="text-[9px] font-bold text-indigo-400">GENEL / BİRİM</div><div class="font-black text-indigo-700">${generalCount} / ${unitCount}</div></div><div class="rounded-lg bg-emerald-50 border border-emerald-100 p-2"><div class="text-[9px] font-bold text-emerald-500">TAMAMLANAN</div><div class="font-black text-emerald-700">${completed}/${records.length}</div></div></div>`;
-    container.innerHTML = records.length ? summary + records.map((rec, position) => {
-        const unit = getFirmaRecordUnit(rec);
-        const scopeLabel = rec.kapsam === 'birim' && unit ? `${unit.ilce} / ${unit.mahalle}` : 'GENEL NOT';
-        const scopeClass = rec.kapsam === 'birim' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200';
-        return `<div class="flex items-start gap-3 rounded-xl border ${rec.tamamlandi ? 'border-emerald-200 bg-emerald-50/50 opacity-65' : 'border-slate-200 bg-white'} p-3 shadow-sm"><button onclick="toggleFirmaNoteComplete('${rec.id}')" class="notes-interactive flex-shrink-0 w-7 h-7 rounded-full border flex items-center justify-center ${rec.tamamlandi ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : 'bg-white text-slate-400 border-slate-300'}"><i class="fas fa-check text-xs"></i></button><div class="flex-shrink-0 w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-black">${position + 1}</div><div class="flex-1 min-w-0"><div class="flex flex-wrap items-center gap-2 mb-1"><span class="text-[9px] font-black border rounded-md px-2 py-1 ${scopeClass}">${escapeNoteHtml(scopeLabel)}</span><span class="text-[9px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-md px-2 py-1"><i class="fas fa-calendar-day mr-1"></i>${escapeNoteHtml(rec.tarih || '-')}</span></div><div class="text-xs font-semibold text-slate-700 break-words ${rec.tamamlandi ? 'line-through' : ''}">${escapeNoteHtml(rec.metin)}</div></div><button onclick="deleteFirmaNoteRecord('${rec.id}')" class="notes-interactive text-slate-300 hover:text-red-500 p-1" title="Sil"><i class="fas fa-trash-alt"></i></button></div>`;
-    }).join('') : '<div class="rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400">Henüz genel veya birim notu eklenmedi.</div>';
+    normalizeFirmaNoteData();
+    const notes = [...(yatirimData.firmaNotKayitlari || [])].sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')));
+    const completed = notes.filter(note => note.tamamlandi).length;
+    const summary = `<div class="grid grid-cols-2 gap-2 mb-2"><div class="rounded-lg bg-slate-50 border border-slate-200 p-2 text-center"><div class="text-[9px] font-bold text-slate-400 uppercase">Toplam</div><div class="text-lg font-black text-slate-700">${notes.length}</div></div><div class="rounded-lg bg-emerald-50 border border-emerald-200 p-2 text-center"><div class="text-[9px] font-bold text-emerald-600 uppercase">Tamamlanan</div><div class="text-lg font-black text-emerald-700">${completed}/${notes.length}</div></div></div>`;
+    const cards = notes.length ? notes.map((note, index) => {
+        const unit = data.find(item => String(item.sn) === String(note.birimSn));
+        const scopeLabel = note.tur === 'birim' ? `${unit?.ilce || 'Birim'} / ${unit?.mahalle || ''}` : 'Genel Not';
+        return `<div class="flex items-start gap-2 rounded-xl border ${note.tamamlandi ? 'border-emerald-200 bg-emerald-50/50 opacity-60' : 'border-slate-200 bg-white'} p-3"><button onclick="toggleFirmaNoteComplete('${note.id}')" class="flex-shrink-0 w-7 h-7 rounded-full border flex items-center justify-center ${note.tamamlandi ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : 'bg-white text-slate-400 border-slate-300 hover:text-emerald-600'}"><i class="fas fa-check text-xs"></i></button><div class="flex-shrink-0 w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-black">${index + 1}</div><div class="flex-1 min-w-0"><div class="flex flex-wrap gap-1.5 mb-1"><span class="text-[9px] font-black rounded-md px-2 py-1 ${note.tur === 'birim' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-indigo-50 text-indigo-700 border border-indigo-100'}">${escapeNoteHtml(scopeLabel)}</span><span class="text-[9px] font-bold text-slate-500 bg-slate-50 border border-slate-100 rounded-md px-2 py-1">${getFirmaNoteDate(note.text) || 'Tarihsiz'}</span></div><div class="text-xs font-semibold text-slate-700 break-words ${note.tamamlandi ? 'line-through' : ''}">${escapeNoteHtml(note.text)}</div></div><div class="flex gap-1"><button onclick="editFirmaNote('${note.id}')" class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100" title="Notu düzenle"><i class="fas fa-pen text-[10px]"></i></button><button onclick="deleteFirmaNote('${note.id}')" class="w-7 h-7 rounded-lg bg-red-50 text-red-500 hover:bg-red-100" title="Notu sil"><i class="fas fa-trash text-[10px]"></i></button></div></div>`;
+    }).join('') : '<div class="rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400">Firma notu bulunmuyor.</div>';
+    container.innerHTML = summary + cards;
+}
+
+function addFirmaNote() {
+    const textarea = document.getElementById('firmaNoteTextarea');
+    const scope = document.getElementById('firmaNoteScope').value;
+    const unitSn = document.getElementById('firmaNoteUnit').value;
+    const text = textarea.value.trim();
+    if (!text) return showToast('Eksik bilgi', 'Yeni notu yazmalısınız.', 'error');
+    yatirimData.firmaNotKayitlari.push({ id: String(Date.now()), tur: scope, birimSn: scope === 'birim' ? unitSn : null, text, tamamlandi: false, createdAt: new Date().toISOString() });
+    textarea.value = '';
+    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+    setUnsavedState(true);
+    renderFirmaNotesPreview();
+    renderFirmaAllNotes();
+}
+
+function toggleFirmaNoteComplete(id) {
+    const unitLine = /^unit-line-(\d+)-(\d+)$/.exec(String(id));
+    if (unitLine) {
+        toggleNoteLineComplete(Number(unitLine[1]), Number(unitLine[2]));
+        renderFirmaNotesPreview();
+        renderFirmaAllNotes();
+        return;
+    }
+    const note = (yatirimData.firmaNotKayitlari || []).find(item => String(item.id) === String(id));
+    if (!note) return;
+    note.tamamlandi = !note.tamamlandi;
+    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+    setUnsavedState(true);
+    renderFirmaNotesPreview();
+    renderFirmaAllNotes();
+}
+
+function editFirmaNote(id) {
+    const unitLine = /^unit-line-(\d+)-(\d+)$/.exec(String(id));
+    if (unitLine) {
+        const item = data.find(row => Number(row.sn) === Number(unitLine[1]));
+        if (!item) return;
+        const lines = getNoteLines(item.notlar);
+        const index = Number(unitLine[2]);
+        const editedText = prompt('Notu düzenleyin:', lines[index] || '');
+        if (editedText === null) return;
+        if (!editedText.trim()) return showToast('Eksik bilgi', 'Not boş bırakılamaz.', 'error');
+        lines[index] = editedText.trim();
+        item.notlar = lines.join('\n');
+        localStorage.setItem('ihaleData', JSON.stringify(data));
+    } else {
+        const note = (yatirimData.firmaNotKayitlari || []).find(item => String(item.id) === String(id));
+        if (!note) return;
+        const editedText = prompt('Notu düzenleyin:', note.text || '');
+        if (editedText === null) return;
+        if (!editedText.trim()) return showToast('Eksik bilgi', 'Not boş bırakılamaz.', 'error');
+        note.text = editedText.trim();
+        localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+    }
+    setUnsavedState(true);
+    renderTable();
+    generateNotesReport();
+    renderFirmaNotesPreview();
+    renderFirmaAllNotes();
+}
+
+function deleteFirmaNote(id) {
+    if (!confirm('Bu notu silmek istediğinize emin misiniz?')) return;
+    const unitLine = /^unit-line-(\d+)-(\d+)$/.exec(String(id));
+    if (unitLine) {
+        const item = data.find(row => Number(row.sn) === Number(unitLine[1]));
+        if (!item) return;
+        const lines = getNoteLines(item.notlar);
+        const states = getNoteCompletionStates(item, lines.length);
+        const index = Number(unitLine[2]);
+        lines.splice(index, 1);
+        states.splice(index, 1);
+        item.notlar = lines.join('\n');
+        item.notlar_tamamlandi = states;
+        localStorage.setItem('ihaleData', JSON.stringify(data));
+    } else {
+        yatirimData.firmaNotKayitlari = (yatirimData.firmaNotKayitlari || []).filter(note => String(note.id) !== String(id));
+        if (String(id).startsWith('legacy-') && !yatirimData.firmaNotlariSilinen.includes(String(id))) {
+            yatirimData.firmaNotlariSilinen.push(String(id));
+        }
+        localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+    }
+    setUnsavedState(true);
+    renderTable();
+    generateNotesReport();
+    renderFirmaNotesPreview();
+    renderFirmaAllNotes();
+    showToast('Silindi', 'Not silindi.', 'success');
 }
 
 function generateNotesReport() {
@@ -1100,89 +1132,48 @@ function generateNotesReport() {
             <div class="text-[10px] font-bold uppercase tracking-wide text-amber-700">Not Satırı</div>
             <div class="text-2xl font-black text-amber-800 mt-1">${totalNoteLines.toLocaleString('tr-TR')}</div>
         </div>
-        <div class="bg-violet-50 border border-violet-200 rounded-xl p-3 text-center">
-            <div class="text-[10px] font-bold uppercase tracking-wide text-violet-700">Tamamlanan Satır</div>
-            <div class="text-2xl font-black text-violet-800 mt-1">${completedNoteLines.toLocaleString('tr-TR')}</div>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-emerald-700">Tamamlanan Satır</div>
+            <div class="text-2xl font-black text-emerald-800 mt-1">${completedNoteLines.toLocaleString('tr-TR')}</div>
         </div>`;
-
+    
     if (notesData.length === 0) {
-        container.innerHTML = '<div class="notes-pdf-card text-center text-slate-500 py-10 font-medium bg-white rounded-xl border border-slate-200">Bu görünüme ait birim notu bulunamadı.</div>';
+        container.innerHTML = '<div class="text-center text-slate-500 py-10 font-medium bg-white rounded-xl border border-slate-200">Bu görünüme ait birim notu bulunamadı.</div>';
         return;
     }
 
-    const ilceRenkleri = {
-        'ANAMUR':   { bg: '#eff6ff', border: '#93c5fd', title: '#1d4ed8', chip: '#dbeafe', icon: 'fa-water' },
-        'BOZYAZI':  { bg: '#ecfdf5', border: '#86efac', title: '#047857', chip: '#dcfce7', icon: 'fa-leaf' },
-        'SİLİFKE':  { bg: '#fffbeb', border: '#fcd34d', title: '#b45309', chip: '#fef3c7', icon: 'fa-sun' },
-        'GÜLNAR':   { bg: '#faf5ff', border: '#d8b4fe', title: '#7e22ce', chip: '#f3e8ff', icon: 'fa-mountain' },
-        'AYDINCIK': { bg: '#fff1f2', border: '#fda4af', title: '#be123c', chip: '#ffe4e6', icon: 'fa-location-dot' }
-    };
-    const ilceSirasi = ['ANAMUR', 'BOZYAZI', 'SİLİFKE', 'GÜLNAR', 'AYDINCIK'];
-    const gruplar = {};
-    notesData.forEach(item => {
-        const ilce = String(item.ilce || 'DİĞER').toLocaleUpperCase('tr-TR');
-        if (!gruplar[ilce]) gruplar[ilce] = [];
-        gruplar[ilce].push(item);
-    });
-
-    const siraliIlceler = Object.keys(gruplar).sort((a, b) => {
-        const ai = ilceSirasi.indexOf(a), bi = ilceSirasi.indexOf(b);
-        return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi) || a.localeCompare(b, 'tr');
-    });
-
-    container.innerHTML = siraliIlceler.map(ilce => {
-        const renk = ilceRenkleri[ilce] || { bg:'#f8fafc', border:'#cbd5e1', title:'#475569', chip:'#e2e8f0', icon:'fa-map-marker-alt' };
-        const birimler = gruplar[ilce].sort((a,b) => String(a.mahalle || '').localeCompare(String(b.mahalle || ''), 'tr'));
-        const toplamSatir = birimler.reduce((sum, d) => sum + getNoteLines(d.notlar).length, 0);
-        const tamamlanan = birimler.reduce((sum, d) => sum + getNoteCompletionStates(d, getNoteLines(d.notlar).length).filter(Boolean).length, 0);
-
-        const birimHtml = birimler.map(d => {
-            const noteLines = getNoteLines(d.notlar);
-            const noteStates = getNoteCompletionStates(d, noteLines.length);
-            const notlarList = noteLines.map((line, index) => `
-                <li class="flex items-start gap-2 rounded-lg px-2.5 py-2 ${noteStates[index] ? 'opacity-60' : ''}" style="background:${noteStates[index] ? '#f8fafc' : 'rgba(255,255,255,.82)'};border:1px solid ${renk.border};">
-                    <button class="notes-interactive flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center ${noteStates[index] ? 'bg-emerald-100 text-emerald-600 border-emerald-300' : 'bg-white text-slate-300 border-slate-300 hover:text-emerald-600'}" onclick="toggleNoteLineComplete(${d.sn}, ${index})"><i class="fas fa-check text-[10px]"></i></button>
-                    <span class="text-xs font-semibold leading-relaxed ${noteStates[index] ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeNoteHtml(line)}</span>
-                </li>`).join('');
-            return `<div class="rounded-xl p-3" style="background:white;border:1px solid ${renk.border};break-inside:avoid;page-break-inside:avoid;">
-                <div class="flex flex-col md:flex-row justify-between md:items-center gap-2 mb-2 pb-2" style="border-bottom:1px solid ${renk.border};">
-                    <div class="flex items-center gap-2 min-w-0">
-                        <span class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${renk.chip};color:${renk.title};"><i class="fas fa-map-pin text-xs"></i></span>
-                        <span class="font-black text-sm mahalle-pdf-title" style="color:${renk.title};display:block;line-height:1.45;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word;padding:2px 0 1px;">${escapeNoteHtml(d.mahalle || '')}</span>
-                    </div>
-                    <div class="flex flex-wrap gap-1.5 text-[9px] font-bold">
-                        <span class="px-2 py-1 rounded-md" style="background:${renk.chip};color:${renk.title};">22-A: ${d.yirmi_iki_a || 0}</span>
-                        <span class="px-2 py-1 rounded-md bg-slate-100 text-slate-600">${noteLines.length} Not</span>
-                        <span class="px-2 py-1 rounded-md bg-emerald-50 text-emerald-700">${noteStates.filter(Boolean).length} Tamam</span>
+    let html = '';
+    notesData.forEach(d => {
+        const noteLines = getNoteLines(d.notlar);
+        const noteStates = getNoteCompletionStates(d, noteLines.length);
+        const notlarList = noteLines.map((line, index) => `<li class="mb-2 flex items-start gap-2"><button onclick="toggleNoteLineComplete(${d.sn}, ${index})" class="flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center ${noteStates[index] ? 'bg-emerald-100 text-emerald-600 border-emerald-300' : 'bg-white text-slate-300 border-slate-300 hover:text-emerald-600'}"><i class="fas fa-check text-[10px]"></i></button><span class="${noteStates[index] ? 'line-through text-slate-400' : ''}">${escapeNoteHtml(line)}</span></li>`).join('');
+        
+        html += `
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between md:items-center border-b border-slate-100 pb-3 mb-3 gap-3">
+                    <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-map-marker-alt text-blue-500"></i> <span class="text-blue-700">${d.ilce || ''}</span> - ${d.mahalle || ''}
+                    </h4>
+                    <div class="flex flex-wrap gap-2 text-[10px] font-bold text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+                        <span class="flex items-center gap-1.5"><i class="fas fa-layer-group text-emerald-500"></i> 22-A: ${d.yirmi_iki_a || 0}</span>
+                        <span class="flex items-center gap-1.5"><i class="fas fa-user-tie text-blue-400"></i> ${d.muhendis || 'Atanmadı'}</span>
+                        <span class="flex items-center gap-1.5"><i class="fas fa-tools text-purple-400"></i> ${d.tekniker || 'Atanmadı'}</span>
                     </div>
                 </div>
-                <ul class="space-y-1.5">${notlarList}</ul>
-                <div class="mt-2 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-[9px] font-bold text-slate-500" style="border-top:1px dashed ${renk.border};">
-                    <span><i class="fas fa-user-tie mr-1" style="color:${renk.title};"></i>${escapeNoteHtml(d.muhendis || 'Mühendis atanmadı')}</span>
-                    <span><i class="fas fa-tools mr-1" style="color:${renk.title};"></i>${escapeNoteHtml(d.tekniker || 'Tekniker atanmadı')}</span>
-                </div>
-            </div>`;
-        }).join('');
-
-        return `<section class="notes-pdf-card rounded-2xl p-4 shadow-sm" style="background:${renk.bg};border:1px solid ${renk.border};break-inside:avoid;page-break-inside:avoid;">
-            <div class="flex justify-between items-center mb-3 pb-3" style="border-bottom:1px solid ${renk.border};">
-                <div class="flex items-center gap-2.5">
-                    <span class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:${renk.chip};color:${renk.title};"><i class="fas ${renk.icon}"></i></span>
-                    <div><h4 class="font-black text-sm tracking-wide" style="color:${renk.title};">${escapeNoteHtml(ilce)} NOTLARI</h4><p class="text-[9px] font-bold text-slate-500 mt-0.5">${birimler.length} birim · ${toplamSatir} not satırı</p></div>
-                </div>
-                <span class="text-[10px] font-black px-2.5 py-1.5 rounded-full bg-white" style="color:${renk.title};border:1px solid ${renk.border};">${tamamlanan}/${toplamSatir} tamamlandı</span>
+                <ul class="text-xs text-slate-700 font-medium pl-1">
+                    ${notlarList}
+                </ul>
             </div>
-            <div class="grid grid-cols-1 gap-3">${birimHtml}</div>
-        </section>`;
-    }).join('');
+        `;
+    });
+    
+    container.innerHTML = html;
 }
 
 async function exportNotesToPDF() {
     const printable = document.getElementById('notesReportPrintable');
-    migrateFirmaNotesToRecords();
-    renderFirmaNotesPreview();
-    generateNotesReport();
-    showToast("Hazırlanıyor...", "Not Raporu düzenli PDF olarak oluşturuluyor...", "info");
+    localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+    showToast("Hazırlanıyor...", "Not Raporu PDF olarak oluşturuluyor...", "info");
 
     const originalHeight = printable.style.height;
     const originalMaxHeight = printable.style.maxHeight;
@@ -1191,64 +1182,33 @@ async function exportNotesToPDF() {
     printable.style.maxHeight = 'none';
     printable.style.overflow = 'visible';
 
-    const interactive = Array.from(printable.querySelectorAll('.notes-interactive, textarea, button'));
-    const oldDisplays = interactive.map(el => el.style.display);
-    interactive.forEach(el => {
-        if (el.classList.contains('notes-interactive') || el.tagName === 'TEXTAREA' || (el.tagName === 'BUTTON' && el.closest('#firmaNotesCard'))) el.style.display = 'none';
-    });
-
-    const wrapper = document.getElementById('firmaNotesPreviewWrapper');
-    const wrapperWasHidden = wrapper ? wrapper.classList.contains('hidden') : false;
-    if (wrapper) wrapper.classList.remove('hidden');
-
     try {
-        if (document.fonts && document.fonts.ready) await document.fonts.ready;
-        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const canvas = await html2canvas(printable, { scale: 2, useCORS: true, backgroundColor: '#f8fafc' });
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 10;
-        const gap = 4;
-        const usableWidth = pageWidth - margin * 2;
-        const usableHeight = pageHeight - margin * 2;
-        let cursorY = margin;
-        let pageHasContent = false;
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const margin = 8;
+        const imageWidth = pdfWidth - (margin * 2);
+        const imageHeight = (canvas.height * imageWidth) / canvas.width;
+        let heightLeft = imageHeight;
+        let position = margin;
+        const image = canvas.toDataURL('image/jpeg', 0.95);
 
-        const cards = Array.from(printable.querySelectorAll(':scope > .notes-pdf-card, #notesReportContentContainer > .notes-pdf-card'));
-        const uniqueCards = [...new Set(cards)];
-
-        for (const card of uniqueCards) {
-            const canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
-            let drawWidth = usableWidth;
-            let drawHeight = canvas.height * (drawWidth / canvas.width);
-
-            if (drawHeight > usableHeight) {
-                const scale = usableHeight / drawHeight;
-                drawWidth *= scale;
-                drawHeight *= scale;
-            }
-
-            if (pageHasContent && cursorY + drawHeight > pageHeight - margin) {
-                pdf.addPage();
-                cursorY = margin;
-                pageHasContent = false;
-            }
-
-            const x = margin + (usableWidth - drawWidth) / 2;
-            pdf.addImage(canvas.toDataURL('image/jpeg', 0.96), 'JPEG', x, cursorY, drawWidth, drawHeight);
-            cursorY += drawHeight + gap;
-            pageHasContent = true;
+        pdf.addImage(image, 'JPEG', margin, position, imageWidth, imageHeight);
+        heightLeft -= (pdfHeight - margin * 2);
+        while (heightLeft > 0) {
+            position = margin - (imageHeight - heightLeft);
+            pdf.addPage();
+            pdf.addImage(image, 'JPEG', margin, position, imageWidth, imageHeight);
+            heightLeft -= (pdfHeight - margin * 2);
         }
-
-        pdf.save(`Genel_Not_Raporu_${new Date().toLocaleDateString('tr-TR').replaceAll('.', '-')}.pdf`);
+        pdf.save(`Genel_Not_Raporu_${new Date().toLocaleDateString('tr-TR')}.pdf`);
         showToast("Başarılı", "Not Raporu PDF olarak indirildi.", "success");
     } catch (err) {
         console.error('Not Raporu PDF hatası:', err);
         showToast("Hata", "Not Raporu PDF oluşturulamadı.", "error");
     } finally {
-        interactive.forEach((el, i) => el.style.display = oldDisplays[i]);
-        if (wrapper && wrapperWasHidden) wrapper.classList.add('hidden');
         printable.style.height = originalHeight;
         printable.style.maxHeight = originalMaxHeight;
         printable.style.overflow = originalOverflow;
@@ -1257,30 +1217,30 @@ async function exportNotesToPDF() {
 
 function exportNotesToExcel() {
     const notesData = currentFilteredData.filter(d => (d.notlar || '').trim() !== '');
-    migrateFirmaNotesToRecords();
-    const firmaKayitlari = yatirimData.firmaNotKayitlari || [];
+    const firmaNotes = yatirimData.firmaNotKayitlari || [];
 
-    if (notesData.length === 0 && firmaKayitlari.length === 0) {
+    if (notesData.length === 0 && firmaNotes.length === 0) {
         return showToast("Hata", "İndirilecek not bulunamadı.", "error");
     }
 
     const wb = XLSX.utils.book_new();
 
-    // 1. Sayfa: Genel ve seçili birim notları
-    if (firmaKayitlari.length) {
-        const firmaRows = [["Sıra", "Kapsam", "İlçe", "Mahalle", "Tarih", "Görev / Not", "Durum"]];
-        firmaKayitlari.forEach((rec, index) => {
-            const unit = getFirmaRecordUnit(rec);
-            firmaRows.push([index + 1, rec.kapsam === 'birim' ? 'Birim Notu' : 'Genel Not', unit?.ilce || '-', unit?.mahalle || '-', rec.tarih || '-', rec.metin, rec.tamamlandi ? 'Tamamlandı' : 'Bekliyor']);
+    // 1. Sayfa: İhale Firması Notları
+    if (firmaNotes.length) {
+        const firmaRows = [["Sıra", "Kapsam", "Tarih", "Görev / Not", "Durum"]];
+        [...firmaNotes].sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || ''))).forEach((note, index) => {
+            const unit = data.find(item => String(item.sn) === String(note.birimSn));
+            const scope = note.tur === 'birim' ? `${unit?.ilce || ''} - ${unit?.mahalle || ''}` : 'Genel Not';
+            firmaRows.push([index + 1, scope, getFirmaNoteDate(note.text) || '-', note.text, note.tamamlandi ? 'Tamamlandı' : 'Bekliyor']);
         });
         const ws1 = XLSX.utils.aoa_to_sheet(firmaRows);
-        ws1['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 16 }, { wch: 24 }, { wch: 14 }, { wch: 70 }, { wch: 16 }];
-        ws1['!autofilter'] = { ref: `A1:G${firmaRows.length}` };
+        ws1['!cols'] = [{ wch: 8 }, { wch: 28 }, { wch: 15 }, { wch: 80 }, { wch: 16 }];
+        ws1['!autofilter'] = { ref: `A1:E${firmaRows.length}` };
         ws1['!freeze'] = { xSplit: 0, ySplit: 1 };
-        XLSX.utils.book_append_sheet(wb, ws1, "Genel ve Birim Notları");
+        XLSX.utils.book_append_sheet(wb, ws1, "Firma Notları");
     } else {
-        const ws1 = XLSX.utils.aoa_to_sheet([["Not bulunmamaktadır."]]);
-        XLSX.utils.book_append_sheet(wb, ws1, "Genel ve Birim Notları");
+         const ws1 = XLSX.utils.aoa_to_sheet([["Not bulunmamaktadır."]]);
+         XLSX.utils.book_append_sheet(wb, ws1, "Firma Notları");
     }
 
     // 2. Sayfa: Birim Notları
@@ -1583,48 +1543,6 @@ function generateDynamicReport() {
     };
 
     const formatArray = (arr) => arr.length > 0 ? arr.join(', ') : 'Bulunmamaktadır.';
-
-    // Bilgi notundaki birimleri ilçe bazında, sabit renklerle düzenli gösterir.
-    const ilceRenkleri = {
-        'ANAMUR':   { bg: '#eff6ff', border: '#93c5fd', title: '#1d4ed8', chip: '#dbeafe' },
-        'BOZYAZI':  { bg: '#ecfdf5', border: '#86efac', title: '#047857', chip: '#dcfce7' },
-        'SİLİFKE':  { bg: '#fffbeb', border: '#fcd34d', title: '#b45309', chip: '#fef3c7' },
-        'GÜLNAR':   { bg: '#faf5ff', border: '#d8b4fe', title: '#7e22ce', chip: '#f3e8ff' },
-        'AYDINCIK': { bg: '#fff1f2', border: '#fda4af', title: '#be123c', chip: '#ffe4e6' }
-    };
-
-    const escapeReportHtml = value => String(value || '').replace(/[&<>"']/g, ch => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-    }[ch]));
-
-    const renderBirimlerByIlce = (birimler) => {
-        const gruplar = {};
-        birimler.forEach(birim => {
-            const ayirac = birim.indexOf('-');
-            const ilce = (ayirac > -1 ? birim.slice(0, ayirac) : 'DİĞER').trim().toLocaleUpperCase('tr-TR');
-            const mahalle = (ayirac > -1 ? birim.slice(ayirac + 1) : birim).trim();
-            if (!gruplar[ilce]) gruplar[ilce] = [];
-            gruplar[ilce].push(mahalle);
-        });
-
-        const ilceSirasi = ['ANAMUR', 'BOZYAZI', 'SİLİFKE', 'GÜLNAR', 'AYDINCIK'];
-        const siraliIlceler = Object.keys(gruplar).sort((a, b) => {
-            const ai = ilceSirasi.indexOf(a), bi = ilceSirasi.indexOf(b);
-            return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi) || a.localeCompare(b, 'tr');
-        });
-
-        return `<div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">${siraliIlceler.map(ilce => {
-            const renk = ilceRenkleri[ilce] || { bg: '#f8fafc', border: '#cbd5e1', title: '#475569', chip: '#e2e8f0' };
-            const mahalleler = gruplar[ilce].sort((a, b) => a.localeCompare(b, 'tr'));
-            return `<div style="background:${renk.bg};border:1px solid ${renk.border};border-radius:8px;padding:9px 10px;break-inside:avoid;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid ${renk.border};">
-                    <span style="font-size:10px;font-weight:800;color:${renk.title};letter-spacing:.06em;">${escapeReportHtml(ilce)}</span>
-                    <span style="font-size:9px;font-weight:800;color:${renk.title};background:white;padding:2px 6px;border-radius:999px;border:1px solid ${renk.border};">${mahalleler.length} Birim</span>
-                </div>
-                <div style="display:flex;flex-wrap:wrap;gap:4px;">${mahalleler.map(mahalle => `<span style="display:inline-block;background:${renk.chip};color:#334155;border-radius:5px;padding:3px 6px;font-size:9px;font-weight:700;line-height:1.25;">${escapeReportHtml(mahalle)}</span>`).join('')}</div>
-            </div>`;
-        }).join('')}</div>`;
-    };
     
     let digerleriHtml = '';
     if (Object.keys(stats.digerleri).length > 0) {
@@ -1649,12 +1567,12 @@ function generateDynamicReport() {
         for (const durum of sortedKeys) {
             const birimler = stats.digerleri[durum];
             digerleriHtml += `
-                <div class="report-stage-card mb-4 bg-white border border-slate-200 rounded-lg p-4 shadow-sm" style="break-inside:avoid;page-break-inside:avoid;">
+                <div class="mb-4 bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
                     <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-100">
                         <span class="font-bold text-[13px] text-slate-800 uppercase">${durum}</span>
                         <span class="font-bold text-[13px] text-slate-800">${birimler.length} Birim</span>
                     </div>
-                    ${renderBirimlerByIlce(birimler)}
+                    <div class="text-[11px] text-slate-600 leading-relaxed font-medium uppercase">${birimler.join(', ')}</div>
                 </div>`;
         }
         digerleriHtml += '</div>';
@@ -1663,7 +1581,6 @@ function generateDynamicReport() {
     }
     
     const html = `
-        <div id="reportIntroSection">
         <div class="text-center mb-8">
             <h2 class="text-indigo-700 font-bold text-[13px] tracking-[0.2em] mb-2">BİLGİ NOTU</h2>
             <h1 class="text-xl md:text-2xl font-black text-slate-900 uppercase">MERSİN İLİ KADASTRO GÜNCELLEME ÇALIŞMALARI</h1>
@@ -1742,9 +1659,8 @@ function generateDynamicReport() {
                 <div><i class="fas fa-info-circle text-slate-500 w-5"></i> <strong>Diğer Çalışma Aşamasındaki Birimler:</strong> Kalan birimlerin aşama durumları ve dağılımları aşağıda detaylandırılmıştır.</div>
             </div>
         </div>
-        </div>
 
-        <div id="reportStagesSection">${digerleriHtml}</div>
+        ${digerleriHtml}
     `;
     
     document.getElementById('reportContentContainer').innerHTML = html;
@@ -1929,118 +1845,53 @@ async function exportReportToPDF() {
     }
 
     const container = document.getElementById('reportContentContainer');
-    const introSection = document.getElementById('reportIntroSection');
-    const stageCards = Array.from(container.querySelectorAll('.report-stage-card'));
     showToast("Hazırlanıyor...", "PDF Raporu oluşturuluyor...", "info");
 
     const originalHeight = container.style.height;
     const originalMaxHeight = container.style.maxHeight;
     const originalOverflow = container.style.overflow;
-
+    
     container.style.height = 'auto';
     container.style.maxHeight = 'none';
     container.style.overflow = 'visible';
 
     try {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 10;
-        const gap = 4;
-        const usableWidth = pageWidth - (margin * 2);
-        const usableHeight = pageHeight - (margin * 2);
-        let cursorY = margin;
-        let hasContent = false;
-
-        const renderElement = element => html2canvas(element, {
-            scale: 2,
+        const canvas = await html2canvas(container, {
+            scale: 2, 
             useCORS: true,
-            backgroundColor: '#ffffff',
-            logging: false,
-            scrollX: 0,
-            scrollY: -window.scrollY
+            backgroundColor: '#ffffff'
         });
 
-        const addCanvasAcrossPages = canvas => {
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
-            const naturalHeight = canvas.height * (usableWidth / canvas.width);
-            let sourceY = 0;
-            let remainingHeight = naturalHeight;
+        const { jsPDF } = window.jspdf;
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        
+        const imgProps = pdf.getImageProperties(imgData);
+        const margin = 10;
+        const availableWidth = pdfWidth - (margin * 2);
+        
+        const ratio = availableWidth / imgProps.width;
+        const imgHeightInMm = imgProps.height * ratio;
 
-            while (remainingHeight > 0.1) {
-                if (hasContent && cursorY >= pageHeight - margin - 0.1) {
-                    pdf.addPage();
-                    cursorY = margin;
-                }
+        let heightLeft = imgHeightInMm;
+        let position = margin;
 
-                const availableHeight = pageHeight - margin - cursorY;
-                const sliceHeightMm = Math.min(remainingHeight, availableHeight);
-                const sliceHeightPx = Math.max(1, Math.round(sliceHeightMm / naturalHeight * canvas.height));
+        pdf.addImage(imgData, 'JPEG', margin, position, availableWidth, imgHeightInMm);
+        heightLeft -= (pdfHeight - margin * 2);
 
-                const sliceCanvas = document.createElement('canvas');
-                sliceCanvas.width = canvas.width;
-                sliceCanvas.height = Math.min(sliceHeightPx, canvas.height - sourceY);
-                const ctx = sliceCanvas.getContext('2d');
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-                ctx.drawImage(canvas, 0, sourceY, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
-
-                const actualHeightMm = sliceCanvas.height * (usableWidth / sliceCanvas.width);
-                pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 1.0), 'JPEG', margin, cursorY, usableWidth, actualHeightMm);
-                cursorY += actualHeightMm;
-                sourceY += sliceCanvas.height;
-                remainingHeight -= actualHeightMm;
-                hasContent = true;
-
-                if (remainingHeight > 0.1) {
-                    pdf.addPage();
-                    cursorY = margin;
-                }
-            }
-        };
-
-        // Başlık ve süreç özetleri gerektiğinde normal şekilde sayfalara yayılabilir.
-        if (introSection) {
-            const introCanvas = await renderElement(introSection);
-            addCanvasAcrossPages(introCanvas);
-        }
-
-        // Her aşama kartı tek parça olarak yerleştirilir; iki sayfaya bölünmez.
-        for (const card of stageCards) {
-            const cardCanvas = await renderElement(card);
-            const imgData = cardCanvas.toDataURL('image/jpeg', 1.0);
-            let drawWidth = usableWidth;
-            let drawHeight = cardCanvas.height * (drawWidth / cardCanvas.width);
-
-            // Kart tek başına bir A4 içerik alanından yüksekse, tamamı aynı sayfaya sığacak kadar küçült.
-            if (drawHeight > usableHeight) {
-                const fitScale = usableHeight / drawHeight;
-                drawWidth *= fitScale;
-                drawHeight = usableHeight;
-            }
-
-            const neededHeight = (cursorY > margin ? gap : 0) + drawHeight;
-            const remainingOnPage = pageHeight - margin - cursorY;
-
-            // Kalan alana tam sığmıyorsa kartın tamamını yeni sayfaya taşı.
-            if (hasContent && neededHeight > remainingOnPage + 0.1) {
-                pdf.addPage();
-                cursorY = margin;
-            } else if (cursorY > margin) {
-                cursorY += gap;
-            }
-
-            const drawX = (pageWidth - drawWidth) / 2;
-            pdf.addImage(imgData, 'JPEG', drawX, cursorY, drawWidth, drawHeight);
-            cursorY += drawHeight;
-            hasContent = true;
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeightInMm + margin;
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', margin, position, availableWidth, imgHeightInMm);
+            heightLeft -= pdfHeight;
         }
 
         pdf.save(`Mersin_Kadastro_Raporu_${new Date().toLocaleDateString('tr-TR')}.pdf`);
         showToast("Başarılı", "PDF başarıyla indirildi.", "success");
     } catch (err) {
-        console.error('PDF oluşturma hatası:', err);
         showToast("Hata", "PDF oluşturulamadı.", "error");
     } finally {
         container.style.height = originalHeight;
@@ -2048,7 +1899,6 @@ async function exportReportToPDF() {
         container.style.overflow = originalOverflow;
     }
 }
-
 // =====================================================================
 
 // ====================== GELİŞMİŞ PDF YAZDIRMA (TABLO) ======================
@@ -2072,7 +1922,7 @@ function createPrintTable(items) {
         {n: "Altlık Durum", w: 140}, {n: "Uçuş Tarihi", w: 130},
         {n: "Uçuş Kıymet.", w: 140}, {n: "Değerlendirme", w: 140},
         {n: "Bilgilendirme", w: 130}, {n: "Komisyon", w: 140},
-        {n: "Kesin Askı", w: 130}
+        {n: "Kesin Askı", w: 130}, {n: "Notlar", w: 180}
     ];
     
     cols.forEach(c => html += `<th style="width:${c.w}px; background-color:#0f172a; color:white; padding:12px 6px; border:1px solid #64748b; text-align:center; font-weight:bold; overflow:hidden;">${c.n}</th>`);
@@ -2086,6 +1936,11 @@ function createPrintTable(items) {
         }
         if(val.includes('BİTTİ') || val.includes('YAPILDI') || val === 'Yapıldı') return `<span style="background-color:#d1fae5; color:#047857; border:1px solid #6ee7b7; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
         return `<span style="background-color:#fef3c7; color:#b45309; border:1px solid #fcd34d; padding:6px; border-radius:6px; font-weight:bold; display:block; text-align:center;">${val}</span>`;
+    };
+
+    const formatNotlar = (text) => {
+        if (!text) return '-';
+        return text.split('\n').filter(n => n.trim() !== '').map(line => `• ${line.trim()}`).join('<br>');
     };
 
     items.forEach(item => {
@@ -2112,6 +1967,7 @@ function createPrintTable(items) {
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getDateBadge(item.bilgilendirme_tarihi)}</td>
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getStatusBadge(item.komisyon_durum)}</td>
             <td style="padding:8px 4px; border:1px solid #cbd5e1;">${getDateBadge(item.kesin_aski_tarihi)}</td>
+            <td style="font-size:11px; padding:8px 4px; border:1px solid #cbd5e1; overflow:hidden; text-align:left;">${formatNotlar(item.notlar)}</td>
         </tr>`;
     });
     html += '</tbody></table>';
