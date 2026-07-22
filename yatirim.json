@@ -67,6 +67,30 @@
       "text": "[22.07.2026] Kıymetlendirme geldi",
       "tamamlandi": false,
       "createdAt": "2026-07-22T08:41:53.037Z"
+    },
+    {
+      "id": "1784709888960",
+      "tur": "birim",
+      "birimSn": "19",
+      "text": "[22.07.2026] Kıymetlendirme 25.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": "2026-07-22T08:44:48.960Z"
+    },
+    {
+      "id": "1784709894763",
+      "tur": "birim",
+      "birimSn": "3",
+      "text": "[22.07.2026] Kıymetlendirme 25.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": "2026-07-22T08:44:54.763Z"
+    },
+    {
+      "id": "1784709901883",
+      "tur": "birim",
+      "birimSn": "20",
+      "text": "[22.07.2026] Kıymetlendirme 25.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": "2026-07-22T08:45:01.883Z"
     }
   ],
   "firmaNotlariTamamlandi": [],
