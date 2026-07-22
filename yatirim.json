@@ -5,14 +5,6 @@
   "firmaNotlari": "[09.07.2026] BOZDOĞAN: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] KALINÖREN: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] KAALARBAHŞİŞ: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] MALAKLAR: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] NASRADDİN: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] ORTAKÖY: Kıymetlendirme 13-17.07.2026 gelecek\n[09.07.2026] Tutanak taramaları alınacak.(ANAMUR)",
   "firmaNotKayitlari": [
     {
-      "id": "legacy-6",
-      "tur": "genel",
-      "birimSn": null,
-      "text": "[09.07.2026] Tutanak taramaları alınacak.(ANAMUR)",
-      "tamamlandi": false,
-      "createdAt": ""
-    },
-    {
       "id": "1784708268851",
       "tur": "birim",
       "birimSn": "2",
@@ -101,6 +93,7 @@
     "legacy-2",
     "legacy-3",
     "legacy-4",
-    "legacy-5"
+    "legacy-5",
+    "legacy-6"
   ]
 }
