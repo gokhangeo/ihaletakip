@@ -686,7 +686,11 @@
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Devam Ediyor",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[22.07.2026] Meskun alanın kıymetlendirmesi tamamlandı"
   },
   {
     "sn": 37,
