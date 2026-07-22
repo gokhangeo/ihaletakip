@@ -629,7 +629,8 @@
     "ucus_kiymet_durum": "Yapıldı",
     "ucus_tarihi": "2026-05-01",
     "genel_durum": "ALTLIK HAZIRLANIYOR",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Devam Ediyor",
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 34,
