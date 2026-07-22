@@ -329,7 +329,7 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ YAPILIYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_kiymet_durum": "Yapılmadı",
+    "ucus_kiymet_durum": "Devam Ediyor",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-07",
     "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)\n[22.07.2026] Arazi kontrolü yapılacak (Müh.)",
@@ -378,11 +378,12 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ YAPILIYOR",
+    "genel_durum": "DEĞERLENDİRMEDE",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-07",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)"
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 20,
@@ -399,11 +400,12 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ YAPILIYOR",
+    "genel_durum": "DEĞERLENDİRMEDE",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-07",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)"
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 21,
