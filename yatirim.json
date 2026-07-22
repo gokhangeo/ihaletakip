@@ -59,6 +59,14 @@
       "text": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek",
       "tamamlandi": false,
       "createdAt": "2026-07-22T08:18:52.986Z"
+    },
+    {
+      "id": "1784709713037",
+      "tur": "birim",
+      "birimSn": "12",
+      "text": "[22.07.2026] Kıymetlendirme geldi",
+      "tamamlandi": false,
+      "createdAt": "2026-07-22T08:41:53.037Z"
     }
   ],
   "firmaNotlariTamamlandi": [],
