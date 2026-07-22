@@ -37,7 +37,11 @@
     "ucus_tarihi": "2026-06-20",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)"
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)\n[22.07.2026] Değerlendirme tamam, Ormancı kontrol için verilecek(Müh.)",
+    "notlar_tamamlandi": [
+      false,
+      false
+    ]
   },
   {
     "sn": 3,
