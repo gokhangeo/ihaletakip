@@ -11,8 +11,64 @@
       "text": "[09.07.2026] Tutanak taramaları alınacak.(ANAMUR)",
       "tamamlandi": false,
       "createdAt": ""
+    },
+    {
+      "id": "1784708268851",
+      "tur": "birim",
+      "birimSn": "2",
+      "text": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": "2026-07-22T08:17:48.852Z"
+    },
+    {
+      "id": "1784708284417",
+      "tur": "birim",
+      "birimSn": "10",
+      "text": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": "2026-07-22T08:18:04.417Z"
+    },
+    {
+      "id": "1784708294239",
+      "tur": "birim",
+      "birimSn": "12",
+      "text": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": "2026-07-22T08:18:14.239Z"
+    },
+    {
+      "id": "1784708312735",
+      "tur": "birim",
+      "birimSn": "15",
+      "text": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": "2026-07-22T08:18:32.735Z"
+    },
+    {
+      "id": "1784708321463",
+      "tur": "birim",
+      "birimSn": "16",
+      "text": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": "2026-07-22T08:18:41.463Z"
+    },
+    {
+      "id": "1784708332986",
+      "tur": "birim",
+      "birimSn": "18",
+      "text": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek",
+      "tamamlandi": false,
+      "createdAt": "2026-07-22T08:18:52.986Z"
     }
   ],
   "firmaNotlariTamamlandi": [],
-  "firmaNotlariAktarildi": true
+  "firmaNotlariAktarildi": true,
+  "firmaNotlariSilinen": [
+    "legacy-0",
+    "legacy-1",
+    "legacy-2",
+    "legacy-3",
+    "legacy-4",
+    "legacy-5"
+  ]
 }
