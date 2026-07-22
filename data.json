@@ -476,7 +476,11 @@
     "ucus_tarihi": "2026-06-05",
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Tekn.)"
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Tekn.)\n[22.07.2026] Meskun ölçülüp teslim edildi.",
+    "notlar_tamamlandi": [
+      false,
+      false
+    ]
   },
   {
     "sn": 26,
@@ -565,8 +569,12 @@
     "ucus_tarihi": "2026-06-07",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Uçuş bir kısmı eksik. Değerlendirme devam ediyor(Tekn.)",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "notlar": "[09.07.2026] Uçuş bir kısmı eksik. Değerlendirme devam ediyor(Tekn.)\n[22.07.2026] Meskun ölçülüp teslim edildi.",
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "notlar_tamamlandi": [
+      false,
+      false
+    ]
   },
   {
     "sn": 31,
@@ -608,8 +616,12 @@
     "ucus_tarihi": "2026-06-08",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "notlar": "[14.07.2026] Değerlendirme devam ediyor.(Tekn.)",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "notlar": "[14.07.2026] Değerlendirme devam ediyor.(Tekn.)\n[22.07.2026] Meskun ölçülüp teslim edildi.",
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "notlar_tamamlandi": [
+      false,
+      false
+    ]
   },
   {
     "sn": 33,
