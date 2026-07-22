@@ -95,7 +95,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-22"
   },
   {
     "sn": 6,
@@ -150,7 +151,8 @@
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-22"
   },
   {
     "sn": 9,
@@ -459,7 +461,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-22"
   },
   {
     "sn": 25,
@@ -502,7 +505,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-22"
   },
   {
     "sn": 27,
@@ -520,7 +524,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-22"
   },
   {
     "sn": 28,
@@ -601,7 +606,8 @@
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Arazi ölçüsü teslim edildi, bazı parseller kontrol edilecek"
+    "notlar": "[09.07.2026] Arazi ölçüsü teslim edildi, bazı parseller kontrol edilecek",
+    "ucus_tarihi": "2026-07-22"
   },
   {
     "sn": 32,
