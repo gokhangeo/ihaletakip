@@ -858,7 +858,8 @@
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 43,
@@ -877,7 +878,8 @@
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "YER TESLİMİ YAPILDI",
-    "ucus_kiymet_durum": "Yapıldı"
+    "ucus_kiymet_durum": "Yapıldı",
+    "altlik_durum": "Devam Ediyor"
   },
   {
     "sn": 44,
@@ -1063,7 +1065,7 @@
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "ALTLIK HAZIRLANIYOR",
     "ucus_kiymet_durum": "Yapıldı",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 54,
