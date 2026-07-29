@@ -731,9 +731,10 @@
     "ucus_kiymet_durum": "Devam Ediyor",
     "altlik_durum": "Devam Ediyor",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[22.07.2026] Meskun alanın kıymetlendirmesi tamamlandı"
+    "notlar": "[22.07.2026] Meskun alanın kıymetlendirmesi tamamlandı(Firma)\n[29.07.2026] Sadece görüntü geldi"
   },
   {
     "sn": 37,
