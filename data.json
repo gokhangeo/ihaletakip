@@ -81,7 +81,7 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Yapılmadı",
+    "ucus_kiymet_durum": "Devam Ediyor",
     "altlik_durum": "Yapıldı"
   },
   {
@@ -120,7 +120,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 7,
@@ -215,7 +216,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 12,
@@ -272,7 +274,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 15,
@@ -428,7 +431,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 22,
@@ -462,7 +466,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 24,
@@ -564,7 +569,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 29,
@@ -581,7 +587,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
     "sn": 30,
