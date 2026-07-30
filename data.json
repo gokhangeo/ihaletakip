@@ -82,7 +82,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_tarihi": "2026-07-27"
   },
   {
     "sn": 5,
@@ -121,7 +122,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-27"
   },
   {
     "sn": 7,
@@ -217,7 +219,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-27"
   },
   {
     "sn": 12,
@@ -275,7 +278,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-27"
   },
   {
     "sn": 15,
@@ -432,7 +436,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-27"
   },
   {
     "sn": 22,
@@ -467,7 +472,8 @@
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-27"
   },
   {
     "sn": 24,
@@ -570,7 +576,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Devam Ediyor",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-27"
   },
   {
     "sn": 29,
@@ -588,7 +595,8 @@
     "fen": "",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-07-27"
   },
   {
     "sn": 30,
