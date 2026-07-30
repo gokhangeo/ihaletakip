@@ -643,9 +643,10 @@
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Arazi ölçüsü teslim edildi, bazı parseller kontrol edilecek\n[22.07.2026] Arazi kontrolü yapılacak(Tekn.) 31.07.2026 firma askıya hazır edecek.",
+    "notlar": "[09.07.2026] Arazi ölçüsü teslim edildi, bazı parseller kontrol edilecek\n[22.07.2026] Arazi kontrolü yapılacak(Tekn.) 31.07.2026 firma askıya hazır edecek.\n[30.07.2026] 27.07.2026 firmaya teslim edildi, askıya hazırlanıyor.",
     "ucus_tarihi": "2026-07-22",
     "notlar_tamamlandi": [
+      false,
       false,
       false
     ]
