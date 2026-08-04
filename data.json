@@ -903,9 +903,9 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "YER TESLİMİ YAPILDI",
+    "genel_durum": "VERİLER ELEKTRONİK ORTAMDA HAZIRLANDI",
     "ucus_kiymet_durum": "Yapıldı",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 44,
@@ -942,8 +942,9 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-05-04"
+    "ucus_kiymet_durum": "Yapılmadı",
+    "ucus_tarihi": "2026-05-04",
+    "altlik_durum": "Devam Ediyor"
   },
   {
     "sn": 46,
