@@ -1000,7 +1000,7 @@
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 49,
@@ -1034,7 +1034,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ BEKLİYOR",
+    "altlik_durum": "Devam Ediyor"
   },
   {
     "sn": 51,
@@ -1052,7 +1053,7 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 52,
@@ -1072,7 +1073,7 @@
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 53,
@@ -1092,7 +1093,11 @@
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "VERİLER ELEKTRONİK ORTAMDA HAZIRLANDI",
     "ucus_kiymet_durum": "Yapıldı",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[04.08.2026] Altlık kontrol ediliyor"
   },
   {
     "sn": 54,
