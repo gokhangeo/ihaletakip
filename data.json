@@ -806,9 +806,10 @@
     "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[22.07.2026] Değerlendimeye başlanıldı"
+    "notlar": "[22.07.2026] Değerlendimeye başlanıldı\n[04.08.2026] Değerlendirme devam ediyor"
   },
   {
     "sn": 39,
