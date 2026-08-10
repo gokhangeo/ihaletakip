@@ -2681,7 +2681,20 @@ function calculateStats() {
     buildCards(r2Eng, 'reg2-engStats'); buildCards(r2Tech, 'reg2-techStats');
 }
 
+function getRegionFilteredData() {
+    if (!Array.isArray(activeRegionFilter) || activeRegionFilter.length === 0) return data;
+
+    const selectedDistricts = new Set(
+        activeRegionFilter.map(district => String(district).trim().toLocaleUpperCase('tr-TR'))
+    );
+
+    return data.filter(item => selectedDistricts.has(
+        String(item.ilce || '').trim().toLocaleUpperCase('tr-TR')
+    ));
+}
+
 function calculateProgressStats() {
+    const statsData = getRegionFilteredData();
     const stats = {
         altlik: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Altlık Durumu", icon: "fa-map", field: "altlik_durum" },
         ucusTarihi: { yapildi: 0, yapilmadi: 0, label: "UÇUŞ DURUM", icon: "fa-calendar-alt", field: "ucus_tarihi" },
@@ -2693,7 +2706,7 @@ function calculateProgressStats() {
 
     let bitenIsler = 0;
 
-    data.forEach(item => {
+    statsData.forEach(item => {
         const getCat = (val) => val === 'Yapıldı' ? 'yapildi' : (val === 'Devam Ediyor' ? 'devam' : 'yapilmadi');
         stats.altlik[getCat(item.altlik_durum)]++;
         stats.ucus[getCat(item.ucus_kiymet_durum)]++;
@@ -2735,7 +2748,7 @@ function calculateProgressStats() {
         <div class="progress-card shadow-sm border border-indigo-200 bg-indigo-50/50 flex flex-col justify-center items-center text-center p-3 w-[180px] flex-shrink-0">
             <i class="fas fa-flag-checkered text-indigo-500 text-2xl mb-2"></i>
             <h4 class="font-bold text-xs text-indigo-900 uppercase mb-1">Tescili Biten İşler</h4>
-            <div class="text-3xl font-black text-indigo-600">${bitenIsler}<span class="text-sm text-indigo-400 font-normal"> / ${data.length}</span></div>
+            <div class="text-3xl font-black text-indigo-600">${bitenIsler}<span class="text-sm text-indigo-400 font-normal"> / ${statsData.length}</span></div>
         </div>
     `;
 }
