@@ -984,7 +984,7 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "genel_durum": "UÇUŞ BEKLİYOR",
     "ucus_tarihi": "2026-07-09",
     "ucus_kiymet_durum": "Devam Ediyor"
   },
@@ -1003,7 +1003,7 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
   },
   {
     "sn": 48,
@@ -1040,7 +1040,7 @@
     "kadastro": "İSMAİL AKLAN",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
   },
   {
     "sn": 50,
@@ -1075,7 +1075,7 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR",
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı"
   },
   {
@@ -1137,6 +1137,6 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
   }
 ]
