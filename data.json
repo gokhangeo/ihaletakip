@@ -331,7 +331,10 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": ""
+    "notlar": "[18.08.2026] Altlık kontrol ediliyor(Kont. Mem.)",
+    "notlar_tamamlandi": [
+      false
+    ]
   },
   {
     "sn": 17,
