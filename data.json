@@ -519,9 +519,10 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "ucus_kiymet_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-22"
+    "genel_durum": "DEĞERLENDİRMEDE",
+    "ucus_kiymet_durum": "Yapıldı",
+    "ucus_tarihi": "2026-07-22",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 25,
