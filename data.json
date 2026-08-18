@@ -522,7 +522,11 @@
     "genel_durum": "DEĞERLENDİRMEDE",
     "ucus_kiymet_durum": "Yapıldı",
     "ucus_tarihi": "2026-07-22",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[18.08.2026] Kıymetlendirme geldi. Değerlendirmeye başlanacak."
   },
   {
     "sn": 25,
