@@ -9,7 +9,7 @@
       "tur": "birim",
       "birimSn": "2",
       "text": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-07-22T08:17:48.852Z"
     },
     {
@@ -83,6 +83,46 @@
       "text": "[22.07.2026] Kıymetlendirme 25.07.2026 gelecek",
       "tamamlandi": false,
       "createdAt": "2026-07-22T08:45:01.883Z"
+    },
+    {
+      "id": "1787045688399",
+      "tur": "birim",
+      "birimSn": "10",
+      "text": "[18.08.2026] Kıymetlendirme geldi",
+      "tamamlandi": false,
+      "createdAt": "2026-08-18T09:34:48.399Z"
+    },
+    {
+      "id": "1787045715115",
+      "tur": "birim",
+      "birimSn": "16",
+      "text": "[18.08.2026] Kıymetlendirme geldi",
+      "tamamlandi": false,
+      "createdAt": "2026-08-18T09:35:15.115Z"
+    },
+    {
+      "id": "1787045721084",
+      "tur": "birim",
+      "birimSn": "20",
+      "text": "[18.08.2026] Kıymetlendirme geldi",
+      "tamamlandi": false,
+      "createdAt": "2026-08-18T09:35:21.084Z"
+    },
+    {
+      "id": "1787045776562",
+      "tur": "birim",
+      "birimSn": "3",
+      "text": "[18.08.2026] Yersel ölçülüyor",
+      "tamamlandi": false,
+      "createdAt": "2026-08-18T09:36:16.562Z"
+    },
+    {
+      "id": "1787045793995",
+      "tur": "birim",
+      "birimSn": "19",
+      "text": "[18.08.2026] Yersel ölçüldü",
+      "tamamlandi": false,
+      "createdAt": "2026-08-18T09:36:33.995Z"
     }
   ],
   "firmaNotlariTamamlandi": [],
