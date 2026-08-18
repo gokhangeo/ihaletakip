@@ -37,8 +37,9 @@
     "ucus_tarihi": "2026-06-20",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Yapıldı",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)\n[22.07.2026] Değerlendirme tamam, Ormancı kontrol için verilecek(Müh.) Firmaya 07.08.2026 tarihine kadar teslim edilip, firma tarafından 21.07.2026 tarihine kadar askıya hazır edecek.\n[06.08.2026] 13-17.08.2026 tarihine kadar firmaya teslim edilmesi gerekmektedir.",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)\n[22.07.2026] Değerlendirme tamam, Ormancı kontrol için verilecek(Müh.) Firmaya 07.08.2026 tarihine kadar teslim edilip, firma tarafından 21.07.2026 tarihine kadar askıya hazır edecek.\n[06.08.2026] 13-17.08.2026 tarihine kadar firmaya teslim edilmesi gerekmektedir.\n[18.08.2026] 19.08.2026 firmaya teslim edilecek",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false
