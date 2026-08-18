@@ -907,7 +907,7 @@
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "ALTLIK HAZIRLANIYOR",
     "ucus_kiymet_durum": "Yapıldı",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 42,
@@ -1005,7 +1005,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
     "ucus_tarihi": "2026-07-09",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Devam Ediyor",
+    "altlik_durum": "Devam Ediyor"
   },
   {
     "sn": 47,
