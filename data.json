@@ -248,8 +248,9 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-25",
     "ucus_kiymet_durum": "Yapıldı",
-    "notlar": "[06.08.2026] Değerlendirme devam ediyor. Bina ölçümleri gelmedi.\n[18.08.2026] Değerlendirme 19.08.2026 da bitecek, bina ölçümleri gelmedi.",
+    "notlar": "[06.08.2026] Değerlendirme devam ediyor. Bina ölçümleri gelmedi.\n[18.08.2026] Değerlendirme 19.08.2026 da bitecek, bina ölçümleri gelmedi.\n[25.08.2026] Değerlendirme bitti, bina teslim edilmedi",
     "notlar_tamamlandi": [
+      false,
       false,
       false
     ],
@@ -333,8 +334,9 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[18.08.2026] Altlık kontrol ediliyor(Kont. Mem.)",
+    "notlar": "[18.08.2026] Altlık kontrol ediliyor(Kont. Mem.)\n[25.08.2026] Değerlendirmeye başlanıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ]
   },
@@ -386,8 +388,9 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor\n[22.07.2026] Değerlendirme devam ediyor(Kont. Mem.)\n[06.08.2026] Değerlendirme tamam, kıymetlendirme bekliyor.\n[18.08.2026] Zeminde kontrol yapılacak.",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor\n[22.07.2026] Değerlendirme devam ediyor(Kont. Mem.)\n[06.08.2026] Değerlendirme tamam, kıymetlendirme bekliyor.\n[18.08.2026] Zeminde kontrol yapılacak.\n[25.08.2026] 27-28.08 arazi kontrolü yapılacak",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false,
@@ -525,9 +528,10 @@
     "ucus_tarihi": "2026-07-22",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[18.08.2026] Kıymetlendirme geldi. Değerlendirmeye başlanacak."
+    "notlar": "[18.08.2026] Kıymetlendirme geldi. Değerlendirmeye başlanacak.\n[25.08.2026] Tekn. değerlendirme devam ediyor"
   },
   {
     "sn": 25,
@@ -548,8 +552,9 @@
     "ucus_tarihi": "2026-06-05",
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Tekn.)\n[22.07.2026] Meskun ölçülüp teslim edildi. Değerlendirme devam ediyor(Tekn.)\n[06.08.2026] Ortofoto kayıklık var.\n[18.08.2026] Ortofoto teslim edildi kontrol ediliyor",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Tekn.)\n[22.07.2026] Meskun ölçülüp teslim edildi. Değerlendirme devam ediyor(Tekn.)\n[06.08.2026] Ortofoto kayıklık var.\n[18.08.2026] Ortofoto teslim edildi kontrol ediliyor\n[25.08.2026] Bir bölgede kayıklık var yersel ölçülecek",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false,
@@ -654,9 +659,10 @@
     "ucus_tarihi": "2026-06-07",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Uçuş bir kısmı eksik. Değerlendirme devam ediyor(Tekn.)\n[22.07.2026] Meskun ölçülüp teslim edildi.\n[06.08.2026] Ormancıya verildi, değerlendirme devam ediyor, ortofoto kayık\n[18.08.2026] Lidar ölçüm yapılacak yer var. Diğer yerlerin kontrolü devam ediyor.",
+    "notlar": "[09.07.2026] Uçuş bir kısmı eksik. Değerlendirme devam ediyor(Tekn.)\n[22.07.2026] Meskun ölçülüp teslim edildi.\n[06.08.2026] Ormancıya verildi, değerlendirme devam ediyor, ortofoto kayık\n[18.08.2026] Lidar ölçüm yapılacak yer var. Diğer yerlerin kontrolü devam ediyor.\n[25.08.2026] Değerlendirme tamam, 26.08 Ormancı kontrol edip firmaya verilecek",
     "ucus_kiymet_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false,
@@ -682,12 +688,13 @@
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Yapıldı",
     "ucus_kiymet_durum": "Yapıldı",
-    "notlar": "[09.07.2026] Arazi ölçüsü teslim edildi, bazı parseller kontrol edilecek\n[22.07.2026] Arazi kontrolü yapılacak(Tekn.) 31.07.2026 firma askıya hazır edecek.\n[29.07.2026] 27.07.2026 firmaya teslim edildi, askıya hazırlanıyor.",
+    "notlar": "[09.07.2026] Arazi ölçüsü teslim edildi, bazı parseller kontrol edilecek\n[22.07.2026] Arazi kontrolü yapılacak(Tekn.) 31.07.2026 firma askıya hazır edecek.\n[29.07.2026] 27.07.2026 firmaya teslim edildi, askıya hazırlanıyor.\n[25.08.2026] 27.08 kesin askı hazır edilecek",
     "ucus_tarihi": "2026-07-22",
     "notlar_tamamlandi": [
       true,
       true,
-      true
+      true,
+      false
     ],
     "bilgilendirme_tarihi": "2026-08-07"
   },
@@ -710,9 +717,10 @@
     "ucus_tarihi": "2026-06-08",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
-    "notlar": "[14.07.2026] Değerlendirme devam ediyor.(Tekn.)\n[22.07.2026] Meskun ölçüldü teslim edilmedi. Değerlendirme devam ediyor(Tekn.)\n[06.08.2026] Zemin kontrolü yapılacak\n[18.08.2026] Kıymetlendirme gelmedi. Ortofotoda kayıklık vardı düzeltildi, kontrol tekrar yapılıyor.",
+    "notlar": "[14.07.2026] Değerlendirme devam ediyor.(Tekn.)\n[22.07.2026] Meskun ölçüldü teslim edilmedi. Değerlendirme devam ediyor(Tekn.)\n[06.08.2026] Zemin kontrolü yapılacak\n[18.08.2026] Kıymetlendirme gelmedi. Ortofotoda kayıklık vardı düzeltildi, kontrol tekrar yapılıyor.\n[25.08.2026] Arazi kontrolü yapılıyor",
     "ucus_kiymet_durum": "Devam Ediyor",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false,
