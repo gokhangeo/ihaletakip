@@ -1114,7 +1114,11 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_tarihi": "2026-08-21"
+    "ucus_tarihi": "2026-08-21",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)"
   },
   {
     "sn": 52,
@@ -1179,10 +1183,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-08-21",
     "altlik_durum": "Yapıldı",
-    "notlar_tamamlandi": [
-      false
-    ],
-    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)",
+    "notlar_tamamlandi": [],
+    "notlar": "",
     "degerlendirme_durum": "Devam Ediyor"
   }
 ]
