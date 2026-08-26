@@ -857,9 +857,10 @@
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[22.07.2026] Değerlendimeye başlanıldı\n[04.08.2026] Değerlendirme devam ediyor. 21.08.2026 tarihine kadar değerlendirmenin yapılarak firmaya teslim edilmesi.",
+    "notlar": "[22.07.2026] Değerlendimeye başlanıldı\n[04.08.2026] Değerlendirme devam ediyor. 21.08.2026 tarihine kadar değerlendirmenin yapılarak firmaya teslim edilmesi.\n[26.08.2026] Arazi kontrolü yapılıyor",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
@@ -1160,9 +1161,10 @@
     "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[04.08.2026] Altlık kontrol ediliyor. 13.08.2026 tarihin kadar altlık kont. tamamlanarak değerlendirmeye başlanılması.",
+    "notlar": "[04.08.2026] Altlık kontrol ediliyor. 13.08.2026 tarihin kadar altlık kont. tamamlanarak değerlendirmeye başlanılması.\n[26.08.2026] Değerlendirme devam ediyor",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
