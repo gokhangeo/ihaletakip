@@ -1182,6 +1182,7 @@
     "notlar_tamamlandi": [
       false
     ],
-    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)"
+    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)",
+    "degerlendirme_durum": "Devam Ediyor"
   }
 ]
