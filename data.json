@@ -763,7 +763,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_tarihi": "2026-08-21"
   },
   {
     "sn": 35,
@@ -895,7 +896,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_tarihi": "2026-08-21"
   },
   {
     "sn": 41,
@@ -972,8 +974,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR",
-    "ucus_tarihi": "",
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_tarihi": "2026-08-21",
     "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
@@ -1031,7 +1033,8 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_tarihi": "2026-08-21"
   },
   {
     "sn": 48,
@@ -1068,7 +1071,8 @@
     "kadastro": "İSMAİL AKLAN",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_tarihi": "2026-08-21"
   },
   {
     "sn": 50,
@@ -1085,8 +1089,9 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR",
-    "altlik_durum": "Devam Ediyor"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "altlik_durum": "Devam Ediyor",
+    "ucus_tarihi": "2026-08-21"
   },
   {
     "sn": 51,
@@ -1104,7 +1109,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_tarihi": "2026-08-21"
   },
   {
     "sn": 52,
@@ -1165,6 +1171,7 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_tarihi": "2026-08-21"
   }
 ]
