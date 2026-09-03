@@ -1149,9 +1149,10 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-08-21",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)"
+    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor"
   },
   {
     "sn": 52,
