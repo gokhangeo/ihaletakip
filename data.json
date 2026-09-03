@@ -14,8 +14,9 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "ucus_tarihi": "",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "ucus_tarihi": "2026-08-28",
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 2,
@@ -193,7 +194,9 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_tarihi": "2026-08-28",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 10,
@@ -277,8 +280,9 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR",
-    "altlik_durum": "Yapıldı"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "altlik_durum": "Yapıldı",
+    "ucus_tarihi": "2026-08-28"
   },
   {
     "sn": 14,
@@ -500,7 +504,9 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ BEKLİYOR"
+    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "ucus_tarihi": "2026-08-28",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 23,
