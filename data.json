@@ -795,7 +795,8 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
-    "ucus_tarihi": ""
+    "ucus_tarihi": "",
+    "altlik_durum": "Devam Ediyor"
   },
   {
     "sn": 35,
@@ -1030,7 +1031,7 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Yapılmadı",
     "ucus_tarihi": "2026-05-04",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 46,
@@ -1069,7 +1070,7 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-08-21",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 48,
@@ -1108,7 +1109,7 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-08-21",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 50,
@@ -1126,7 +1127,7 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
-    "altlik_durum": "Devam Ediyor",
+    "altlik_durum": "Yapıldı",
     "ucus_tarihi": ""
   },
   {
