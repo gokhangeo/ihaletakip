@@ -355,19 +355,20 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "UÇUŞ YAPILIYOR",
+    "genel_durum": "BİLGİLENDİRME İLANINDA",
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "degerlendirme_durum": "Devam Ediyor",
+    "degerlendirme_durum": "Yapıldı",
     "ucus_tarihi": "2026-07-07",
     "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.)\n[22.07.2026] Arazi kontrolü yapılacak(23-27.07) (Tekn.) 28.07.2026 firmaya teslim edilip, 10.08.2026 firma askıya hazır edecek.\n[29.07.2026] Firmaya teslim edilmedi(Müh.)\n[06.08.2026] 10-13.08.2026 firmaya teslim edilecek\n[18.08.2026] Gene sınırda orman ile ilgili sıkıntı var o düzeltilip 21.08.2026 tarihine kadar firmaya teslim edilecek.",
     "notlar_tamamlandi": [
-      false,
-      false,
-      false,
-      false,
-      false
-    ]
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "bilgilendirme_tarihi": "2026-09-04"
   },
   {
     "sn": 18,
