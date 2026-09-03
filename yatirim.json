@@ -17,7 +17,7 @@
       "tur": "birim",
       "birimSn": "10",
       "text": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-07-22T08:18:04.417Z"
     },
     {
@@ -41,7 +41,7 @@
       "tur": "birim",
       "birimSn": "16",
       "text": "[09.07.2026] Kıymetlendirme 13-17.07.2026 gelecek",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-07-22T08:18:41.463Z"
     },
     {
@@ -81,7 +81,7 @@
       "tur": "birim",
       "birimSn": "20",
       "text": "[22.07.2026] Kıymetlendirme 25.07.2026 gelecek",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-07-22T08:45:01.883Z"
     },
     {
@@ -89,7 +89,7 @@
       "tur": "birim",
       "birimSn": "10",
       "text": "[18.08.2026] Kıymetlendirme geldi",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-08-18T09:34:48.399Z"
     },
     {
@@ -97,7 +97,7 @@
       "tur": "birim",
       "birimSn": "16",
       "text": "[18.08.2026] Kıymetlendirme geldi",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-08-18T09:35:15.115Z"
     },
     {
@@ -105,7 +105,7 @@
       "tur": "birim",
       "birimSn": "20",
       "text": "[18.08.2026] Kıymetlendirme geldi",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-08-18T09:35:21.084Z"
     },
     {
