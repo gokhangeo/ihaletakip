@@ -236,7 +236,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-27"
+    "ucus_tarihi": "2026-07-27",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 12,
@@ -525,7 +526,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-27"
+    "ucus_tarihi": "2026-07-27",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 24,
@@ -659,7 +661,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-27"
+    "ucus_tarihi": "2026-07-27",
+    "altlik_durum": "Yapıldı"
   },
   {
     "sn": 30,
