@@ -258,8 +258,9 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-25",
     "ucus_kiymet_durum": "Yapıldı",
-    "notlar": "[06.08.2026] Değerlendirme devam ediyor. Bina ölçümleri gelmedi.\n[18.08.2026] Değerlendirme 19.08.2026 da bitecek, bina ölçümleri gelmedi.\n[25.08.2026] Değerlendirme bitti, bina teslim edilmedi",
+    "notlar": "[06.08.2026] Değerlendirme devam ediyor. Bina ölçümleri gelmedi.\n[18.08.2026] Değerlendirme 19.08.2026 da bitecek, bina ölçümleri gelmedi.\n[25.08.2026] Değerlendirme bitti, bina teslim edilmedi\n[03.09.2026] Bina teslim edilmedi",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false
@@ -323,7 +324,7 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-25",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapıldı",
     "notlar": "[03.09.2026] Kıymetlendirme geldi, bina ölçümü teslim edildi",
     "notlar_tamamlandi": [
       false
@@ -348,8 +349,9 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Yapıldı",
-    "notlar": "[18.08.2026] Altlık kontrol ediliyor(Kont. Mem.)\n[25.08.2026] Değerlendirmeye başlanıldı",
+    "notlar": "[18.08.2026] Altlık kontrol ediliyor(Kont. Mem.)\n[25.08.2026] Değerlendirmeye başlanıldı\n[03.09.2026] Değerlendirme devam ediyor",
     "notlar_tamamlandi": [
+      false,
       false,
       false
     ]
@@ -461,9 +463,10 @@
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-07",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)\n[06.08.2026] Kıymetlendirme bekleniyor, yersel ölçülebilir.\n[18.08.2026] Kıymetlendirme teslim edilip kontrol edildi, ormancı kontrolünde. 20.08.2026 firmaya teslim edilecek.\n[28.08.2026] Firmaya teslim edildi",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)\n[06.08.2026] Kıymetlendirme bekleniyor, yersel ölçülebilir.\n[18.08.2026] Kıymetlendirme teslim edilip kontrol edildi, ormancı kontrolünde. 20.08.2026 firmaya teslim edilecek.\n[28.08.2026] Firmaya teslim edildi\n[03.09.2026] Askıya hazırlanıyor",
     "ucus_kiymet_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false,
