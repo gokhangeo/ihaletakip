@@ -123,6 +123,30 @@
       "text": "[18.08.2026] Yersel ölçüldü",
       "tamamlandi": true,
       "createdAt": "2026-08-18T09:36:33.995Z"
+    },
+    {
+      "id": "1788426055606",
+      "tur": "birim",
+      "birimSn": "12",
+      "text": "[03.09.2026] Bina ölçümleri teslim edilmedi",
+      "tamamlandi": false,
+      "createdAt": "2026-09-03T09:00:55.606Z"
+    },
+    {
+      "id": "1788426123885",
+      "tur": "birim",
+      "birimSn": "25",
+      "text": "[03.09.2026] Kıymetlendirme gelmedi",
+      "tamamlandi": false,
+      "createdAt": "2026-09-03T09:02:03.885Z"
+    },
+    {
+      "id": "1788426155373",
+      "tur": "birim",
+      "birimSn": "30",
+      "text": "[03.09.2026] Lidar teslim edilmedi",
+      "tamamlandi": false,
+      "createdAt": "2026-09-03T09:02:35.373Z"
     }
   ],
   "firmaNotlariTamamlandi": [],
