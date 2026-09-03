@@ -213,7 +213,7 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapıldı",
     "notlar": ""
   },
   {
@@ -339,7 +339,7 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapıldı",
     "notlar": "[18.08.2026] Altlık kontrol ediliyor(Kont. Mem.)\n[25.08.2026] Değerlendirmeye başlanıldı",
     "notlar_tamamlandi": [
       false,
@@ -454,7 +454,7 @@
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-07",
     "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)\n[06.08.2026] Kıymetlendirme bekleniyor, yersel ölçülebilir.\n[18.08.2026] Kıymetlendirme teslim edilip kontrol edildi, ormancı kontrolünde. 20.08.2026 firmaya teslim edilecek.\n[28.08.2026] Firmaya teslim edildi",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
       false,
