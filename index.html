@@ -415,6 +415,10 @@
                 <i class="fas fa-clipboard-list text-indigo-600"></i> Yönetici Özet Not Raporu
             </h3>
             <div class="flex items-center gap-2 md:gap-3">
+                <label class="flex items-center gap-2 bg-white border border-indigo-200 text-indigo-800 px-3 py-2 rounded-lg text-xs font-bold shadow-sm cursor-pointer select-none" title="Tamamlanan notları rapordan çıkar">
+                    <input type="checkbox" id="managerHideCompleted" onchange="generateManagerNotesReport()" class="w-4 h-4 accent-indigo-600 cursor-pointer">
+                    <span class="hidden sm:inline">Tamamlananları gizle</span><span class="sm:hidden">Bitenleri gizle</span>
+                </label>
                 <button onclick="exportManagerNotesToPDF()" class="bg-red-600 hover:bg-red-700 text-white px-3 md:px-4 py-2 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 transition-all">
                     <i class="fas fa-file-pdf text-sm"></i> <span class="hidden md:inline">PDF İndir</span><span class="md:hidden">PDF</span>
                 </button>
@@ -999,10 +1003,17 @@ function generateManagerNotesReport() {
     if (!container) return;
 
     normalizeFirmaNoteData();
+    const hideCompleted = document.getElementById('managerHideCompleted')?.checked === true;
+    const reportData = getRegionFilteredData();
+    const reportUnitSns = new Set(reportData.map(item => String(item.sn)));
     const firmaNotes = [...(yatirimData.firmaNotKayitlari || [])]
+        .filter(note => note.tur !== 'birim' || reportUnitSns.has(String(note.birimSn)))
         .sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')));
-    const unitNotes = data.filter(item => getNoteLines(item.notlar).length > 0)
+    const unitNotes = reportData.filter(item => getNoteLines(item.notlar).length > 0)
         .sort((a, b) => `${a.ilce || ''}-${a.mahalle || ''}`.localeCompare(`${b.ilce || ''}-${b.mahalle || ''}`, 'tr'));
+    const visibleUnitNotes = hideCompleted
+        ? unitNotes.filter(item => getNoteCompletionStates(item, getNoteLines(item.notlar).length).some(isComplete => !isComplete))
+        : unitNotes;
     const totalUnitLines = unitNotes.reduce((total, item) => total + getNoteLines(item.notlar).length, 0);
     const completedUnitLines = unitNotes.reduce((total, item) => total + getNoteCompletionStates(item, getNoteLines(item.notlar).length).filter(Boolean).length, 0);
     const completedFirmaNotes = firmaNotes.filter(note => note.tamamlandi).length;
@@ -1010,13 +1021,18 @@ function generateManagerNotesReport() {
     const completedNotes = completedUnitLines + completedFirmaNotes;
     const pendingNotes = totalNotes - completedNotes;
     const reportDate = new Date().toLocaleDateString('tr-TR');
+    const reportScope = !activeRegionFilter
+        ? 'Tüm bölgeler'
+        : activeRegionFilter.includes('ANAMUR')
+            ? 'Anamur - Bozyazı Bölgesi'
+            : 'Silifke - Gülnar - Aydıncık Bölgesi';
 
     const statusBadge = (isComplete) => isComplete
         ? '<span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-1 text-[10px] font-black"><i class="fas fa-check"></i> Tamamlandı</span>'
         : '<span class="inline-flex items-center gap-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200 px-2 py-1 text-[10px] font-black"><i class="fas fa-clock"></i> Bekliyor</span>';
     const formatText = (text) => escapeNoteHtml(text || '').replace(/\n/g, '<br>');
-    const firmaGeneralNotes = firmaNotes.filter(note => note.tur !== 'birim');
-    const firmaUnitNotes = firmaNotes.filter(note => note.tur === 'birim');
+    const firmaGeneralNotes = firmaNotes.filter(note => note.tur !== 'birim' && (!hideCompleted || !note.tamamlandi));
+    const firmaUnitNotes = firmaNotes.filter(note => note.tur === 'birim' && (!hideCompleted || !note.tamamlandi));
     const firmaUnitNoteGroups = Array.from(firmaUnitNotes.reduce((groups, note) => {
         const key = String(note.birimSn || 'bilinmeyen');
         if (!groups.has(key)) groups.set(key, []);
@@ -1047,7 +1063,10 @@ function generateManagerNotesReport() {
     const renderUnitCard = (item) => {
         const lines = getNoteLines(item.notlar);
         const states = getNoteCompletionStates(item, lines.length);
-        const lineItems = lines.map((line, index) => `<li class="flex items-start gap-2 ${states[index] ? 'text-slate-400 line-through' : 'text-slate-700'}"><span class="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${states[index] ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}"><i class="fas ${states[index] ? 'fa-check' : 'fa-clock'} text-[8px]"></i></span><span>${escapeNoteHtml(line)}</span></li>`).join('');
+        const visibleLines = lines
+            .map((line, index) => ({ line, index }))
+            .filter(({ index }) => !hideCompleted || !states[index]);
+        const lineItems = visibleLines.map(({ line, index }) => `<li class="flex items-start gap-2 ${states[index] ? 'text-slate-400 line-through' : 'text-slate-700'}"><span class="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${states[index] ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}"><i class="fas ${states[index] ? 'fa-check' : 'fa-clock'} text-[8px]"></i></span><span>${escapeNoteHtml(line)}</span></li>`).join('');
         const completed = states.filter(Boolean).length;
         return `<div class="manager-notes-pdf-card bg-white border border-slate-200 rounded-lg p-3 shadow-sm" style="break-inside: avoid; page-break-inside: avoid;">
             <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 border-b border-slate-100 pb-2 mb-2"><div><div class="text-[10px] uppercase tracking-wider font-black text-blue-600">${escapeNoteHtml(item.ilce || 'İlçe bilgisi yok')}</div><h4 class="font-extrabold text-sm text-slate-800 mt-0.5">${escapeNoteHtml(item.mahalle || 'Mahalle bilgisi yok')}</h4><div class="flex flex-wrap gap-1.5 text-[10px] font-bold mt-2"><span class="rounded-md bg-blue-50 border border-blue-100 text-blue-700 px-2 py-1"><i class="fas fa-user-tie mr-1"></i>Müh: ${escapeNoteHtml(item.muhendis || 'Atanmadı')}</span><span class="rounded-md bg-purple-50 border border-purple-100 text-purple-700 px-2 py-1"><i class="fas fa-tools mr-1"></i>Tek: ${escapeNoteHtml(item.tekniker || 'Atanmadı')}</span></div></div><div class="flex flex-wrap gap-1.5 text-[10px] font-bold"><span class="rounded-md bg-emerald-50 border border-emerald-100 text-emerald-700 px-2 py-1">22-A: ${item.yirmi_iki_a || 0}</span><span class="rounded-md bg-slate-50 border border-slate-200 text-slate-600 px-2 py-1">${completed}/${lines.length} tamamlandı</span></div></div>
@@ -1057,11 +1076,11 @@ function generateManagerNotesReport() {
 
     const empty = (message) => `<div class="manager-notes-pdf-card bg-white rounded-lg border border-dashed border-slate-300 px-3 py-4 text-center text-xs font-medium text-slate-400" style="break-inside: avoid; page-break-inside: avoid;">${message}</div>`;
     container.innerHTML = `
-        <div class="text-center mb-7 manager-notes-pdf-card" style="break-inside: avoid; page-break-inside: avoid;"><div class="text-[11px] font-black tracking-[0.22em] text-indigo-600 mb-2">YÖNETİCİ ÖZET NOT RAPORU</div><h2 class="text-xl font-black text-slate-900 uppercase">Mersin İli Kadastro Güncelleme Çalışmaları</h2><p class="text-xs text-slate-500 font-medium mt-2">Tüm firma ve birim notları · ${reportDate}</p></div>
+        <div class="text-center mb-7 manager-notes-pdf-card" style="break-inside: avoid; page-break-inside: avoid;"><div class="text-[11px] font-black tracking-[0.22em] text-indigo-600 mb-2">YÖNETİCİ ÖZET NOT RAPORU</div><h2 class="text-xl font-black text-slate-900 uppercase">Mersin İli Kadastro Güncelleme Çalışmaları</h2><p class="text-xs text-slate-500 font-medium mt-2">${reportScope} · ${hideCompleted ? 'Yalnızca bekleyen notlar' : 'Tüm firma ve birim notları'} · ${reportDate}</p></div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-7 manager-notes-pdf-card" style="break-inside: avoid; page-break-inside: avoid;"><div class="rounded-xl border border-indigo-200 bg-indigo-50 p-3 text-center"><div class="text-[10px] font-bold uppercase text-indigo-700">Toplam Not</div><div class="text-2xl font-black text-indigo-800 mt-1">${totalNotes}</div></div><div class="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-center"><div class="text-[10px] font-bold uppercase text-emerald-700">Tamamlanan</div><div class="text-2xl font-black text-emerald-800 mt-1">${completedNotes}</div></div><div class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-center"><div class="text-[10px] font-bold uppercase text-amber-700">Bekleyen</div><div class="text-2xl font-black text-amber-800 mt-1">${pendingNotes}</div></div><div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-center"><div class="text-[10px] font-bold uppercase text-blue-700">Notlu Birim</div><div class="text-2xl font-black text-blue-800 mt-1">${unitNotes.length}</div></div></div>
         <section class="manager-notes-section mb-6"><h3 class="text-xs font-black tracking-widest text-slate-400 uppercase mb-3"><i class="fas fa-building text-indigo-500 mr-1"></i> Firma Genel Notları</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-3">${firmaGeneralNotes.length ? firmaGeneralNotes.map(renderFirmaCard).join('') : empty('Genel firma notu bulunmuyor.')}</div></section>
         <section class="manager-notes-section mb-6"><h3 class="text-xs font-black tracking-widest text-slate-400 uppercase mb-3"><i class="fas fa-briefcase text-violet-500 mr-1"></i> Firmaya Ait Birim Notları</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-3">${firmaUnitNoteGroups.length ? firmaUnitNoteGroups.map(renderFirmaUnitCard).join('') : empty('Firmaya ait birim notu bulunmuyor.')}</div></section>
-        <section class="manager-notes-section"><h3 class="text-xs font-black tracking-widest text-slate-400 uppercase mb-3"><i class="fas fa-map-marked-alt text-blue-500 mr-1"></i> Birim Notları</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-3">${unitNotes.length ? unitNotes.map(renderUnitCard).join('') : empty('Birim notu bulunmuyor.')}</div></section>`;
+        <section class="manager-notes-section"><h3 class="text-xs font-black tracking-widest text-slate-400 uppercase mb-3"><i class="fas fa-map-marked-alt text-blue-500 mr-1"></i> Birim Notları</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-3">${visibleUnitNotes.length ? visibleUnitNotes.map(renderUnitCard).join('') : empty(hideCompleted ? 'Bekleyen birim notu bulunmuyor.' : 'Birim notu bulunmuyor.')}</div></section>`;
 }
 
 async function exportManagerNotesToPDF() {
