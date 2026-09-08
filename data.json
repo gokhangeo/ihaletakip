@@ -559,9 +559,10 @@
     "notlar_tamamlandi": [
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[18.08.2026] Kıymetlendirme geldi. Değerlendirmeye başlanacak.\n[25.08.2026] Tekn. değerlendirme devam ediyor. 27.08 zemin ölçümü ve ykn kontrolü yapılacak\n[03.09.2026] Değerlendirme devam ediyor.(%50 tamam)"
+    "notlar": "[18.08.2026] Kıymetlendirme geldi. Değerlendirmeye başlanacak.\n[25.08.2026] Tekn. değerlendirme devam ediyor. 27.08 zemin ölçümü ve ykn kontrolü yapılacak\n[03.09.2026] Değerlendirme devam ediyor.(%50 tamam)\n[08.09.2026] Değerlendirme tamam(ormana bakılacak)(Tekn.)"
   },
   {
     "sn": 25,
