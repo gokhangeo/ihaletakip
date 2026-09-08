@@ -350,8 +350,9 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Yapıldı",
-    "notlar": "[18.08.2026] Altlık kontrol ediliyor(Kont. Mem.)\n[25.08.2026] Değerlendirmeye başlanıldı\n[03.09.2026] Değerlendirme devam ediyor",
+    "notlar": "[18.08.2026] Altlık kontrol ediliyor(Kont. Mem.)\n[25.08.2026] Değerlendirmeye başlanıldı\n[03.09.2026] Değerlendirme devam ediyor\n[08.09.2026] Değerlendirme devam ediyor",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false
@@ -406,8 +407,9 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor\n[22.07.2026] Değerlendirme devam ediyor(Kont. Mem.)\n[06.08.2026] Değerlendirme tamam, kıymetlendirme bekliyor.\n[18.08.2026] Zeminde kontrol yapılacak.\n[25.08.2026] 27-28.08 arazi kontrolü yapılacak\n[03.09.2026] Arazi kontrolü yapılacak. 07-09 arzi kontrolü yapılacak",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor\n[22.07.2026] Değerlendirme devam ediyor(Kont. Mem.)\n[06.08.2026] Değerlendirme tamam, kıymetlendirme bekliyor.\n[18.08.2026] Zeminde kontrol yapılacak.\n[25.08.2026] 27-28.08 arazi kontrolü yapılacak\n[03.09.2026] Arazi kontrolü yapılacak. 07-09 arzi kontrolü yapılacak\n[08.09.2026] Arazi kont. yapılıyor(Müh.)",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false,
