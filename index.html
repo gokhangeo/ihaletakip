@@ -263,7 +263,7 @@
                 <i id="yatirimToggleIcon" class="fas fa-chevron-down text-slate-400 transition-transform"></i>
             </button>
             <div id="yatirimPanelContent" class="hidden px-4 pb-4 border-t border-slate-100">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3" id="finansalKartlar"></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mt-3" id="finansalKartlar"></div>
                 <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-2 mt-3" id="ilerlemeCubuklari"></div>
             </div>
         </div>
@@ -1506,6 +1506,10 @@ function renderYatirim() {
     const baslangic = new Date('2026-05-18T00:00:00');
     const bitis = new Date('2027-08-10T00:00:00');
     const bugun = new Date();
+    const bugunBaslangici = new Date(bugun);
+    bugunBaslangici.setHours(0, 0, 0, 0);
+    const kalanGun = Math.max(0, Math.ceil((bitis - bugunBaslangici) / (1000 * 60 * 60 * 24)));
+    const ihaleSuresiTamamlandi = bugunBaslangici >= bitis;
     
     let sureYuzde = 0;
     if (bugun >= bitis) sureYuzde = 100;
@@ -1539,6 +1543,14 @@ function renderYatirim() {
             <div class="text-lg font-black tracking-tight leading-none flex items-center">
                 ₺ <span class="${spanClass} ml-1" ${editableAttr} onblur="updateYatirim('odenen', this.innerText)">${odenen.toLocaleString('tr-TR')}</span>
             </div>
+        </div>
+
+        <div class="bg-[#7c3aed] text-white rounded-lg p-2.5 flex flex-col justify-center items-end shadow-sm transition-transform">
+            <div class="text-[11px] font-medium opacity-90 leading-none mb-1">Kalan İhale Süresi</div>
+            <div class="text-lg font-black tracking-tight leading-none">
+                ${ihaleSuresiTamamlandi ? 'Süre Tamamlandı' : `${kalanGun.toLocaleString('tr-TR')} Gün`}
+            </div>
+            <div class="text-[9px] font-medium opacity-75 mt-1">Bitiş: 10.08.2027</div>
         </div>
     `;
 
@@ -2690,7 +2702,7 @@ function renderDeadlineWarnings(items) {
     const makeWarning = (itemsToShow, type) => {
         if (!itemsToShow.length) return '';
         const isKomisyon = type === 'komisyon';
-        const title = isKomisyon ? 'Komisyon Bekliyor' : 'Kesin Askıdan İndi';
+        const title = isKomisyon ? 'Komisyon Bekliyor' : 'Kesin Askıdan İndi. Beklemede';
         const detail = isKomisyon ? 'Bilgilendirme ilanı 15 günlük süresini tamamladı. Komisyon durumundan “Yapıldı” seçilene kadar uyarı devam eder.' : 'Kesin askı ilanı 30 günlük süresini tamamladı. Genel durumdan “DEVİR YAPILDI” seçilene kadar uyarı devam eder.';
         const icon = isKomisyon ? 'fa-gavel' : 'fa-sign-out-alt';
         const theme = isKomisyon
@@ -2751,7 +2763,8 @@ function calculateProgressStats() {
         ucus: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Uçuş Kıymet.", icon: "fa-plane", field: "ucus_kiymet_durum" },
         degerlendirme: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Değerlendirme", icon: "fa-tasks", field: "degerlendirme_durum" },
         bilgilendirmeTarihi: { yapildi: 0, yapilmadi: 0, label: "BİLGİLENDİRME DURUM", icon: "fa-bullhorn", field: "bilgilendirme_tarihi" },
-        komisyon: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Komisyon", icon: "fa-users", field: "komisyon_durum" }
+        komisyon: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Komisyon", icon: "fa-users", field: "komisyon_durum" },
+        kesinAskiTarihi: { yapildi: 0, yapilmadi: 0, label: "KESİN ASKI DURUM", icon: "fa-thumbtack", field: "kesin_aski_tarihi" }
     };
 
     let bitenIsler = 0;
@@ -2765,6 +2778,7 @@ function calculateProgressStats() {
 
         if(item.ucus_tarihi) stats.ucusTarihi.yapildi++; else stats.ucusTarihi.yapilmadi++;
         if(item.bilgilendirme_tarihi) stats.bilgilendirmeTarihi.yapildi++; else stats.bilgilendirmeTarihi.yapilmadi++;
+        if(item.kesin_aski_tarihi) stats.kesinAskiTarihi.yapildi++; else stats.kesinAskiTarihi.yapilmadi++;
 
         if (item.genel_durum === "TESCİLİ BİTTİ") bitenIsler++;
     });
@@ -2795,6 +2809,7 @@ function calculateProgressStats() {
         ${createCard(stats.degerlendirme.label, stats.degerlendirme.icon, stats.degerlendirme, stats.degerlendirme.field)}
         ${createCard(stats.bilgilendirmeTarihi.label, stats.bilgilendirmeTarihi.icon, stats.bilgilendirmeTarihi, stats.bilgilendirmeTarihi.field)}
         ${createCard(stats.komisyon.label, stats.komisyon.icon, stats.komisyon, stats.komisyon.field)}
+        ${createCard(stats.kesinAskiTarihi.label, stats.kesinAskiTarihi.icon, stats.kesinAskiTarihi, stats.kesinAskiTarihi.field)}
         <div class="progress-card shadow-sm border border-indigo-200 bg-indigo-50/50 flex flex-col justify-center items-center text-center p-3 w-[180px] flex-shrink-0">
             <i class="fas fa-flag-checkered text-indigo-500 text-2xl mb-2"></i>
             <h4 class="font-bold text-xs text-indigo-900 uppercase mb-1">Tescili Biten İşler</h4>
