@@ -259,7 +259,7 @@
         <!-- İhale Yatırım Takip Bölümü -->
         <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
             <button id="yatirimToggleButton" onclick="toggleYatirimPanel()" aria-expanded="false" class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
-                <span class="font-extrabold text-sm text-slate-700 uppercase tracking-wider"><i class="fas fa-chart-pie text-blue-500 mr-1.5"></i> İhale Yatırım ve İlerleme Takibi <span class="text-xs font-normal text-slate-400 normal-case ml-2">(Sözleşme Tarihi: 18.05.2026 - Bitiş: 10.08.2027)</span></span>
+                <span class="font-extrabold text-sm text-slate-700 uppercase tracking-wider flex flex-wrap items-center gap-y-1"><span><i class="fas fa-chart-pie text-blue-500 mr-1.5"></i> İhale Yatırım ve İlerleme Takibi</span><span class="text-xs font-normal text-slate-400 normal-case ml-2">(Sözleşme Tarihi: 18.05.2026 - Bitiş: 10.08.2027 <span id="yatirimKalanSure" class="font-bold text-violet-600 whitespace-nowrap">- Kalan süre hesaplanıyor</span>)</span></span>
                 <i id="yatirimToggleIcon" class="fas fa-chevron-down text-slate-400 transition-transform"></i>
             </button>
             <div id="yatirimPanelContent" class="hidden px-4 pb-4 border-t border-slate-100">
@@ -1510,6 +1510,12 @@ function renderYatirim() {
     bugunBaslangici.setHours(0, 0, 0, 0);
     const kalanGun = Math.max(0, Math.ceil((bitis - bugunBaslangici) / (1000 * 60 * 60 * 24)));
     const ihaleSuresiTamamlandi = bugunBaslangici >= bitis;
+    const kalanSureLabel = document.getElementById('yatirimKalanSure');
+    if (kalanSureLabel) {
+        kalanSureLabel.textContent = ihaleSuresiTamamlandi
+            ? '- Süre tamamlandı'
+            : `- Kalan: ${kalanGun.toLocaleString('tr-TR')} gün`;
+    }
     
     let sureYuzde = 0;
     if (bugun >= bitis) sureYuzde = 100;
