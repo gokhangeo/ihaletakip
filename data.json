@@ -804,7 +804,11 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
     "ucus_tarihi": "",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Devam Ediyor",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[23.09.2026] Yersel yapılacak"
   },
   {
     "sn": 35,
@@ -1085,7 +1089,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-08-21",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_kiymet_durum": "Yapılmadı"
   },
   {
     "sn": 48,
@@ -1124,7 +1129,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "DEĞERLENDİRMEDE",
     "ucus_tarihi": "2026-08-21",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "ucus_kiymet_durum": "Yapıldı"
   },
   {
     "sn": 50,
