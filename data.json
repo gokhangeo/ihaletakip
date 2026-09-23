@@ -994,7 +994,11 @@
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "DEĞERLENDİRMEDE",
     "ucus_kiymet_durum": "Yapıldı",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor"
   },
   {
     "sn": 43,
