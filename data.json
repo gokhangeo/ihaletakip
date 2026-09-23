@@ -785,7 +785,11 @@
     "ucus_tarihi": "2026-05-01",
     "genel_durum": "DEĞERLENDİRMEDE",
     "altlik_durum": "Yapıldı",
-    "degerlendirme_durum": "Yapılmadı"
+    "degerlendirme_durum": "Yapılmadı",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor"
   },
   {
     "sn": 34,
