@@ -823,8 +823,12 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-06-01",
-    "ucus_kiymet_durum": "Devam Ediyor",
-    "altlik_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Yapılmadı",
+    "altlik_durum": "Devam Ediyor",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[23.09.2026] Yersel ölçülüyor"
   },
   {
     "sn": 36,
@@ -843,7 +847,7 @@
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
     "genel_durum": "DEĞERLENDİRMEDE",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapılmadı",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
