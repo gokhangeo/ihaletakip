@@ -884,9 +884,10 @@
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[22.07.2026] Altlık kontrolü devam ediyor\n[04.08.2026] Altlık kontrolü devam ediyor. 07.08.2026 tarihine kadar altlık kont. tamamlanması, 28.08.2026 tarihine kadar değerlendirmenin tamamlanarak firmaya teslim edilmesi.",
+    "notlar": "[22.07.2026] Altlık kontrolü devam ediyor\n[04.08.2026] Altlık kontrolü devam ediyor. 07.08.2026 tarihine kadar altlık kont. tamamlanması, 28.08.2026 tarihine kadar değerlendirmenin tamamlanarak firmaya teslim edilmesi.\n[23.09.2026] 25.09 firmaya teslim edilecek",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
