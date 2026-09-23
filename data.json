@@ -1139,7 +1139,11 @@
     "genel_durum": "DEĞERLENDİRMEDE",
     "ucus_tarihi": "2026-08-21",
     "altlik_durum": "Yapıldı",
-    "ucus_kiymet_durum": "Yapıldı"
+    "ucus_kiymet_durum": "Yapıldı",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)"
   },
   {
     "sn": 50,
@@ -1208,7 +1212,7 @@
     "notlar_tamamlandi": [
       false
     ],
-    "notlar": "[23.09.2026] Değerlendirme devam ediyor"
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)"
   },
   {
     "sn": 53,
