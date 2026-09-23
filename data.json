@@ -1180,9 +1180,10 @@
     "ucus_tarihi": "2026-08-21",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor",
+    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor\n[23.09.2026] Meskun bekleniyor",
     "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
