@@ -2471,8 +2471,13 @@ function clearAllFilters() {
 }
 
 function togglePersonFilter(personName) {
-    activePersonFilter = activePersonFilter === personName ? null : personName;
-    document.getElementById('globalSearch').value = ""; updateFilterBanner(); renderTable();
+    const isSamePerson = activePersonFilter === personName && !activeCardFilter;
+    activePersonFilter = isSamePerson ? null : personName;
+    activeCardFilter = null;
+    document.getElementById('globalSearch').value = "";
+    document.getElementById('statusFilter').value = "";
+    updateFilterBanner();
+    renderTable();
 }
 
 function setPersonStatusFilter(personName, statusKey, label) {
