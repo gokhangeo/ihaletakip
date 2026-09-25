@@ -156,9 +156,10 @@
     "ucus_tarihi": "2026-06-19",
     "ucus_kiymet_durum": "Devam Ediyor",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[03.09.2026] Kontrole başlanacak"
+    "notlar": "[03.09.2026] Kontrole başlanacak\n[25.09.2026] Hüseyin Büyük değerlendimesi yapılıyor"
   },
   {
     "sn": 8,
@@ -409,8 +410,9 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor\n[22.07.2026] Değerlendirme devam ediyor(Kont. Mem.)\n[06.08.2026] Değerlendirme tamam, kıymetlendirme bekliyor.\n[18.08.2026] Zeminde kontrol yapılacak.\n[25.08.2026] 27-28.08 arazi kontrolü yapılacak\n[03.09.2026] Arazi kontrolü yapılacak. 07-09 arzi kontrolü yapılacak\n[08.09.2026] Arazi kont. yapılıyor(Müh.)",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor\n[22.07.2026] Değerlendirme devam ediyor(Kont. Mem.)\n[06.08.2026] Değerlendirme tamam, kıymetlendirme bekliyor.\n[18.08.2026] Zeminde kontrol yapılacak.\n[25.08.2026] 27-28.08 arazi kontrolü yapılacak\n[03.09.2026] Arazi kontrolü yapılacak. 07-09 arzi kontrolü yapılacak\n[08.09.2026] Arazi kont. yapılıyor(Müh.)\n[25.09.2026] alan karşılaştırması yapılıyor",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false,
@@ -440,9 +442,10 @@
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-07",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)\n[06.08.2026] Ortofoto kayık, kıymetlendirme bekleniyor.\n[18.08.2026] Yersel ölçüm yapıldı birleştirilip Tekn. teslim edilecek.\n[03.09.2026] Değerlendirme tamam, firmaya teslim edildi(Müh. kont. edecek)",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)\n[06.08.2026] Ortofoto kayık, kıymetlendirme bekleniyor.\n[18.08.2026] Yersel ölçüm yapıldı birleştirilip Tekn. teslim edilecek.\n[03.09.2026] Değerlendirme tamam, firmaya teslim edildi(Müh. kont. edecek)\n[25.09.2026] mühendis kontrolü bitti tutanaklar imzalandı kontrol memurunda",
     "ucus_kiymet_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false,
       false,
       false,
@@ -464,19 +467,21 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "ASKI İLANINA HAZIRLANIYOR",
+    "genel_durum": "BİLGİLENDİRME İLANINDA",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Yapıldı",
     "ucus_tarihi": "2026-07-07",
-    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)\n[06.08.2026] Kıymetlendirme bekleniyor, yersel ölçülebilir.\n[18.08.2026] Kıymetlendirme teslim edilip kontrol edildi, ormancı kontrolünde. 20.08.2026 firmaya teslim edilecek.\n[28.08.2026] Firmaya teslim edildi\n[03.09.2026] Askıya hazırlanıyor",
+    "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)\n[06.08.2026] Kıymetlendirme bekleniyor, yersel ölçülebilir.\n[18.08.2026] Kıymetlendirme teslim edilip kontrol edildi, ormancı kontrolünde. 20.08.2026 firmaya teslim edilecek.\n[28.08.2026] Firmaya teslim edildi\n[03.09.2026] Askıya hazırlanı\n[25.09.2026]  bilgilendirme ilanına alındı 23.09.2026",
     "ucus_kiymet_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
       false,
       false,
       false,
+      false,
       false
-    ]
+    ],
+    "bilgilendirme_tarihi": "2026-09-23"
   },
   {
     "sn": 21,
