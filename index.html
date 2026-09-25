@@ -2446,7 +2446,10 @@ function updateFilterBanner() {
         else texts.push('Bölge: Silifke-Gülnar-Aydıncık');
     }
     if (activePersonFilter) texts.push(`Personel: ${activePersonFilter}`);
-    if (activeCardFilter) texts.push(`${activeCardFilter.label} (${activeCardFilter.val})`);
+    if (activeCardFilter) {
+        if (activeCardFilter.field === "person_status") texts.push(`Personel: ${activeCardFilter.person} — ${activeCardFilter.label}`);
+        else texts.push(`${activeCardFilter.label} (${activeCardFilter.val})`);
+    }
     
     const banner = document.getElementById('activeFilterBanner');
     if (texts.length > 0) {
@@ -2470,6 +2473,21 @@ function clearAllFilters() {
 function togglePersonFilter(personName) {
     activePersonFilter = activePersonFilter === personName ? null : personName;
     document.getElementById('globalSearch').value = ""; updateFilterBanner(); renderTable();
+}
+
+function setPersonStatusFilter(personName, statusKey, label) {
+    const isSame = activeCardFilter && activeCardFilter.field === "person_status" && activeCardFilter.person === personName && activeCardFilter.val === statusKey;
+    activeCardFilter = isSame ? null : { field: "person_status", person: personName, label, val: statusKey };
+    activePersonFilter = null;
+    activeRegionFilter = null;
+    document.getElementById('globalSearch').value = "";
+    document.getElementById('statusFilter').value = "";
+    document.getElementById('content-region1').classList.add('hidden');
+    document.getElementById('icon-region1').classList.remove('rotate-180');
+    document.getElementById('content-region2').classList.add('hidden');
+    document.getElementById('icon-region2').classList.remove('rotate-180');
+    updateFilterBanner();
+    renderTable();
 }
 
 function setCardFilter(field, label, val) {
@@ -2584,7 +2602,17 @@ function renderTable() {
         if (activeCardFilter) {
             const f = activeCardFilter.field;
             const v = activeCardFilter.val;
-            if (f === 'ucus_tarihi' || f === 'bilgilendirme_tarihi' || f === 'kesin_aski_tarihi') {
+            if (f === "person_status") {
+                const statusByKey = {
+                    degerlendirmede: "DEĞERLENDİRMEDE",
+                    firmaTeslim: "FİRMAYA TESLİM EDİLDİ",
+                    bilgilendirme: "BİLGİLENDİRME İLANINDA",
+                    kesinAski: "KESİN ASKIDA",
+                    biten: "TESCİLİ BİTTİ"
+                };
+                matchesCard = [item.muhendis, item.tekniker].includes(activeCardFilter.person)
+                    && String(item.genel_durum || "").trim().toLocaleUpperCase("tr-TR") === statusByKey[v];
+            } else if (f === 'ucus_tarihi' || f === 'bilgilendirme_tarihi' || f === 'kesin_aski_tarihi') {
                 const isDone = !!item[f];
                 matchesCard = (v === 'Yapıldı' && isDone) || (v === 'Yapılmadı' && !isDone);
             } else {
@@ -2724,35 +2752,57 @@ function renderDeadlineWarnings(items) {
 function calculateStats() {
     const region1Districts = ["ANAMUR", "BOZYAZI"];
     const region2Districts = ["SİLİFKE", "GÜLNAR", "AYDINCIK"];
-
     const r1Eng = {}, r1Tech = {}, r2Eng = {}, r2Tech = {};
 
-    data.forEach(item => {
-        const p = parseInt(item.parsel) || 0;
-        const dist = item.ilce || 'BİLMEYEN';
-        const updateMap = (map, person) => {
-            if (!person) return;
-            if (!map[person]) map[person] = { total: 0, details: {} };
-            map[person].total += p;
-            if (!map[person].details[dist]) map[person].details[dist] = { parsel: 0, count: 0 };
-            map[person].details[dist].parsel += p;
-            map[person].details[dist].count += 1;
-        };
+    const normalizeStatus = (value) => String(value || "").trim().toLocaleUpperCase("tr-TR");
+    const statusDefinitions = [
+        { key: "degerlendirmede", label: "Değerlendirmede", match: item => normalizeStatus(item.genel_durum) === "DEĞERLENDİRMEDE", color: "text-amber-700 bg-amber-50 border-amber-200" },
+        { key: "firmaTeslim", label: "Firmaya teslim", match: item => normalizeStatus(item.genel_durum) === "FİRMAYA TESLİM EDİLDİ", color: "text-sky-700 bg-sky-50 border-sky-200" },
+        { key: "bilgilendirme", label: "Bilgilendirme ilanı", match: item => normalizeStatus(item.genel_durum) === "BİLGİLENDİRME İLANINDA", color: "text-violet-700 bg-violet-50 border-violet-200" },
+        { key: "kesinAski", label: "Kesin askı ilanı", match: item => normalizeStatus(item.genel_durum) === "KESİN ASKIDA", color: "text-rose-700 bg-rose-50 border-rose-200" },
+        { key: "biten", label: "Biten", match: item => normalizeStatus(item.genel_durum) === "TESCİLİ BİTTİ", color: "text-emerald-700 bg-emerald-50 border-emerald-200" }
+    ];
 
-        if (region1Districts.includes(dist)) { updateMap(r1Eng, item.muhendis); updateMap(r1Tech, item.tekniker); } 
-        else if (region2Districts.includes(dist)) { updateMap(r2Eng, item.muhendis); updateMap(r2Tech, item.tekniker); }
+    const updateMap = (map, person, item) => {
+        if (!person) return;
+        if (!map[person]) map[person] = { total: 0, details: {}, statuses: Object.fromEntries(statusDefinitions.map(s => [s.key, 0])) };
+        const entry = map[person];
+        entry.total += parseInt(item.parsel) || 0;
+        const dist = item.ilce || "BİLMEYEN";
+        if (!entry.details[dist]) entry.details[dist] = { parsel: 0, count: 0 };
+        entry.details[dist].parsel += parseInt(item.parsel) || 0;
+        entry.details[dist].count += 1;
+        statusDefinitions.forEach(status => { if (status.match(item)) entry.statuses[status.key]++; });
+    };
+
+    data.forEach(item => {
+        const dist = String(item.ilce || "BİLMEYEN").trim().toLocaleUpperCase("tr-TR");
+        if (region1Districts.includes(dist)) { updateMap(r1Eng, item.muhendis, item); updateMap(r1Tech, item.tekniker, item); }
+        else if (region2Districts.includes(dist)) { updateMap(r2Eng, item.muhendis, item); updateMap(r2Tech, item.tekniker, item); }
     });
 
     const buildCards = (mapContainer, domId) => {
         const html = Object.entries(mapContainer).sort((a, b) => b[1].total - a[1].total).map(([name, statData]) => {
-            const isActive = activePersonFilter === name ? 'active-filter' : '';
-            const checkIcon = isActive ? '<i class="fas fa-check-circle text-indigo-500 float-right"></i>' : '';
+            const isActive = activePersonFilter === name;
+            const isEscaped = String(name).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
             const detailsHtml = Object.entries(statData.details).sort((a, b) => b[1].parsel - a[1].parsel).map(([ilce, stats]) => `
                 <div class="flex justify-between items-center text-[10px] py-0.5 border-b border-slate-100 last:border-0" title="${stats.count} adet mahalle/iş birimi">
                     <span class="text-slate-500 font-medium">${ilce} <span class="text-slate-400 font-normal">(${stats.count} Birim)</span></span>
                     <span class="font-bold text-indigo-600">${stats.parsel.toLocaleString('tr-TR')}</span>
                 </div>`).join('');
-            return `<div onclick="togglePersonFilter('${name}')" class="stat-card p-3 shadow-sm ${isActive}">${checkIcon}<div class="text-[11px] font-bold text-slate-500 uppercase mb-0.5">${name}</div><div class="text-lg font-black text-slate-800 mb-2">${statData.total.toLocaleString('tr-TR')} <span class="text-[10px] font-normal text-slate-400 italic">parsel</span></div><div class="bg-slate-50 rounded-md p-1.5 border border-slate-100">${detailsHtml}</div></div>`;
+            const statusHtml = statusDefinitions.map(status => {
+                const filterLabel = `Personel: ${name} — ${status.label}`;
+                const activeClass = activeCardFilter && activeCardFilter.field === "person_status" && activeCardFilter.person === name && activeCardFilter.val === status.key ? "ring-2 ring-indigo-400" : "";
+                return `<button type="button" onclick="event.stopPropagation(); setPersonStatusFilter('${isEscaped}', '${status.key}', '${status.label}')" class="w-full flex justify-between items-center gap-2 rounded-md border px-2 py-1 text-[10px] font-semibold ${status.color} ${activeClass} hover:brightness-95 transition" title="${filterLabel}">
+                    <span class="truncate">${status.label}</span><span class="font-black">${statData.statuses[status.key]}</span>
+                </button>`;
+            }).join('');
+            return `<div class="stat-card p-3 shadow-sm ${isActive ? 'active-filter' : ''}" onclick="togglePersonFilter('${isEscaped}')">
+                <div class="text-[11px] font-bold text-slate-500 uppercase mb-0.5">${name}</div>
+                <div class="text-lg font-black text-slate-800 mb-2">${statData.total.toLocaleString('tr-TR')} <span class="text-[10px] font-normal text-slate-400 italic">parsel</span></div>
+                <div class="bg-slate-50 rounded-md p-1.5 border border-slate-100 mb-2">${detailsHtml}</div>
+                <div class="grid grid-cols-1 gap-1" aria-label="Personel ihale durum sayıları">${statusHtml}</div>
+            </div>`;
         }).join('');
         document.getElementById(domId).innerHTML = html;
     };
@@ -2760,7 +2810,6 @@ function calculateStats() {
     buildCards(r1Eng, 'reg1-engStats'); buildCards(r1Tech, 'reg1-techStats');
     buildCards(r2Eng, 'reg2-engStats'); buildCards(r2Tech, 'reg2-techStats');
 }
-
 function calculateProgressStats() {
     const statsData = getRegionFilteredData();
     const stats = {
