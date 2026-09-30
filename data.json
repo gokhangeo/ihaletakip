@@ -887,16 +887,17 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "DEĞERLENDİRMEDE",
+    "genel_durum": "FİRMAYA TESLİM EDİLDİ",
     "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[22.07.2026] Altlık kontrolü devam ediyor\n[04.08.2026] Altlık kontrolü devam ediyor. 07.08.2026 tarihine kadar altlık kont. tamamlanması, 28.08.2026 tarihine kadar değerlendirmenin tamamlanarak firmaya teslim edilmesi.\n[23.09.2026] 25.09 firmaya teslim edilecek",
-    "degerlendirme_durum": "Devam Ediyor"
+    "notlar": "[22.07.2026] Altlık kontrolü devam ediyor\n[04.08.2026] Altlık kontrolü devam ediyor. 07.08.2026 tarihine kadar altlık kont. tamamlanması, 28.08.2026 tarihine kadar değerlendirmenin tamamlanarak firmaya teslim edilmesi.\n[23.09.2026] 25.09 firmaya teslim edilecek\n[30.09.2026] Firmaya teslim edildi. 05.10.2026 tutanaklar hazır edilecek",
+    "degerlendirme_durum": "Yapıldı"
   },
   {
     "sn": 38,
@@ -920,9 +921,10 @@
     "notlar_tamamlandi": [
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[22.07.2026] Değerlendimeye başlanıldı\n[04.08.2026] Değerlendirme devam ediyor. 21.08.2026 tarihine kadar değerlendirmenin yapılarak firmaya teslim edilmesi.\n[26.08.2026] Arazi kontrolü yapılıyor",
+    "notlar": "[22.07.2026] Değerlendimeye başlanıldı\n[04.08.2026] Değerlendirme devam ediyor. 21.08.2026 tarihine kadar değerlendirmenin yapılarak firmaya teslim edilmesi.\n[26.08.2026] Arazi kontrolü yapılıyor\n[30.09.2026] Değerlendirme devam ediyor.",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
@@ -1149,9 +1151,10 @@
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)"
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[30.09.2026] Arazi kontrolü yapılıyor(Tekn.)"
   },
   {
     "sn": 50,
@@ -1193,9 +1196,10 @@
     "notlar_tamamlandi": [
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor\n[23.09.2026] Meskun bekleniyor",
+    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor\n[23.09.2026] Meskun bekleniyor\n[30.09.2026] Meskun yapıldı.",
     "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
