@@ -80,6 +80,52 @@
             #notesReportSummary .text-2xl { font-size: 20px; }
             #firmaNotesPreview .text-xs { font-size: 12px; line-height: 1.35; }
         }
+        #planningModal { position:fixed; inset:0; z-index:75; padding:20px; background:rgba(15,23,42,.65); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; }
+        #planningModal.hidden { display:none; }
+        #toast { z-index:100; }
+        .planning-shell { width:100%; max-width:1600px; max-height:94vh; display:flex; flex-direction:column; overflow:hidden; border-radius:18px; background:#fff; box-shadow:0 24px 70px #0f172a40; }
+        .planning-header { padding:18px 22px; background:#173b62; color:white; display:flex; align-items:center; justify-content:space-between; gap:15px; flex-wrap:wrap; }
+        .planning-header h3 { font-size:20px; font-weight:800; margin:0; }
+        .planning-header p { font-size:12px; margin:5px 0 0; color:#d7e6f7; }
+        .planning-actions { display:flex; gap:8px; align-items:center; }
+        .planning-button { border:1px solid #cbd5e1; border-radius:9px; padding:9px 12px; font-size:12px; font-weight:700; background:white; color:#173b62; cursor:pointer; white-space:nowrap; }
+        .planning-button:hover { background:#f1f5f9; }
+        .planning-button.save { color:white; background:#2563eb; border-color:#2563eb; }
+        .planning-button.excel { color:white; background:#059669; border-color:#059669; }
+        .planning-close { border:0; background:transparent; color:white; font-size:24px; cursor:pointer; padding:4px 8px; }
+        .planning-toolbar { padding:12px 22px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; flex-wrap:wrap; align-items:end; gap:10px; }
+        .planning-toolbar label { display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:700; color:#475569; }
+        .planning-toolbar select,.planning-toolbar input { background:white; border:1px solid #cbd5e1; border-radius:8px; padding:8px 10px; min-width:170px; font:inherit; font-size:12px; color:#334155; }
+        .planning-info { flex:1; min-width:220px; font-size:11px; line-height:1.8; color:#475569; }
+        .planning-summary { padding:10px 22px; display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:#475569; border-bottom:1px solid #e2e8f0; }
+        .planning-summary strong { color:#173b62; }
+        .planning-scroll { flex:1; overflow:auto; min-height:160px; }
+        .planning-table { width:100%; min-width:1250px; border-collapse:separate; border-spacing:0; font-size:12px; }
+        .planning-table thead { position:sticky; top:0; z-index:2; }
+        .planning-table th { text-align:left; padding:13px 10px; background:#173b62; color:white; font-weight:700; }
+        .planning-table th.staff { background:#997117; }
+        .planning-table th.manager { background:#356c9c; }
+        .planning-table td { vertical-align:top; padding:10px; border-bottom:1px solid #e2e8f0; background:white; }
+        .planning-table tr:nth-child(even) td { background:#f8fafc; }
+        .planning-table td.staff { background:#fff5d4 !important; }
+        .planning-table td.manager { background:#edf4fd !important; }
+        .planning-table input,.planning-table textarea { display:block; width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; background:#ffffffc9; font:inherit; color:#334155; }
+        .planning-table input { min-width:145px; cursor:pointer; }
+        .planning-table textarea { resize:vertical; min-width:150px; min-height:76px; }
+        .planning-table .planning-late { border-color:#f87171; background:#fee2e2; color:#991b1b; }
+        .planning-late-message { color:#b91c1c; font-size:10px; line-height:1.4; margin-top:5px; }
+        .planning-notes { min-width:270px; max-width:420px; }
+        .planning-notes select { width:100%; margin-bottom:7px; }
+        .planning-notes summary { cursor:pointer; color:#1d4ed8; font-weight:700; padding:5px 0; }
+        .planning-note-row { display:flex; align-items:start; gap:7px; border-top:1px solid #e2e8f0; padding:7px 0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:11px; }
+        .planning-note-row button { flex-shrink:0; padding:3px 6px; border:1px solid #cbd5e1; border-radius:5px; background:#fff; cursor:pointer; }
+        .planning-note-row .done { color:#047857; background:#d1fae5; }
+        .planning-note-text { flex:1; }
+        .planning-note-source { display:block; font-size:9px; color:#64748b; margin-bottom:3px; }
+        .planning-note-preview { color:#64748b; font-size:10px; line-height:1.5; overflow-wrap:anywhere; }
+        .planning-footer { padding:11px 22px; background:#f8fafc; border-top:1px solid #e2e8f0; font-size:11px; color:#64748b; }
+        .planning-delivered { color:#047857; font-size:10px; font-weight:700; margin-top:5px; }
+        @media(max-width:640px) { #planningModal { padding:6px; } .planning-shell { max-height:98vh; border-radius:12px; } .planning-header,.planning-toolbar { padding:12px; } .planning-header h3 { font-size:17px; } .planning-actions { flex-wrap:wrap; } .planning-summary,.planning-footer { padding:10px 12px; } }
     </style>
 </head>
 <body class="text-slate-800 h-screen w-screen overflow-hidden">
@@ -288,6 +334,9 @@
                     <button onclick="openReportModal()" class="bg-cyan-600 text-white px-3 py-1.5 rounded-lg hover:bg-cyan-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
                         <i class="fas fa-file-invoice"></i> Bilgi Notu
                     </button>
+                    <button id="planningOpenBtn" onclick="openPlanningModal()" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
+                        <i class="fas fa-calendar-check"></i> Planlama
+                    </button>
                     <button onclick="openPdfModal()" class="bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition flex items-center gap-1.5 text-xs font-bold shadow-sm">
                         <i class="fas fa-file-pdf"></i> Tablo PDF İndir
                     </button>
@@ -325,6 +374,34 @@
                 </table>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Birim kayıtlarına bağlı, düzenlenebilir personel teslim planı -->
+<div id="planningModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="planningTitle">
+    <div class="planning-shell">
+        <div class="planning-header">
+            <div><h3 id="planningTitle"><i class="fas fa-calendar-check"></i> MRS-ANM II · Personel Teslim Planı</h3><p>Anamur–Bozyazı · Personel hedefini girer, müdür değerlendirmesinden sonra kesin hedef belirlenir.</p></div>
+            <div class="planning-actions">
+                <button class="planning-button save" onclick="saveToGithub()"><i class="fas fa-cloud-upload-alt"></i> Değişiklikleri Kaydet</button>
+                <button id="planningExcelBtn" class="planning-button excel" onclick="exportPlanningToExcel()"><i class="fas fa-file-excel"></i> Excel İndir</button>
+                <button class="planning-close" onclick="closePlanningModal()" aria-label="Planlamayı kapat">×</button>
+            </div>
+        </div>
+        <div class="planning-toolbar">
+            <label>Mühendis<select id="planningEngineer" onchange="renderPlanningModal()"><option value="">Tüm mühendisler</option></select></label>
+            <label>Gösterim<select id="planningScope" onchange="renderPlanningModal()"><option value="pending">Bilgilendirme ilanı çıkmayanlar</option><option value="all">Bölgedeki tüm birimler</option></select></label>
+            <label>Birim ara<input id="planningSearch" type="search" placeholder="İlçe / birim adı" oninput="renderPlanningModal()"></label>
+            <div class="planning-info">İhale bitişi: <strong>10.08.2027</strong> · 45 gün önce: <strong id="planningLimitLabel">26.06.2027</strong><br>Sarı: personel girişi · Mavi: müdür girişi · Tarihler takvimden seçilir.</div>
+        </div>
+        <div id="planningSummary" class="planning-summary" aria-live="polite"></div>
+        <div class="planning-scroll">
+            <table class="planning-table">
+                <thead><tr><th>Mühendis</th><th>İlçe</th><th>Birim</th><th>Not / Durum (tarihli)</th><th class="staff">Personel teslim hedefi</th><th class="staff">Personel açıklaması</th><th class="manager">Kesin teslim hedefi</th><th class="manager">Müdür değerlendirmesi</th></tr></thead>
+                <tbody id="planningTableBody"></tbody>
+            </table>
+        </div>
+        <div class="planning-footer"><span id="planningSaveStatus" role="status"></span> · Ana tablo ile aynı birim kayıtları kullanılır. Tarihli notlar açılıp düzenlenebilir; Excel, seçili mühendis ve gösterimdeki güncel satırları indirir.</div>
     </div>
 </div>
 
@@ -601,7 +678,8 @@ let clickTimer;
 let activePersonFilter = null;
 let activeCardFilter = null;
 let activeRegionFilter = null;
-let hasUnsavedChanges = false;
+let hasUnsavedChanges = localStorage.getItem('ihaleUnsavedChanges') === 'true';
+let githubSaveInProgress = false;
 let openDropdowns = new Set();
 let draggedSn = null;
 let computedReportData = null; 
@@ -637,7 +715,7 @@ const colorPalette = [
 ];
 
 let personnel = JSON.parse(localStorage.getItem('customPersonnel')) || JSON.parse(JSON.stringify(defaultPersonnel));
-let durumListesi = [...defaultDurumlar];
+let durumListesi = JSON.parse(localStorage.getItem('ihaleDurumListesi')) || [...defaultDurumlar];
 let data = JSON.parse(localStorage.getItem('ihaleData')) || [];
 let currentFilteredData = data; 
 
@@ -781,6 +859,9 @@ document.getElementById('titleContainer').addEventListener('click', () => {
 
 function setUnsavedState(state) {
     hasUnsavedChanges = state;
+    localStorage.setItem('ihaleUnsavedChanges', String(state));
+    localStorage.setItem('ihaleDurumListesi', JSON.stringify(durumListesi));
+    updatePlanningSaveStatus();
     const topBtn = document.getElementById('saveBtn');
     const tableBtn = document.getElementById('tableSaveBtn');
     const alertBox = document.getElementById('unsavedAlert');
@@ -797,6 +878,10 @@ function setUnsavedState(state) {
 }
 
 async function fetchFromGithub(isAuto = false) {
+    if (isAuto && hasUnsavedChanges && data.length) {
+        populateDurumFilter(); renderTable(); renderYatirim(); setUnsavedState(true);
+        return;
+    }
     try {
         if(!isAuto) showToast("Bağlanıyor...", "GitHub'dan veriler çekiliyor.", "info");
         
@@ -846,6 +931,8 @@ async function fetchFromGithub(isAuto = false) {
 }
 
 async function saveToGithub(isAuto = false) {
+    if (githubSaveInProgress) return;
+    githubSaveInProgress = true;
     try {
         if(!isAuto) showToast("Kaydediliyor...", "GitHub'a gönderiliyor.", "info");
         
@@ -860,9 +947,10 @@ async function saveToGithub(isAuto = false) {
             const d = await getResData.json();
             bodyData.sha = d.sha;
         }
-        await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
+        const saveDataResponse = await fetch(`https://api.github.com/repos/${_repo}/contents/${_path}`, {
             method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyData)
         });
+        if (!saveDataResponse.ok) throw new Error(`Tablo kaydedilemedi (${saveDataResponse.status}).`);
 
         // 2. Durum Listesi Kaydı
         const bodyDurum = { message: `Update Durum - ${new Date().toLocaleString()}`, content: encodeBase64(JSON.stringify(durumListesi, null, 2)) };
@@ -873,9 +961,10 @@ async function saveToGithub(isAuto = false) {
             const d = await getResDurum.json();
             bodyDurum.sha = d.sha;
         }
-        await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}`, {
+        const saveStatusResponse = await fetch(`https://api.github.com/repos/${_repo}/contents/${_durumlarPath}`, {
             method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyDurum)
         });
+        if (!saveStatusResponse.ok) throw new Error(`Durumlar kaydedilemedi (${saveStatusResponse.status}).`);
 
         // 3. Yatırım Verisi Kaydı (Firma Notları dahil)
         const bodyYatirim = { message: `Update Yatirim - ${new Date().toLocaleString()}`, content: encodeBase64(JSON.stringify(yatirimData, null, 2)) };
@@ -886,17 +975,217 @@ async function saveToGithub(isAuto = false) {
             const d = await getResYatirim.json();
             bodyYatirim.sha = d.sha;
         }
-        await fetch(`https://api.github.com/repos/${_repo}/contents/${_yatirimPath}`, {
+        const saveInvestmentResponse = await fetch(`https://api.github.com/repos/${_repo}/contents/${_yatirimPath}`, {
             method: 'PUT', headers: { 'Authorization': `Bearer ${_getToken()}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(bodyYatirim)
         });
+        if (!saveInvestmentResponse.ok) throw new Error(`Firma notları kaydedilemedi (${saveInvestmentResponse.status}).`);
 
-        setUnsavedState(false);
-        if(!isAuto) showToast("Kaydedildi", "Tüm veriler buluta başarıyla aktarıldı.", "success");
+        const changedWhileSaving = bodyData.content !== encodeBase64(JSON.stringify(data, null, 2)) || bodyDurum.content !== encodeBase64(JSON.stringify(durumListesi, null, 2)) || bodyYatirim.content !== encodeBase64(JSON.stringify(yatirimData, null, 2));
+        setUnsavedState(changedWhileSaving);
+        localStorage.setItem('ihaleData', JSON.stringify(data));
+        renderTable();
+        if(!isAuto) showToast("Kaydedildi", changedWhileSaving ? "Kayıt sırasında yeni değişiklik yapıldı. Son değişiklikler için tekrar kaydedin." : "Tüm veriler buluta başarıyla aktarıldı.", "success");
     } catch (e) {
         console.error("Kayıt Hatası:", e);
         if(!isAuto) showToast("Hata", "Buluta kaydedilemedi! Lütfen tekrar deneyin.", "error");
+    } finally {
+        githubSaveInProgress = false;
     }
 }
+
+// ====================== PERSONEL TESLİM PLANLAMASI ======================
+const planningEndDate = '2027-08-10';
+const planningLeadDays = 45;
+const planningDistricts = ['ANAMUR', 'BOZYAZI'];
+const planningFields = ['plan_personel_hedef', 'plan_personel_aciklama', 'plan_kesin_hedef', 'plan_mudur_degerlendirme'];
+let planningInputUpdateInProgress = false;
+
+function getPlanningLimitDate() {
+    const date = new Date(planningEndDate + 'T12:00:00Z');
+    date.setUTCDate(date.getUTCDate() - planningLeadDays);
+    return date.toISOString().slice(0, 10);
+}
+
+function formatPlanningDate(value) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(String(value || '')) ? String(value).split('-').reverse().join('.') : '';
+}
+
+function hasPlanningAnnouncement(item) {
+    const status = String(item.genel_durum || '').trim().toLocaleUpperCase('tr-TR');
+    return !!(item.bilgilendirme_tarihi || item.kesin_aski_tarihi) || [
+        'BİLGİLENDİRME İLANINDA', 'KOMİSYON AŞAMASINDA', 'KOMİSYON YAPILDI', 'KESİN ASKIDA',
+        'KESİN ASKIDAN İNDİ. BEKLEMEDE', 'DEVİR YAPILDI', 'TESCİL AŞAMASINDA', 'TESCİLİ BİTTİ', 'İHALEDEN/PROGRAMDAN ÇIKARILDI'
+    ].includes(status);
+}
+
+function getPlanningRegionData() {
+    return data.filter(item => planningDistricts.includes(String(item.ilce || '').trim().toLocaleUpperCase('tr-TR')));
+}
+
+function getPlanningRows() {
+    const engineer = document.getElementById('planningEngineer')?.value || '';
+    const scope = document.getElementById('planningScope')?.value || 'pending';
+    const search = (document.getElementById('planningSearch')?.value || '').trim().toLocaleLowerCase('tr-TR');
+    return getPlanningRegionData().filter(item =>
+        (!engineer || item.muhendis === engineer) &&
+        (scope === 'all' || !hasPlanningAnnouncement(item)) &&
+        (!search || `${item.ilce || ''} ${item.mahalle || ''}`.toLocaleLowerCase('tr-TR').includes(search))
+    ).sort((a, b) => String(a.muhendis || '').localeCompare(String(b.muhendis || ''), 'tr') || String(a.ilce || '').localeCompare(String(b.ilce || ''), 'tr') || String(a.mahalle || '').localeCompare(String(b.mahalle || ''), 'tr'));
+}
+
+function getPlanningNoteEntries(item) {
+    const lines = getNoteLines(item.notlar);
+    const states = getNoteCompletionStates(item, lines.length);
+    const unitNotes = lines.map((text, index) => ({text, completed:states[index], source:'Birim notu', id:`unit-line-${item.sn}-${index}`}));
+    const firmaNotes = (yatirimData.firmaNotKayitlari || []).filter(note => note.tur === 'birim' && String(note.birimSn) === String(item.sn))
+        .map(note => ({text:note.text, completed:note.tamamlandi === true, source:'Firma notu', id:String(note.id)}));
+    return [...unitNotes, ...firmaNotes];
+}
+
+function getPlanningNotesText(item) {
+    const entries = getPlanningNoteEntries(item);
+    return [item.genel_durum || 'HERHANGİ BİRŞEY YAPILMADI', ...entries.map(note => `${note.source}: ${note.text} — ${note.completed ? 'Tamamlandı (kayıt)' : 'Tamamlanmadı (kayıt)'}`)].join('\n');
+}
+
+function updatePlanningSaveStatus() {
+    const status = document.getElementById('planningSaveStatus');
+    if (!status) return;
+    status.textContent = hasUnsavedChanges ? 'Değişiklikler bu tarayıcıda saklandı; ortak kayda aktarmak için Değişiklikleri Kaydet’e basın.' : 'Kaydedilmiş kayıtlar gösteriliyor.';
+    status.style.color = hasUnsavedChanges ? '#b45309' : '#047857';
+}
+
+function openPlanningModal() {
+    normalizeFirmaNoteData();
+    document.getElementById('planningModal').classList.remove('hidden');
+    renderPlanningModal();
+}
+
+function closePlanningModal() {
+    document.getElementById('planningModal').classList.add('hidden');
+    document.getElementById('planningOpenBtn')?.focus();
+}
+
+function showPlanningDatePicker(input) {
+    if (typeof input.showPicker === 'function') {
+        try { input.showPicker(); } catch (_) { /* Native calendar icon remains available. */ }
+    }
+}
+
+function renderPlanningDateInput(item, field, label) {
+    const value = String(item[field] || '');
+    const late = value && value > getPlanningLimitDate();
+    return `<input type="date" value="${escapeNoteHtml(value)}" aria-label="${escapeNoteHtml(item.mahalle + ' ' + label)}" data-planning-sn="${item.sn}" data-planning-field="${field}" class="${late ? 'planning-late' : ''}" onclick="showPlanningDatePicker(this)" onchange="updatePlanningValue(${item.sn}, '${field}', this.value)">${late ? '<div class="planning-late-message">45 günlük süre payının sonrasında.</div>' : ''}`;
+}
+
+function renderPlanningNotes(item) {
+    const notes = getPlanningNoteEntries(item);
+    const noteRows = notes.map(note => {
+        const id = escapeNoteHtml(JSON.stringify(note.id));
+        return `<div class="planning-note-row"><button onclick="toggleFirmaNoteComplete(${id})" class="${note.completed ? 'done' : ''}" aria-label="${note.completed ? 'Notu tamamlanmadı yap' : 'Notu tamamlandı yap'}" title="${note.completed ? 'Tamamlandı' : 'Tamamlanmadı'}">${note.completed ? '✓' : '○'}</button><div class="planning-note-text"><span class="planning-note-source">${note.source} · ${note.completed ? 'Tamamlandı' : 'Tamamlanmadı'}</span>${escapeNoteHtml(note.text)}</div><button onclick="editFirmaNote(${id})" aria-label="Notu düzenle"><i class="fas fa-pen"></i></button></div>`;
+    }).join('');
+    const latestUnitNote = getNoteLines(item.notlar).slice(-1)[0];
+    const preview = latestUnitNote || notes.slice(-1)[0]?.text || 'Birim notu yok.';
+    return `<div class="planning-notes">${createGenelDurumSelect(item.genel_durum, item.sn, 'genel_durum')}<div class="planning-note-preview">${escapeNoteHtml(preview)}</div><details><summary>Tarihli notlar (${notes.length})</summary>${noteRows || '<div class="planning-note-preview">Kayıtlı not yok.</div>'}<button class="planning-button" onclick="addPlanningNote(${item.sn})">+ Tarihli birim notu ekle</button></details></div>`;
+}
+
+function renderPlanningModal() {
+    const modal = document.getElementById('planningModal');
+    if (!modal || modal.classList.contains('hidden')) return;
+    if (planningInputUpdateInProgress) {
+        renderPlanningSummary(getPlanningRows());
+        modal.querySelectorAll('input[data-planning-field]').forEach(input => {
+            const late = !!input.value && input.value > getPlanningLimitDate();
+            input.classList.toggle('planning-late', late);
+            input.parentElement.querySelector('.planning-late-message')?.remove();
+            if (late) {
+                const warning = document.createElement('div');
+                warning.className = 'planning-late-message'; warning.textContent = '45 günlük süre payının sonrasında.';
+                input.after(warning);
+            }
+        });
+        updatePlanningSaveStatus();
+        return;
+    }
+    const scroll = modal.querySelector('.planning-scroll');
+    const scrollTop = scroll.scrollTop, scrollLeft = scroll.scrollLeft;
+    const openNotes = new Set([...modal.querySelectorAll('tr[data-planning-unit] details[open]')].map(details => details.closest('tr').dataset.planningUnit));
+    const selector = document.getElementById('planningEngineer');
+    const selected = selector.value;
+    const engineers = [...new Set(getPlanningRegionData().map(item => item.muhendis).filter(Boolean))].sort((a,b) => a.localeCompare(b,'tr'));
+    selector.innerHTML = '<option value="">Tüm mühendisler</option>' + engineers.map(name => `<option value="${escapeNoteHtml(name)}">${escapeNoteHtml(name)}</option>`).join('');
+    selector.value = engineers.includes(selected) ? selected : '';
+    const rows = getPlanningRows();
+    renderPlanningSummary(rows);
+    document.getElementById('planningTableBody').innerHTML = rows.length ? rows.map(item => `<tr data-planning-unit="${item.sn}"><td>${escapeNoteHtml(item.muhendis || 'Atanmadı')}</td><td>${escapeNoteHtml(item.ilce)}</td><td><strong>${escapeNoteHtml(item.mahalle)}</strong>${String(item.genel_durum || '').trim() === 'FİRMAYA TESLİM EDİLDİ' ? '<div class="planning-delivered">Firma teslimi yapılmış; ilan bekliyor.</div>' : ''}</td><td>${renderPlanningNotes(item)}</td><td class="staff">${renderPlanningDateInput(item,'plan_personel_hedef','personel teslim hedefi')}</td><td class="staff"><textarea rows="3" aria-label="${escapeNoteHtml(item.mahalle + ' personel açıklaması')}" data-planning-sn="${item.sn}" data-planning-field="plan_personel_aciklama" onchange="updatePlanningValue(${item.sn}, 'plan_personel_aciklama', this.value)">${escapeNoteHtml(item.plan_personel_aciklama || '')}</textarea></td><td class="manager">${renderPlanningDateInput(item,'plan_kesin_hedef','kesin teslim hedefi')}</td><td class="manager"><textarea rows="3" aria-label="${escapeNoteHtml(item.mahalle + ' müdür değerlendirmesi')}" data-planning-sn="${item.sn}" data-planning-field="plan_mudur_degerlendirme" onchange="updatePlanningValue(${item.sn}, 'plan_mudur_degerlendirme', this.value)">${escapeNoteHtml(item.plan_mudur_degerlendirme || '')}</textarea></td></tr>`).join('') : '<tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b">Bu seçime uygun birim bulunamadı.</td></tr>';
+    modal.querySelectorAll('tr[data-planning-unit]').forEach(row => { if (openNotes.has(row.dataset.planningUnit)) row.querySelector('details').open = true; });
+    scroll.scrollTop = scrollTop; scroll.scrollLeft = scrollLeft;
+    updatePlanningSaveStatus();
+}
+
+function renderPlanningSummary(rows) {
+    const delivered = rows.filter(item => String(item.genel_durum || '').trim() === 'FİRMAYA TESLİM EDİLDİ').length;
+    const personTargets = rows.filter(item => item.plan_personel_hedef).length;
+    const managerTargets = rows.filter(item => item.plan_kesin_hedef).length;
+    document.getElementById('planningLimitLabel').textContent = formatPlanningDate(getPlanningLimitDate());
+    document.getElementById('planningSummary').innerHTML = `<span><strong>${rows.length}</strong> birim</span><span><strong>${personTargets}</strong> personel hedefi</span><span><strong>${managerTargets}</strong> kesin hedef</span><span><strong>${delivered}</strong> firmaya teslim edilmiş</span><span>26.06.2027 sonrasındaki hedefler kırmızı görünür.</span>`;
+}
+
+function updatePlanningValue(sn, field, value) {
+    if (!planningFields.includes(field)) return;
+    const text = String(value || '').trim();
+    if (field.endsWith('_hedef') && text) {
+        const parsed = new Date(text + 'T12:00:00Z');
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(text) || Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0,10) !== text) {
+            showToast('Geçerli tarih seçin', 'Hedef tarihini takvimden seçin.', 'error');
+            renderPlanningModal();
+            return;
+        }
+    }
+    planningInputUpdateInProgress = true;
+    try { updateValue(Number(sn), field, text); }
+    finally { planningInputUpdateInProgress = false; }
+}
+
+function addPlanningNote(sn) {
+    const item = data.find(row => Number(row.sn) === Number(sn));
+    if (!item) return;
+    const value = prompt(`${item.mahalle} için yeni birim notu:`);
+    if (!value || !value.trim()) return;
+    const lines = getNoteLines(item.notlar);
+    const states = getNoteCompletionStates(item, lines.length);
+    const text = value.trim();
+    lines.push(/^\[\d{2}\.\d{2}\.\d{4}\]/.test(text) ? text : `[${new Date().toLocaleDateString('tr-TR')}] ${text}`);
+    states.push(false); item.notlar_tamamlandi = states;
+    updateValue(Number(sn), 'notlar', lines.join('\n'));
+}
+
+function exportPlanningToExcel() {
+    if (typeof XLSX === 'undefined') return showToast('Excel hazırlanamadı', 'Excel bileşeni yüklenemedi. Sayfayı yenileyip tekrar deneyin.', 'error');
+    normalizeFirmaNoteData();
+    const rows = getPlanningRows();
+    const engineer = document.getElementById('planningEngineer').value || 'Tüm mühendisler';
+    const scope = document.getElementById('planningScope').selectedOptions[0].textContent;
+    const excelDate = value => value ? new Date(value + 'T00:00:00') : null;
+    const content = [
+        ['MRS-ANM II · Personel Teslim Planı'],
+        [`Anamur–Bozyazı | ${engineer} | ${scope} | ${new Date().toLocaleDateString('tr-TR')}`],
+        [`İhale bitişi: ${formatPlanningDate(planningEndDate)} | 45 gün önce: ${formatPlanningDate(getPlanningLimitDate())}`],
+        ['Personel hedefleri öneridir. Kesin hedef müdür değerlendirmesinden sonra belirlenir.'],
+        [],
+        ['Mühendis','İlçe','Birim','Not / Durum (tarihli)','Personel teslim hedefi','Personel açıklaması','Kesin teslim hedefi','Müdür değerlendirmesi'],
+        ...rows.map(item => [item.muhendis || '', item.ilce || '', item.mahalle || '', getPlanningNotesText(item), excelDate(item.plan_personel_hedef), item.plan_personel_aciklama || '', excelDate(item.plan_kesin_hedef), item.plan_mudur_degerlendirme || ''])
+    ];
+    const sheet = XLSX.utils.aoa_to_sheet(content, {cellDates:true,dateNF:'dd/mm/yyyy'});
+    sheet['!cols'] = [25,13,25,85,21,35,21,35].map(wch => ({wch}));
+    sheet['!merges'] = [0,1,2,3].map(r => ({s:{r,c:0},e:{r,c:7}}));
+    sheet['!rows'] = [{hpt:28},{hpt:24},{hpt:24},{hpt:24},{hpt:12},{hpt:28}];
+    if (rows.length) sheet['!autofilter'] = {ref:`A6:H${content.length}`};
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook,sheet,'Personel Teslim Planı');
+    XLSX.writeFile(workbook,`MRS_ANM_II_Planlama_${new Date().toLocaleDateString('tr-TR').replace(/\./g,'-')}.xlsx`);
+}
+
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && !document.getElementById('planningModal').classList.contains('hidden')) closePlanningModal(); });
 
 // ====================== NOT MODALI VE RAPORU ======================
 function openNoteModal(sn) {
@@ -1234,6 +1523,7 @@ function renderFirmaAllNotes() {
     });
     const cards = notes.length ? [...generalCards, ...unitCards].join('') : '<div class="rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400">Firma notu bulunmuyor.</div>';
     container.innerHTML = summary + cards;
+    renderPlanningModal();
 }
 
 function addFirmaNote() {
@@ -2669,6 +2959,7 @@ function renderTable() {
                     <span class="truncate max-w-[130px]">${item.mahalle || ''}</span>
                     <a href="https://maps.google.com/?q=${encodeURIComponent((item.mahalle || '') + ' Mahallesi, ' + (item.ilce || '') + ', Mersin')}&t=k" target="_blank" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-map-marker-alt"></i></a>
                 </div>
+                ${item.plan_personel_hedef || item.plan_kesin_hedef ? `<div class="text-[9px] font-normal text-slate-500 mt-1 leading-relaxed">${item.plan_personel_hedef ? `Personel: ${formatPlanningDate(item.plan_personel_hedef)}` : ''}${item.plan_personel_hedef && item.plan_kesin_hedef ? '<br>' : ''}${item.plan_kesin_hedef ? `<span class="text-indigo-700 font-bold">Kesin: ${formatPlanningDate(item.plan_kesin_hedef)}</span>` : ''}</div>` : ''}
             </td>
             
             <td class="p-3 text-center text-slate-600 font-medium ${editableClass}" ${editableAttr} onblur="updateValue(${item.sn}, 'toplam_parsel', this.innerText)">${item.toplam_parsel || 0}</td>
@@ -2714,6 +3005,7 @@ function renderTable() {
     });
 
     calculateStats(); calculateProgressStats();
+    renderPlanningModal();
 }
 
 function renderDeadlineWarnings(items) {
@@ -2894,6 +3186,7 @@ function updateValue(sn, field, newValue) {
         if (!adminOnlyFields.includes(field)) { renderTable(); } 
         else { calculateStats(); }
         calculateProgressStats();
+        if (adminOnlyFields.includes(field)) renderPlanningModal();
     }
 }
 
