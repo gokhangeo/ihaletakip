@@ -17,6 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <!-- Çok Sayfalı (Multi-sheet) Excel Çıktısı İçin SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
@@ -123,6 +124,7 @@
         .planning-note-text { flex:1; }
         .planning-note-source { display:block; font-size:9px; color:#64748b; margin-bottom:3px; }
         .planning-note-preview { color:#64748b; font-size:10px; line-height:1.5; overflow-wrap:anywhere; }
+        .planning-technician { color:#64748b; font-size:10px; margin-top:4px; }
         .planning-footer { padding:11px 22px; background:#f8fafc; border-top:1px solid #e2e8f0; font-size:11px; color:#64748b; }
         .planning-delivered { color:#047857; font-size:10px; font-weight:700; margin-top:5px; }
         @media(max-width:640px) { #planningModal { padding:6px; } .planning-shell { max-height:98vh; border-radius:12px; } .planning-header,.planning-toolbar { padding:12px; } .planning-header h3 { font-size:17px; } .planning-actions { flex-wrap:wrap; } .planning-summary,.planning-footer { padding:10px 12px; } }
@@ -392,12 +394,13 @@
             <label>Mühendis<select id="planningEngineer" onchange="renderPlanningModal()"><option value="">Tüm mühendisler</option></select></label>
             <label>Gösterim<select id="planningScope" onchange="renderPlanningModal()"><option value="pending">Bilgilendirme ilanı çıkmayanlar</option><option value="all">Bölgedeki tüm birimler</option></select></label>
             <label>Birim ara<input id="planningSearch" type="search" placeholder="İlçe / birim adı" oninput="renderPlanningModal()"></label>
+            <button id="planningFirmaNotesToggle" type="button" class="planning-button" onclick="togglePlanningFirmaNotes()" aria-pressed="false">Firma notlarını gizle</button>
             <div class="planning-info">İhale bitişi: <strong>10.08.2027</strong> · 45 gün önce: <strong id="planningLimitLabel">26.06.2027</strong><br>Sarı: personel girişi · Mavi: müdür girişi · Tarihler takvimden seçilir.</div>
         </div>
         <div id="planningSummary" class="planning-summary" aria-live="polite"></div>
         <div class="planning-scroll">
             <table class="planning-table">
-                <thead><tr><th>Mühendis</th><th>İlçe</th><th>Birim</th><th>Not / Durum (tarihli)</th><th class="staff">Personel teslim hedefi</th><th class="staff">Personel açıklaması</th><th class="manager">Kesin teslim hedefi</th><th class="manager">Müdür değerlendirmesi</th></tr></thead>
+                <thead><tr><th>Mühendis / Tekniker</th><th>İlçe</th><th>Birim</th><th>Not / Durum (tarihli)</th><th class="staff">Personel teslim hedefi</th><th class="staff">Personel açıklaması</th><th class="manager">Kesin teslim hedefi</th><th class="manager">Müdür değerlendirmesi</th></tr></thead>
                 <tbody id="planningTableBody"></tbody>
             </table>
         </div>
@@ -999,6 +1002,7 @@ const planningLeadDays = 45;
 const planningDistricts = ['ANAMUR', 'BOZYAZI'];
 const planningFields = ['plan_personel_hedef', 'plan_personel_aciklama', 'plan_kesin_hedef', 'plan_mudur_degerlendirme'];
 let planningInputUpdateInProgress = false;
+let planningShowFirmaNotes = true;
 
 function getPlanningLimitDate() {
     const date = new Date(planningEndDate + 'T12:00:00Z');
@@ -1038,8 +1042,20 @@ function getPlanningNoteEntries(item) {
     const states = getNoteCompletionStates(item, lines.length);
     const unitNotes = lines.map((text, index) => ({text, completed:states[index], source:'Birim notu', id:`unit-line-${item.sn}-${index}`}));
     const firmaNotes = (yatirimData.firmaNotKayitlari || []).filter(note => note.tur === 'birim' && String(note.birimSn) === String(item.sn))
-        .map(note => ({text:note.text, completed:note.tamamlandi === true, source:'Firma notu', id:String(note.id)}));
-    return [...unitNotes, ...firmaNotes];
+        .map(note => ({text:note.text, completed:note.tamamlandi === true, source:'Firma notu', id:String(note.id), createdAt:note.createdAt || note.tarih || ''}));
+    const noteDate = note => {
+        const match = String(note.text || '').match(/(?:^|\s)\[?(\d{2})\.(\d{2})\.(\d{4})\]?/);
+        if (match) return `${match[3]}-${match[2]}-${match[1]}`;
+        const iso = String(note.createdAt || '').match(/^(\d{4}-\d{2}-\d{2})/);
+        return iso ? iso[1] : '9999-12-31';
+    };
+    return [...unitNotes, ...(planningShowFirmaNotes ? firmaNotes : [])]
+        .sort((a, b) => noteDate(a).localeCompare(noteDate(b)));
+}
+
+function togglePlanningFirmaNotes() {
+    planningShowFirmaNotes = !planningShowFirmaNotes;
+    renderPlanningModal();
 }
 
 function getPlanningNotesText(item) {
@@ -1083,14 +1099,16 @@ function renderPlanningNotes(item) {
         const id = escapeNoteHtml(JSON.stringify(note.id));
         return `<div class="planning-note-row"><button onclick="toggleFirmaNoteComplete(${id})" class="${note.completed ? 'done' : ''}" aria-label="${note.completed ? 'Notu tamamlanmadı yap' : 'Notu tamamlandı yap'}" title="${note.completed ? 'Tamamlandı' : 'Tamamlanmadı'}">${note.completed ? '✓' : '○'}</button><div class="planning-note-text"><span class="planning-note-source">${note.source} · ${note.completed ? 'Tamamlandı' : 'Tamamlanmadı'}</span>${escapeNoteHtml(note.text)}</div><button onclick="editFirmaNote(${id})" aria-label="Notu düzenle"><i class="fas fa-pen"></i></button></div>`;
     }).join('');
-    const latestUnitNote = getNoteLines(item.notlar).slice(-1)[0];
-    const preview = latestUnitNote || notes.slice(-1)[0]?.text || 'Birim notu yok.';
+    const preview = notes.slice(-1)[0]?.text || 'Görünür not yok.';
     return `<div class="planning-notes">${createGenelDurumSelect(item.genel_durum, item.sn, 'genel_durum')}<div class="planning-note-preview">${escapeNoteHtml(preview)}</div><details><summary>Tarihli notlar (${notes.length})</summary>${noteRows || '<div class="planning-note-preview">Kayıtlı not yok.</div>'}<button class="planning-button" onclick="addPlanningNote(${item.sn})">+ Tarihli birim notu ekle</button></details></div>`;
 }
 
 function renderPlanningModal() {
     const modal = document.getElementById('planningModal');
     if (!modal || modal.classList.contains('hidden')) return;
+    const firmaToggle = document.getElementById('planningFirmaNotesToggle');
+    firmaToggle.textContent = planningShowFirmaNotes ? 'Firma notlarını gizle' : 'Firma notlarını göster';
+    firmaToggle.setAttribute('aria-pressed', String(!planningShowFirmaNotes));
     if (planningInputUpdateInProgress) {
         renderPlanningSummary(getPlanningRows());
         modal.querySelectorAll('input[data-planning-field]').forEach(input => {
@@ -1116,7 +1134,7 @@ function renderPlanningModal() {
     selector.value = engineers.includes(selected) ? selected : '';
     const rows = getPlanningRows();
     renderPlanningSummary(rows);
-    document.getElementById('planningTableBody').innerHTML = rows.length ? rows.map(item => `<tr data-planning-unit="${item.sn}"><td>${escapeNoteHtml(item.muhendis || 'Atanmadı')}</td><td>${escapeNoteHtml(item.ilce)}</td><td><strong>${escapeNoteHtml(item.mahalle)}</strong>${String(item.genel_durum || '').trim() === 'FİRMAYA TESLİM EDİLDİ' ? '<div class="planning-delivered">Firma teslimi yapılmış; ilan bekliyor.</div>' : ''}</td><td>${renderPlanningNotes(item)}</td><td class="staff">${renderPlanningDateInput(item,'plan_personel_hedef','personel teslim hedefi')}</td><td class="staff"><textarea rows="3" aria-label="${escapeNoteHtml(item.mahalle + ' personel açıklaması')}" data-planning-sn="${item.sn}" data-planning-field="plan_personel_aciklama" onchange="updatePlanningValue(${item.sn}, 'plan_personel_aciklama', this.value)">${escapeNoteHtml(item.plan_personel_aciklama || '')}</textarea></td><td class="manager">${renderPlanningDateInput(item,'plan_kesin_hedef','kesin teslim hedefi')}</td><td class="manager"><textarea rows="3" aria-label="${escapeNoteHtml(item.mahalle + ' müdür değerlendirmesi')}" data-planning-sn="${item.sn}" data-planning-field="plan_mudur_degerlendirme" onchange="updatePlanningValue(${item.sn}, 'plan_mudur_degerlendirme', this.value)">${escapeNoteHtml(item.plan_mudur_degerlendirme || '')}</textarea></td></tr>`).join('') : '<tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b">Bu seçime uygun birim bulunamadı.</td></tr>';
+    document.getElementById('planningTableBody').innerHTML = rows.length ? rows.map(item => `<tr data-planning-unit="${item.sn}"><td><strong>${escapeNoteHtml(item.muhendis || 'Atanmadı')}</strong><div class="planning-technician">Tekniker: ${escapeNoteHtml(item.tekniker || 'Atanmadı')}</div></td><td>${escapeNoteHtml(item.ilce)}</td><td><strong>${escapeNoteHtml(item.mahalle)}</strong>${String(item.genel_durum || '').trim() === 'FİRMAYA TESLİM EDİLDİ' ? '<div class="planning-delivered">Firma teslimi yapılmış; ilan bekliyor.</div>' : ''}</td><td>${renderPlanningNotes(item)}</td><td class="staff">${renderPlanningDateInput(item,'plan_personel_hedef','personel teslim hedefi')}</td><td class="staff"><textarea rows="3" aria-label="${escapeNoteHtml(item.mahalle + ' personel açıklaması')}" data-planning-sn="${item.sn}" data-planning-field="plan_personel_aciklama" onchange="updatePlanningValue(${item.sn}, 'plan_personel_aciklama', this.value)">${escapeNoteHtml(item.plan_personel_aciklama || '')}</textarea></td><td class="manager">${renderPlanningDateInput(item,'plan_kesin_hedef','kesin teslim hedefi')}</td><td class="manager"><textarea rows="3" aria-label="${escapeNoteHtml(item.mahalle + ' müdür değerlendirmesi')}" data-planning-sn="${item.sn}" data-planning-field="plan_mudur_degerlendirme" onchange="updatePlanningValue(${item.sn}, 'plan_mudur_degerlendirme', this.value)">${escapeNoteHtml(item.plan_mudur_degerlendirme || '')}</textarea></td></tr>`).join('') : '<tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b">Bu seçime uygun birim bulunamadı.</td></tr>';
     modal.querySelectorAll('tr[data-planning-unit]').forEach(row => { if (openNotes.has(row.dataset.planningUnit)) row.querySelector('details').open = true; });
     scroll.scrollTop = scrollTop; scroll.scrollLeft = scrollLeft;
     updatePlanningSaveStatus();
@@ -1172,14 +1190,35 @@ function exportPlanningToExcel() {
         [`İhale bitişi: ${formatPlanningDate(planningEndDate)} | 45 gün önce: ${formatPlanningDate(getPlanningLimitDate())}`],
         ['Personel hedefleri öneridir. Kesin hedef müdür değerlendirmesinden sonra belirlenir.'],
         [],
-        ['Mühendis','İlçe','Birim','Not / Durum (tarihli)','Personel teslim hedefi','Personel açıklaması','Kesin teslim hedefi','Müdür değerlendirmesi'],
-        ...rows.map(item => [item.muhendis || '', item.ilce || '', item.mahalle || '', getPlanningNotesText(item), excelDate(item.plan_personel_hedef), item.plan_personel_aciklama || '', excelDate(item.plan_kesin_hedef), item.plan_mudur_degerlendirme || ''])
+        ['Mühendis / Tekniker','İlçe','Birim','Not / Durum (tarihli)','Personel teslim hedefi','Personel açıklaması','Kesin teslim hedefi','Müdür değerlendirmesi'],
+        ...rows.map(item => [`${item.muhendis || 'Atanmadı'}\nTekniker: ${item.tekniker || 'Atanmadı'}`, item.ilce || '', item.mahalle || '', getPlanningNotesText(item), excelDate(item.plan_personel_hedef), item.plan_personel_aciklama || '', excelDate(item.plan_kesin_hedef), item.plan_mudur_degerlendirme || ''])
     ];
     const sheet = XLSX.utils.aoa_to_sheet(content, {cellDates:true,dateNF:'dd/mm/yyyy'});
     sheet['!cols'] = [25,13,25,85,21,35,21,35].map(wch => ({wch}));
     sheet['!merges'] = [0,1,2,3].map(r => ({s:{r,c:0},e:{r,c:7}}));
     sheet['!rows'] = [{hpt:28},{hpt:24},{hpt:24},{hpt:24},{hpt:12},{hpt:28}];
     if (rows.length) sheet['!autofilter'] = {ref:`A6:H${content.length}`};
+    const fill = rgb => ({patternType:'solid', fgColor:{rgb}});
+    for (let r = 0; r < content.length; r++) {
+        if (r >= 6) sheet['!rows'][r] = {hpt:Math.min(120, Math.max(42, 14 * Math.min(7, getPlanningNoteEntries(rows[r - 6]).length + 2)))};
+        for (let c = 0; c < 8; c++) {
+            const ref = XLSX.utils.encode_cell({r,c});
+            const cell = sheet[ref];
+            if (!cell) continue;
+            const header = r === 5;
+            const background = r < 5 ? (r === 4 ? 'FFFFFF' : '173B62') : header ? (c === 4 || c === 5 ? '997117' : c >= 6 ? '356C9C' : '173B62') : (c === 4 || c === 5 ? 'FFF5D4' : c >= 6 ? 'EDF4FD' : r % 2 ? 'F8FAFC' : 'FFFFFF');
+            cell.s = {
+                fill:fill(background),
+                font:{name:'Aptos',sz:r === 0 ? 16 : header ? 11 : 10,bold:r < 6 || (r >= 6 && c === 2),color:{rgb:r < 4 || header ? 'FFFFFF' : '334155'}},
+                alignment:{vertical:'top',wrapText:true},
+                border:r >= 5 ? {bottom:{style:'thin',color:{rgb:'E2E8F0'}}} : {}
+            };
+            if (r >= 6 && (c === 4 || c === 6) && cell.t === 'd') {
+                cell.z = 'dd.mm.yyyy';
+                if (cell.v.toISOString().slice(0,10) > getPlanningLimitDate()) cell.s = {...cell.s,fill:fill('FEE2E2'),font:{...cell.s.font,color:{rgb:'991B1B'}}};
+            }
+        }
+    }
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook,sheet,'Personel Teslim Planı');
     XLSX.writeFile(workbook,`MRS_ANM_II_Planlama_${new Date().toLocaleDateString('tr-TR').replace(/\./g,'-')}.xlsx`);
@@ -2901,12 +2940,13 @@ function renderTable() {
                 const statusByKey = {
                     degerlendirmede: "DEĞERLENDİRMEDE",
                     firmaTeslim: "FİRMAYA TESLİM EDİLDİ",
-                    bilgilendirme: "BİLGİLENDİRME İLANINDA",
-                    kesinAski: "KESİN ASKIDA",
                     biten: "TESCİLİ BİTTİ"
                 };
                 matchesCard = [item.muhendis, item.tekniker].includes(activeCardFilter.person)
-                    && String(item.genel_durum || "").trim().toLocaleUpperCase("tr-TR") === statusByKey[v];
+                    && (v === 'bilgilendirme' ? !!item.bilgilendirme_tarihi
+                        : v === 'kesinAski' ? !!item.kesin_aski_tarihi
+                        : v === 'kalan' ? !item.bilgilendirme_tarihi
+                        : String(item.genel_durum || "").trim().toLocaleUpperCase("tr-TR") === statusByKey[v]);
             } else if (f === 'ucus_tarihi' || f === 'bilgilendirme_tarihi' || f === 'kesin_aski_tarihi') {
                 const isDone = !!item[f];
                 matchesCard = (v === 'Yapıldı' && isDone) || (v === 'Yapılmadı' && !isDone);
@@ -3055,9 +3095,10 @@ function calculateStats() {
     const statusDefinitions = [
         { key: "degerlendirmede", label: "Değerlendirmede", match: item => normalizeStatus(item.genel_durum) === "DEĞERLENDİRMEDE", color: "text-amber-700 bg-amber-50 border-amber-200" },
         { key: "firmaTeslim", label: "Firmaya teslim", match: item => normalizeStatus(item.genel_durum) === "FİRMAYA TESLİM EDİLDİ", color: "text-sky-700 bg-sky-50 border-sky-200" },
-        { key: "bilgilendirme", label: "Bilgilendirme ilanı", match: item => normalizeStatus(item.genel_durum) === "BİLGİLENDİRME İLANINDA", color: "text-violet-700 bg-violet-50 border-violet-200" },
-        { key: "kesinAski", label: "Kesin askı ilanı", match: item => normalizeStatus(item.genel_durum) === "KESİN ASKIDA", color: "text-rose-700 bg-rose-50 border-rose-200" },
-        { key: "biten", label: "Biten", match: item => normalizeStatus(item.genel_durum) === "TESCİLİ BİTTİ", color: "text-emerald-700 bg-emerald-50 border-emerald-200" }
+        { key: "bilgilendirme", label: "Bilgilendirme ilanı", match: item => !!item.bilgilendirme_tarihi, color: "text-violet-700 bg-violet-50 border-violet-200" },
+        { key: "kesinAski", label: "Kesin askı ilanı", match: item => !!item.kesin_aski_tarihi, color: "text-rose-700 bg-rose-50 border-rose-200" },
+        { key: "biten", label: "Biten", match: item => normalizeStatus(item.genel_durum) === "TESCİLİ BİTTİ", color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
+        { key: "kalan", label: "Kalan (bilgilendirmeye çıkmayan)", match: item => !item.bilgilendirme_tarihi, color: "text-slate-700 bg-slate-50 border-slate-200" }
     ];
 
     const updateMap = (map, person, item) => {
