@@ -438,19 +438,20 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "ASKI İLANINA HAZIRLANIYOR",
+    "genel_durum": "BİLGİLENDİRME İLANINDA",
     "altlik_durum": "Yapıldı",
-    "degerlendirme_durum": "Devam Ediyor",
+    "degerlendirme_durum": "Yapıldı",
     "ucus_tarihi": "2026-07-07",
     "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)\n[06.08.2026] Ortofoto kayık, kıymetlendirme bekleniyor.\n[18.08.2026] Yersel ölçüm yapıldı birleştirilip Tekn. teslim edilecek.\n[03.09.2026] Değerlendirme tamam, firmaya teslim edildi(Müh. kont. edecek)\n[25.09.2026] mühendis kontrolü bitti tutanaklar imzalandı kontrol memurunda",
     "ucus_kiymet_durum": "Yapıldı",
     "notlar_tamamlandi": [
-      false,
-      false,
-      false,
-      false,
-      false
-    ]
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "bilgilendirme_tarihi": "2026-09-30"
   },
   {
     "sn": 20,
@@ -474,12 +475,12 @@
     "notlar": "[09.07.2026] Değerlendirme devam ediyor(Müh.-Tekn.)\n[06.08.2026] Kıymetlendirme bekleniyor, yersel ölçülebilir.\n[18.08.2026] Kıymetlendirme teslim edilip kontrol edildi, ormancı kontrolünde. 20.08.2026 firmaya teslim edilecek.\n[28.08.2026] Firmaya teslim edildi\n[03.09.2026] Askıya hazırlanı\n[25.09.2026]  bilgilendirme ilanına alındı 23.09.2026",
     "ucus_kiymet_durum": "Yapıldı",
     "notlar_tamamlandi": [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
     ],
     "bilgilendirme_tarihi": "2026-09-23"
   },
