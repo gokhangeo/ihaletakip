@@ -531,17 +531,37 @@
 
 <!-- Not Ekleme Modalı (Tablodaki Birim İçin) -->
 <div id="noteModal" class="fixed inset-0 bg-slate-900/50 z-[80] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto flex flex-col">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-amber-50">
             <h3 class="font-bold text-lg text-amber-800"><i class="fas fa-sticky-note text-amber-500 mr-2"></i>Birim Notları</h3>
             <button onclick="closeNoteModal()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
         </div>
         <div class="p-5 flex flex-col gap-3">
+            <div class="rounded-xl border border-amber-200 bg-amber-50 p-3 space-y-2">
+                <label for="unitNoteChoice" class="block text-xs font-bold text-amber-900">Yeni birim notu</label>
+                <select id="unitNoteChoice" onchange="updateUnitNoteChoice()" class="w-full border border-amber-200 rounded-lg p-2 text-sm bg-white">
+                    <option value="">Durum seçin</option>
+                    <option>Uçuş bekliyor</option>
+                    <option>Kıymetlendirme bekliyor</option>
+                    <option>Yersel ölçüm bekliyor</option>
+                    <option>Yersel ölçüm yapılıyor</option>
+                    <option>Değerlendirme devam ediyor</option>
+                    <option>Ormancı kontrolünde</option>
+                    <option>Firmaya teslim edildi</option>
+                    <option>Askı ilanına hazırlanıyor</option>
+                    <option value="manuel">Manuel giriş</option>
+                </select>
+                <div id="unitNoteEntry" class="hidden space-y-2">
+                    <label class="block text-xs font-semibold text-slate-600">Not tarihi <input id="unitNoteDate" type="date" class="block w-full mt-1 border border-slate-300 rounded-lg p-2 text-sm bg-white"></label>
+                    <input id="unitNoteManual" type="text" class="hidden w-full border border-slate-300 rounded-lg p-2 text-sm bg-white" placeholder="Notunuzu yazın" aria-label="Manuel birim notu">
+                    <button onclick="addSelectedUnitNote()" class="rounded-lg bg-amber-600 text-white px-3 py-2 text-xs font-bold">Listeye ekle</button>
+                </div>
+            </div>
             <div class="flex justify-between items-center">
-                <p class="text-[11px] text-slate-500 font-medium">Her satıra bir not yazabilirsiniz. PDF ve Excel'de maddelendirilir.</p>
+                <p class="text-[11px] text-slate-500 font-medium">Eski ve yeni notlar alt alta korunur. Gerekirse aşağıdan düzenleyin.</p>
                 <button onclick="insertDateToNote()" class="text-[10px] bg-white border border-amber-200 hover:bg-amber-50 text-amber-700 px-2 py-1.5 rounded-lg font-bold transition flex items-center shadow-sm whitespace-nowrap"><i class="fas fa-calendar-plus mr-1"></i>Tarih Ekle</button>
             </div>
-            <textarea id="noteTextarea" rows="6" oninput="renderNoteChecklist()" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-amber-500 outline-none resize-none font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Buraya yazın..."></textarea>
+            <textarea id="noteTextarea" rows="6" oninput="renderNoteChecklist()" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-amber-500 outline-none resize-y font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors" placeholder="Kayıtlı notlar burada görünür."></textarea>
             <div id="noteChecklist" class="max-h-48 overflow-y-auto space-y-1"></div>
             <div class="flex justify-end gap-2 mt-2">
                 <button onclick="closeNoteModal()" class="px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">İptal</button>
@@ -1231,8 +1251,39 @@ function openNoteModal(sn) {
     currentNoteSn = sn;
     const item = data.find(d => d.sn === sn);
     document.getElementById('noteTextarea').value = item.notlar || '';
+    document.getElementById('unitNoteChoice').value = '';
+    document.getElementById('unitNoteManual').value = '';
+    document.getElementById('unitNoteDate').value = new Date().toLocaleDateString('sv-SE', {timeZone:'Europe/Istanbul'});
+    updateUnitNoteChoice();
     renderNoteChecklist();
     document.getElementById('noteModal').classList.remove('hidden');
+}
+
+function updateUnitNoteChoice() {
+    const choice = document.getElementById('unitNoteChoice').value;
+    document.getElementById('unitNoteEntry').classList.toggle('hidden', !choice);
+    document.getElementById('unitNoteManual').classList.toggle('hidden', choice !== 'manuel');
+    if (choice && !document.getElementById('unitNoteDate').value) {
+        document.getElementById('unitNoteDate').value = new Date().toLocaleDateString('sv-SE', {timeZone:'Europe/Istanbul'});
+    }
+}
+
+function addSelectedUnitNote() {
+    const choice = document.getElementById('unitNoteChoice').value;
+    const text = (choice === 'manuel' ? document.getElementById('unitNoteManual').value : choice).trim();
+    const date = document.getElementById('unitNoteDate').value;
+    if (!text || !date) return showToast('Eksik not', 'Durum, açıklama ve tarihi kontrol edin.', 'error');
+    const parsed = new Date(date + 'T12:00:00Z');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0,10) !== date) {
+        return showToast('Geçersiz tarih', 'Takvimden geçerli bir tarih seçin.', 'error');
+    }
+    const textarea = document.getElementById('noteTextarea');
+    const formatted = date.split('-').reverse().join('.');
+    textarea.value = [...getNoteLines(textarea.value), `[${formatted}] ${text.replace(/\s*\n+\s*/g, ' ')}`].join('\n');
+    document.getElementById('unitNoteChoice').value = '';
+    document.getElementById('unitNoteManual').value = '';
+    updateUnitNoteChoice();
+    renderNoteChecklist();
 }
 
 function closeNoteModal() {
