@@ -96,6 +96,9 @@
         .planning-close { border:0; background:transparent; color:white; font-size:24px; cursor:pointer; padding:4px 8px; }
         .planning-toolbar { padding:12px 22px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; flex-wrap:wrap; align-items:end; gap:10px; }
         .planning-toolbar label { display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:700; color:#475569; }
+        .planning-region-tabs { display:flex; flex-wrap:wrap; gap:6px; width:100%; }
+        .planning-region-tabs button { border:1px solid #cbd5e1; background:#fff; color:#475569; border-radius:9px; padding:9px 14px; font-size:12px; font-weight:700; cursor:pointer; }
+        .planning-region-tabs button[aria-pressed="true"] { background:#173b62; border-color:#173b62; color:white; }
         .planning-toolbar select,.planning-toolbar input { background:white; border:1px solid #cbd5e1; border-radius:8px; padding:8px 10px; min-width:170px; font:inherit; font-size:12px; color:#334155; }
         .planning-info { flex:1; min-width:220px; font-size:11px; line-height:1.8; color:#475569; }
         .planning-summary { padding:10px 22px; display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:#475569; border-bottom:1px solid #e2e8f0; }
@@ -383,7 +386,7 @@
 <div id="planningModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="planningTitle">
     <div class="planning-shell">
         <div class="planning-header">
-            <div><h3 id="planningTitle"><i class="fas fa-calendar-check"></i> MRS-ANM II · Personel Teslim Planı</h3><p>Anamur–Bozyazı · Personel hedefini girer, müdür değerlendirmesinden sonra kesin hedef belirlenir.</p></div>
+            <div><h3 id="planningTitle"><i class="fas fa-calendar-check"></i> MRS-ANM II · Personel Teslim Planı</h3><p><span id="planningRegionSubtitle">Anamur–Bozyazı</span> · Personel hedefini girer, müdür değerlendirmesinden sonra kesin hedef belirlenir.</p></div>
             <div class="planning-actions">
                 <button class="planning-button save" onclick="saveToGithub()"><i class="fas fa-cloud-upload-alt"></i> Değişiklikleri Kaydet</button>
                 <button id="planningExcelBtn" class="planning-button excel" onclick="exportPlanningToExcel()"><i class="fas fa-file-excel"></i> Excel İndir</button>
@@ -391,6 +394,10 @@
             </div>
         </div>
         <div class="planning-toolbar">
+            <div class="planning-region-tabs" role="group" aria-label="Planlama bölgesi">
+                <button type="button" data-planning-region="region1" aria-pressed="true" onclick="selectPlanningRegion('region1')">Anamur – Bozyazı</button>
+                <button type="button" data-planning-region="region2" aria-pressed="false" onclick="selectPlanningRegion('region2')">Silifke – Gülnar – Aydıncık</button>
+            </div>
             <label>Mühendis<select id="planningEngineer" onchange="renderPlanningModal()"><option value="">Tüm mühendisler</option></select></label>
             <label>Gösterim<select id="planningScope" onchange="renderPlanningModal()"><option value="pending">Bilgilendirme ilanı çıkmayanlar</option><option value="all">Bölgedeki tüm birimler</option></select></label>
             <label>Birim ara<input id="planningSearch" type="search" placeholder="İlçe / birim adı" oninput="renderPlanningModal()"></label>
@@ -1019,7 +1026,11 @@ async function saveToGithub(isAuto = false) {
 // ====================== PERSONEL TESLİM PLANLAMASI ======================
 const planningEndDate = '2027-08-10';
 const planningLeadDays = 45;
-const planningDistricts = ['ANAMUR', 'BOZYAZI'];
+const planningRegions = {
+    region1: {label:'Anamur–Bozyazı', districts:['ANAMUR', 'BOZYAZI'], exportName:'Anamur_Bozyazi'},
+    region2: {label:'Silifke–Gülnar–Aydıncık', districts:['SİLİFKE', 'GÜLNAR', 'AYDINCIK'], exportName:'Silifke_Gulnar_Aydincik'}
+};
+let activePlanningRegion = 'region1';
 const planningFields = ['plan_personel_hedef', 'plan_personel_aciklama', 'plan_kesin_hedef', 'plan_mudur_degerlendirme'];
 let planningInputUpdateInProgress = false;
 let planningShowFirmaNotes = true;
@@ -1043,7 +1054,16 @@ function hasPlanningAnnouncement(item) {
 }
 
 function getPlanningRegionData() {
-    return data.filter(item => planningDistricts.includes(String(item.ilce || '').trim().toLocaleUpperCase('tr-TR')));
+    return data.filter(item => planningRegions[activePlanningRegion].districts.includes(String(item.ilce || '').trim().toLocaleUpperCase('tr-TR')));
+}
+
+function selectPlanningRegion(region) {
+    if (!planningRegions[region] || activePlanningRegion === region) return;
+    activePlanningRegion = region;
+    document.getElementById('planningEngineer').value = '';
+    document.getElementById('planningSearch').value = '';
+    document.querySelector('#planningModal .planning-scroll').scrollTop = 0;
+    renderPlanningModal();
 }
 
 function getPlanningRows() {
@@ -1126,6 +1146,8 @@ function renderPlanningNotes(item) {
 function renderPlanningModal() {
     const modal = document.getElementById('planningModal');
     if (!modal || modal.classList.contains('hidden')) return;
+    document.getElementById('planningRegionSubtitle').textContent = planningRegions[activePlanningRegion].label;
+    modal.querySelectorAll('[data-planning-region]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.planningRegion === activePlanningRegion)));
     const firmaToggle = document.getElementById('planningFirmaNotesToggle');
     firmaToggle.textContent = planningShowFirmaNotes ? 'Firma notlarını gizle' : 'Firma notlarını göster';
     firmaToggle.setAttribute('aria-pressed', String(!planningShowFirmaNotes));
@@ -1206,7 +1228,7 @@ function exportPlanningToExcel() {
     const excelDate = value => value ? new Date(value + 'T00:00:00') : null;
     const content = [
         ['MRS-ANM II · Personel Teslim Planı'],
-        [`Anamur–Bozyazı | ${engineer} | ${scope} | ${new Date().toLocaleDateString('tr-TR')}`],
+        [`${planningRegions[activePlanningRegion].label} | ${engineer} | ${scope} | ${new Date().toLocaleDateString('tr-TR')}`],
         [`İhale bitişi: ${formatPlanningDate(planningEndDate)} | 45 gün önce: ${formatPlanningDate(getPlanningLimitDate())}`],
         ['Personel hedefleri öneridir. Kesin hedef müdür değerlendirmesinden sonra belirlenir.'],
         [],
@@ -1241,7 +1263,7 @@ function exportPlanningToExcel() {
     }
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook,sheet,'Personel Teslim Planı');
-    XLSX.writeFile(workbook,`MRS_ANM_II_Planlama_${new Date().toLocaleDateString('tr-TR').replace(/\./g,'-')}.xlsx`);
+    XLSX.writeFile(workbook,`MRS_ANM_II_Planlama_${planningRegions[activePlanningRegion].exportName}_${new Date().toLocaleDateString('tr-TR').replace(/\./g,'-')}.xlsx`);
 }
 
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !document.getElementById('planningModal').classList.contains('hidden')) closePlanningModal(); });
