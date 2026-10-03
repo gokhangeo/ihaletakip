@@ -46,7 +46,8 @@
       true,
       true
     ],
-    "bilgilendirme_tarihi": "2026-09-09"
+    "bilgilendirme_tarihi": "2026-09-09",
+    "komisyon_durum": "Devam Ediyor"
   },
   {
     "sn": 3,
@@ -389,7 +390,8 @@
       true,
       true
     ],
-    "bilgilendirme_tarihi": "2026-09-04"
+    "bilgilendirme_tarihi": "2026-09-04",
+    "komisyon_durum": "Devam Ediyor"
   },
   {
     "sn": 18,
