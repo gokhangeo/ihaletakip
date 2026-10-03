@@ -41,7 +41,14 @@
         .stat-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         .stat-card.active-filter { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f1; background-color: #fefce8; }
         
-        .progress-card { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; padding: 1rem; min-w-[200px]; flex-shrink: 0; }
+        .progress-card { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; }
+        #progressSummary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; overflow:visible; }
+        #progressSummary > .progress-card { width:auto; min-width:0; padding:10px; }
+        #progressSummary .progress-card h4 { white-space:normal; line-height:1.25; overflow-wrap:anywhere; }
+        #progressSummary .progress-card button { text-align:left; }
+        @media (min-width:700px) { #progressSummary { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+        @media (min-width:950px) { #progressSummary { grid-template-columns:repeat(5,minmax(0,1fr)); } }
+        @media (min-width:1500px) { #progressSummary { grid-template-columns:repeat(9,minmax(0,1fr)); } }
         
         #toast { transition: opacity 0.3s, transform 0.3s; transform: translateY(100%); opacity: 0; }
         #toast.show { transform: translateY(0); opacity: 1; }
@@ -303,7 +310,7 @@
         </div>
 
         <!-- Süreç İlerleme Özeti -->
-        <div id="progressSummary" class="flex gap-4 overflow-x-auto pb-4 mb-4 snap-x">
+        <div id="progressSummary" class="pb-4 mb-4">
             <!-- JS ile dolacak -->
         </div>
 
@@ -554,6 +561,7 @@
                     <option>Yersel ölçüm yapılıyor</option>
                     <option>Değerlendirme devam ediyor</option>
                     <option>Ormancı kontrolünde</option>
+                    <option>Firmaya teslim edilecek</option>
                     <option>Firmaya teslim edildi</option>
                     <option>Askı ilanına hazırlanıyor</option>
                     <option value="manuel">Manuel giriş</option>
@@ -2899,7 +2907,7 @@ function setPersonStatusFilter(personName, statusKey, label) {
 
 function setCardFilter(field, label, val) {
     if (activeCardFilter && activeCardFilter.field === field && activeCardFilter.val === val) activeCardFilter = null;
-    else { activeCardFilter = { field, label, val }; document.getElementById('statusFilter').value = ""; }
+    else { activeCardFilter = { field, label, val }; activePersonFilter = null; document.getElementById('statusFilter').value = ""; }
     updateFilterBanner(); renderTable();
 }
 
@@ -3020,6 +3028,8 @@ function renderTable() {
                         : v === 'kesinAski' ? !!item.kesin_aski_tarihi
                         : v === 'kalan' ? !item.bilgilendirme_tarihi
                         : String(item.genel_durum || "").trim().toLocaleUpperCase("tr-TR") === statusByKey[v]);
+            } else if (f === 'firma_delivery') {
+                matchesCard = getFirmaDeliveryStage(item) === v;
             } else if (f === 'ucus_tarihi' || f === 'bilgilendirme_tarihi' || f === 'kesin_aski_tarihi') {
                 const isDone = !!item[f];
                 matchesCard = (v === 'Yapıldı' && isDone) || (v === 'Yapılmadı' && !isDone);
@@ -3221,6 +3231,17 @@ function calculateStats() {
     buildCards(r1Eng, 'reg1-engStats'); buildCards(r1Tech, 'reg1-techStats');
     buildCards(r2Eng, 'reg2-engStats'); buildCards(r2Tech, 'reg2-techStats');
 }
+function getFirmaDeliveryStage(item) {
+    const status = String(item.genel_durum || '').trim().toLocaleUpperCase('tr-TR');
+    if (status === 'ASKI İLANINA HAZIRLANIYOR') return 'preparing';
+    if (status === 'FİRMAYA TESLİM EDİLDİ') return 'delivered';
+    const laterStatuses = ['BİLGİLENDİRME İLANINDA', 'KOMİSYON AŞAMASINDA', 'KOMİSYON YAPILDI', 'KESİN ASKIDA', 'KESİN ASKIDAN İNDİ. BEKLEMEDE', 'DEVİR YAPILDI', 'TESCİL AŞAMASINDA', 'TESCİLİ BİTTİ', 'İHALEDEN/PROGRAMDAN ÇIKARILDI'];
+    if (laterStatuses.includes(status) || item.bilgilendirme_tarihi || item.kesin_aski_tarihi) return null;
+    const lines = getNoteLines(item.notlar);
+    const completed = getNoteCompletionStates(item, lines.length);
+    return lines.some((line, index) => !completed[index] && String(line).replace(/^\[\d{2}\.\d{2}\.\d{4}\]\s*/, '').trim().toLocaleUpperCase('tr-TR') === 'FİRMAYA TESLİM EDİLECEK') ? 'todo' : null;
+}
+
 function calculateProgressStats() {
     const statsData = getRegionFilteredData();
     const stats = {
@@ -3228,6 +3249,7 @@ function calculateProgressStats() {
         ucusTarihi: { yapildi: 0, yapilmadi: 0, label: "UÇUŞ DURUM", icon: "fa-calendar-alt", field: "ucus_tarihi" },
         ucus: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Uçuş Kıymet.", icon: "fa-plane", field: "ucus_kiymet_durum" },
         degerlendirme: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Değerlendirme", icon: "fa-tasks", field: "degerlendirme_durum" },
+        firmaDelivery: { todo: 0, delivered: 0, preparing: 0, label: "Firmaya Teslim", field: "firma_delivery" },
         bilgilendirmeTarihi: { yapildi: 0, yapilmadi: 0, label: "BİLGİLENDİRME DURUM", icon: "fa-bullhorn", field: "bilgilendirme_tarihi" },
         komisyon: { yapildi: 0, devam: 0, yapilmadi: 0, label: "Komisyon", icon: "fa-users", field: "komisyon_durum" },
         kesinAskiTarihi: { yapildi: 0, yapilmadi: 0, label: "KESİN ASKI DURUM", icon: "fa-thumbtack", field: "kesin_aski_tarihi" }
@@ -3240,6 +3262,8 @@ function calculateProgressStats() {
         stats.altlik[getCat(item.altlik_durum)]++;
         stats.ucus[getCat(item.ucus_kiymet_durum)]++;
         stats.degerlendirme[getCat(item.degerlendirme_durum)]++;
+        const deliveryStage = getFirmaDeliveryStage(item);
+        if (deliveryStage) stats.firmaDelivery[deliveryStage]++;
         stats.komisyon[getCat(item.komisyon_durum)]++;
 
         if(item.ucus_tarihi) stats.ucusTarihi.yapildi++; else stats.ucusTarihi.yapilmadi++;
@@ -3268,11 +3292,18 @@ function calculateProgressStats() {
         </div>`;
     };
 
+    const createFirmaDeliveryCard = () => {
+        const s = stats.firmaDelivery;
+        const row = (stage, label, color) => `<button type="button" onclick="setCardFilter('firma_delivery', 'Firmaya Teslim', '${stage}')" class="w-full flex justify-between items-center text-[11px] mb-1 rounded p-1.5 hover:bg-slate-50 transition ${activeCardFilter?.field === 'firma_delivery' && activeCardFilter.val === stage ? 'bg-blue-100 ring-1 ring-blue-400' : ''}"><span class="${color} font-semibold">${label}</span><span class="font-bold px-2 py-0.5 rounded bg-slate-50 text-slate-700">${s[stage]}</span></button>`;
+        return `<div class="progress-card shadow-sm border border-slate-200 p-3 w-[220px] flex-shrink-0"><div class="flex items-center gap-2 mb-3 border-b border-slate-100 pb-2"><i class="fas fa-truck-loading text-blue-500"></i><h4 class="font-bold text-[11px] text-slate-700 uppercase">Firmaya Teslim</h4></div>${row('todo', 'Teslim Edilecek', 'text-amber-600')}${row('delivered', 'Teslim Edildi', 'text-sky-700')}${row('preparing', 'Askıya Hazırlanıyor', 'text-violet-700')}</div>`;
+    };
+
     document.getElementById('progressSummary').innerHTML = `
         ${createCard(stats.altlik.label, stats.altlik.icon, stats.altlik, stats.altlik.field)}
         ${createCard(stats.ucusTarihi.label, stats.ucusTarihi.icon, stats.ucusTarihi, stats.ucusTarihi.field)}
         ${createCard(stats.ucus.label, stats.ucus.icon, stats.ucus, stats.ucus.field)}
         ${createCard(stats.degerlendirme.label, stats.degerlendirme.icon, stats.degerlendirme, stats.degerlendirme.field)}
+        ${createFirmaDeliveryCard()}
         ${createCard(stats.bilgilendirmeTarihi.label, stats.bilgilendirmeTarihi.icon, stats.bilgilendirmeTarihi, stats.bilgilendirmeTarihi.field)}
         ${createCard(stats.komisyon.label, stats.komisyon.icon, stats.komisyon, stats.komisyon.field)}
         ${createCard(stats.kesinAskiTarihi.label, stats.kesinAskiTarihi.icon, stats.kesinAskiTarihi, stats.kesinAskiTarihi.field)}
