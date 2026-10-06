@@ -2602,7 +2602,7 @@ function updateSplitLabels() {
 }
 
 function createPrintTable(items) {
-    let html = '<table style="width: 2600px; border-collapse: collapse; font-family: sans-serif; font-size: 13px; background: white; table-layout: fixed;"><thead><tr>';
+    let html = '';
     
     const cols = [
         {n: "S.N.", w: 50}, {n: "İlçe", w: 120}, {n: "Mahalle", w: 180},
@@ -2612,10 +2612,12 @@ function createPrintTable(items) {
         {n: "Altlık Durum", w: 140}, {n: "Uçuş Tarihi", w: 130},
         {n: "Uçuş Kıymet.", w: 140}, {n: "Değerlendirme", w: 140},
         {n: "Bilgilendirme", w: 130}, {n: "Komisyon", w: 140},
-        {n: "Kesin Askı", w: 130}, {n: "Notlar", w: 180}
+        {n: "Kesin Askı", w: 130}, {n: "Notlar", w: 800}
     ];
+    const totalColumnWidth = cols.reduce((total, col) => total + col.w, 0);
+    html = `<style>.ihale-pdf-table th,.ihale-pdf-table td {box-sizing:border-box;overflow-wrap:anywhere;line-height:1.25}.ihale-pdf-table td {padding:5px 4px !important}.ihale-pdf-table td:last-child {line-height:1.3}.ihale-pdf-table td span {padding:4px !important}</style><table class="ihale-pdf-table" style="width:3200px; border-collapse:collapse; font-family:sans-serif; font-size:13px; background:white; table-layout:fixed;"><colgroup>${cols.map(col => `<col style="width:${col.w / totalColumnWidth * 100}%">`).join('')}</colgroup><thead><tr>`;
     
-    cols.forEach(c => html += `<th style="width:${c.w}px; background-color:#0f172a; color:white; padding:12px 6px; border:1px solid #64748b; text-align:center; font-weight:bold; overflow:hidden;">${c.n}</th>`);
+    cols.forEach(c => html += `<th style="background-color:#0f172a; color:white; padding:8px 4px; border:1px solid #64748b; text-align:center; font-weight:bold;">${c.n}</th>`);
     html += '</tr></thead><tbody>';
 
     const getStatusBadge = (val, isGenelDurum = false) => {
@@ -2681,7 +2683,7 @@ async function exportToPDF(exportType) {
     wrapper.style.position = 'absolute';
     wrapper.style.top = '0';
     wrapper.style.left = '0';
-    wrapper.style.width = '2600px'; 
+    wrapper.style.width = '3200px';
     wrapper.style.backgroundColor = 'white';
     wrapper.style.zIndex = '-9999'; 
     document.body.appendChild(wrapper);
@@ -2704,14 +2706,14 @@ async function exportToPDF(exportType) {
     }
 
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('l', 'mm', 'a3'); 
+    const pdf = new jsPDF({orientation:'landscape', unit:'mm', format:'a3'});
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
 
     try {
         for (let i = 0; i < chunks.length; i++) {
             if (chunks[i].length === 0) continue;
-            if (i > 0) pdf.addPage(); 
+            if (i > 0) pdf.addPage('a3', 'landscape');
 
             wrapper.innerHTML = createPrintTable(chunks[i]);
             await new Promise(r => setTimeout(r, 600)); 
@@ -2721,9 +2723,9 @@ async function exportToPDF(exportType) {
                 backgroundColor: '#ffffff', 
                 useCORS: true,
                 scrollY: -window.scrollY, 
-                width: 2600,
+                width: wrapper.offsetWidth,
                 height: wrapper.offsetHeight,
-                windowWidth: 2600,
+                windowWidth: wrapper.offsetWidth,
                 windowHeight: wrapper.offsetHeight 
             });
             
