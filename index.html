@@ -36,6 +36,7 @@
         
         select, input[type="date"], input[type="text"] { background: transparent; border: none; width: 100%; }
         select:focus, input[type="date"]:focus, input[type="text"]:focus { outline: none; background: #fff; box-shadow: 0 0 0 2px #3b82f6; border-radius: 4px;}
+        #managerNoteForm select, #managerNoteForm input[type="date"] { background:#f8fafc; border:1px solid #cbd5e1; }
         
         .stat-card { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; transition: all 0.2s; cursor: pointer; }
         .stat-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
@@ -504,11 +505,13 @@
 <!-- Yönetici Özet Not Raporu -->
 <div id="managerNotesReportModal" class="fixed inset-0 bg-slate-900/60 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
-        <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-indigo-50">
+        <div class="p-5 border-b border-slate-200 flex flex-wrap gap-3 justify-between items-center bg-indigo-50">
             <h3 class="font-extrabold text-xl text-indigo-950 flex items-center gap-2">
                 <i class="fas fa-clipboard-list text-indigo-600"></i> Yönetici Özet Not Raporu
             </h3>
-            <div class="flex items-center gap-2 md:gap-3">
+            <div class="flex flex-wrap items-center gap-2 md:gap-3">
+                <button onclick="openManagerNoteForm()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-sm"><i class="fas fa-plus mr-1"></i>Not Ekle</button>
+                <button onclick="saveToGithub()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-sm"><i class="fas fa-cloud-upload-alt mr-1"></i>Kaydet</button>
                 <label class="flex items-center gap-2 bg-white border border-indigo-200 text-indigo-800 px-3 py-2 rounded-lg text-xs font-bold shadow-sm cursor-pointer select-none" title="Tamamlanan notları rapordan çıkar">
                     <input type="checkbox" id="managerHideCompleted" onchange="generateManagerNotesReport()" class="w-4 h-4 accent-indigo-600 cursor-pointer">
                     <span class="hidden sm:inline">Tamamlananları gizle</span><span class="sm:hidden">Bitenleri gizle</span>
@@ -519,7 +522,17 @@
                 <button onclick="closeManagerNotesReportModal()" class="text-slate-400 hover:text-red-500 transition ml-1" title="Kapat"><i class="fas fa-times text-xl"></i></button>
             </div>
         </div>
-        <div id="managerNotesReportPrintable" class="p-6 overflow-y-auto flex-1 bg-slate-50"></div>
+        <div id="managerNoteForm" class="hidden p-4 border-b border-slate-200 bg-white shrink-0 max-h-[45vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-2"><h4 class="text-sm font-bold text-indigo-900">Yeni Not Ekle</h4><button onclick="closeManagerNoteForm()" class="text-xs font-bold text-slate-500 hover:text-slate-800" aria-label="Not ekleme alanını kapat">Kapat</button></div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
+                <label class="text-xs font-bold text-slate-600">Not türü<select id="managerNoteScope" onchange="updateManagerNoteScope()" class="mt-1 w-full border border-slate-300 rounded-lg px-2 py-2 text-sm"><option value="firma-genel">Firma Genel Notu</option><option value="firma-birim">Firmaya Ait Birim Notu</option><option value="birim">Birim Notu</option></select></label>
+                <label id="managerNoteUnitLabel" class="text-xs font-bold text-slate-600">Birim<select id="managerNoteUnit" class="mt-1 w-full border border-slate-300 rounded-lg px-2 py-2 text-sm"></select></label>
+                <label class="text-xs font-bold text-slate-600">Tarih<input id="managerNoteDate" type="date" class="mt-1 w-full border border-slate-300 rounded-lg px-2 py-2 text-sm"></label>
+            </div>
+            <div class="flex gap-2 items-stretch"><textarea id="managerNoteText" rows="2" class="flex-1 min-w-0 border border-slate-300 rounded-lg p-2 text-sm resize-y" placeholder="Notunuzu yazın..."></textarea><button onclick="addManagerNote()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg text-xs font-bold">Ekle</button></div>
+            <p class="mt-2 text-[11px] text-slate-500">Notlar ana tablo ve planlama ile birlikte güncellenir. Değişiklikleri buluta göndermek için Kaydet düğmesini kullanın.</p>
+        </div>
+        <div id="managerNotesReportPrintable" class="p-6 overflow-y-auto flex-1 min-h-0 bg-slate-50"></div>
     </div>
 </div>
 
@@ -1411,12 +1424,85 @@ function getRegionFilteredData() {
 
 function openManagerNotesReportModal() {
     normalizeFirmaNoteData();
+    populateManagerNoteUnits();
+    updateManagerNoteScope();
+    closeManagerNoteForm();
     generateManagerNotesReport();
     document.getElementById('managerNotesReportModal').classList.remove('hidden');
 }
 
 function closeManagerNotesReportModal() {
     document.getElementById('managerNotesReportModal').classList.add('hidden');
+}
+
+function populateManagerNoteUnits() {
+    const select = document.getElementById('managerNoteUnit');
+    const previousValue = select.value;
+    select.innerHTML = getRegionFilteredData().map(item => `<option value="${escapeNoteHtml(item.sn)}">${escapeNoteHtml(item.ilce || '')} — ${escapeNoteHtml(item.mahalle || '')}</option>`).join('');
+    if (Array.from(select.options).some(option => option.value === previousValue)) select.value = previousValue;
+}
+
+function updateManagerNoteScope() {
+    const isGeneral = document.getElementById('managerNoteScope').value === 'firma-genel';
+    document.getElementById('managerNoteUnitLabel').classList.toggle('hidden', isGeneral);
+    document.getElementById('managerNoteUnit').disabled = isGeneral;
+}
+
+function openManagerNoteForm(scope, sn) {
+    populateManagerNoteUnits();
+    if (scope) document.getElementById('managerNoteScope').value = scope;
+    if (sn !== undefined) document.getElementById('managerNoteUnit').value = String(sn);
+    const date = document.getElementById('managerNoteDate');
+    if (!date.value) date.value = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Istanbul' });
+    updateManagerNoteScope();
+    document.getElementById('managerNoteForm').classList.remove('hidden');
+    document.getElementById('managerNoteText').focus();
+}
+
+function closeManagerNoteForm() {
+    document.getElementById('managerNoteForm').classList.add('hidden');
+}
+
+function refreshManagerNotesReport() {
+    const modal = document.getElementById('managerNotesReportModal');
+    if (modal && !modal.classList.contains('hidden')) generateManagerNotesReport();
+}
+
+function addManagerNote() {
+    const scope = document.getElementById('managerNoteScope').value;
+    const sn = document.getElementById('managerNoteUnit').value;
+    const date = document.getElementById('managerNoteDate').value;
+    const text = document.getElementById('managerNoteText').value.trim();
+    if (!text || !date) return showToast('Eksik bilgi', 'Not ve tarih girin.', 'error');
+    const parsedDate = new Date(date + 'T12:00:00Z');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== date) {
+        return showToast('Geçersiz tarih', 'Takvimden geçerli bir tarih seçin.', 'error');
+    }
+    const unit = getRegionFilteredData().find(item => String(item.sn) === sn);
+    if (scope !== 'firma-genel' && !unit) return showToast('Eksik bilgi', 'Not eklenecek birimi seçin.', 'error');
+    const datePrefix = `[${date.split('-').reverse().join('.')}] `;
+    if (scope === 'birim') {
+        const lines = getNoteLines(unit.notlar);
+        const states = getNoteCompletionStates(unit, lines.length);
+        const newLines = getNoteLines(text).map(line => datePrefix + line);
+        unit.notlar_tamamlandi = [...states, ...newLines.map(() => false)];
+        updateValue(unit.sn, 'notlar', [...lines, ...newLines].join('\n'));
+    } else {
+        normalizeFirmaNoteData();
+        yatirimData.firmaNotKayitlari.push({ id: crypto.randomUUID(), tur: scope === 'firma-birim' ? 'birim' : 'genel', birimSn: scope === 'firma-birim' ? sn : null, text: datePrefix + text, tamamlandi: false, createdAt: new Date().toISOString() });
+        localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
+        setUnsavedState(true);
+    }
+    document.getElementById('managerNoteText').value = '';
+    generateNotesReport();
+    renderFirmaNotesPreview();
+    renderFirmaAllNotes();
+    showToast('Not eklendi', 'Değişiklikleri buluta göndermek için Kaydet düğmesini kullanın.', 'success');
+}
+
+function renderManagerNoteActions(id) {
+    const argument = escapeNoteHtml(JSON.stringify(String(id)));
+    return `<span class="manager-note-controls flex gap-1 shrink-0"><button onclick="editFirmaNote(${argument})" class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100" title="Notu düzenle" aria-label="Notu düzenle"><i class="fas fa-pen text-[10px]"></i></button><button onclick="deleteFirmaNote(${argument})" class="w-7 h-7 rounded-lg bg-red-50 text-red-600 hover:bg-red-100" title="Notu sil" aria-label="Notu sil"><i class="fas fa-trash text-[10px]"></i></button></span>`;
 }
 
 function generateManagerNotesReport() {
@@ -1467,7 +1553,7 @@ function generateManagerNotesReport() {
 
     const renderFirmaCard = (note, index) => {
         return `<div class="manager-notes-pdf-card bg-white border border-slate-200 rounded-lg p-3 shadow-sm" style="break-inside: avoid; page-break-inside: avoid;">
-            <div class="flex items-start justify-between gap-2 mb-1"><div><div class="text-[10px] uppercase tracking-wider font-black text-indigo-600">Genel Firma Notu</div><div class="text-[10px] text-slate-400 font-bold mt-0.5">${getFirmaNoteDate(note.text) || 'Tarihsiz'} · Firma notu ${index + 1}</div></div>${statusBadge(note.tamamlandi)}</div>
+            <div class="flex items-start justify-between gap-2 mb-1"><div><div class="text-[10px] uppercase tracking-wider font-black text-indigo-600">Genel Firma Notu</div><div class="text-[10px] text-slate-400 font-bold mt-0.5">${getFirmaNoteDate(note.text) || 'Tarihsiz'} · Firma notu ${index + 1}</div></div><div class="flex flex-wrap justify-end items-center gap-2">${statusBadge(note.tamamlandi)}${renderManagerNoteActions(note.id)}</div></div>
             <div class="text-[12px] leading-snug font-medium ${note.tamamlandi ? 'text-slate-400 line-through' : 'text-slate-700'}">${formatText(note.text)}</div>
         </div>`;
     };
@@ -1477,7 +1563,7 @@ function generateManagerNotesReport() {
         const label = unit ? `${escapeNoteHtml(unit.ilce || 'Birim')} - ${escapeNoteHtml(unit.mahalle || '')}` : 'Birim bilgisi bulunamadı';
         const completed = notes.filter(note => note.tamamlandi).length;
         const unitMeta = unit ? `<div class="flex flex-wrap gap-1.5 text-[10px] font-bold mt-2"><span class="rounded-md bg-emerald-50 border border-emerald-100 text-emerald-700 px-2 py-1">22-A: ${unit.yirmi_iki_a || 0}</span><span class="rounded-md bg-blue-50 border border-blue-100 text-blue-700 px-2 py-1"><i class="fas fa-user-tie mr-1"></i>Müh: ${escapeNoteHtml(unit.muhendis || 'Atanmadı')}</span><span class="rounded-md bg-purple-50 border border-purple-100 text-purple-700 px-2 py-1"><i class="fas fa-tools mr-1"></i>Tek: ${escapeNoteHtml(unit.tekniker || 'Atanmadı')}</span></div>` : '';
-        const noteRows = notes.map((note) => `<div class="py-2 ${note === notes[notes.length - 1] ? '' : 'border-b border-slate-100'}"><div class="flex items-start justify-between gap-2 mb-1"><span class="text-[10px] text-slate-400 font-bold">${getFirmaNoteDate(note.text) || 'Tarihsiz'}</span>${statusBadge(note.tamamlandi)}</div><div class="text-[12px] leading-snug font-medium ${note.tamamlandi ? 'text-slate-400 line-through' : 'text-slate-700'}">${formatText(note.text)}</div></div>`).join('');
+        const noteRows = notes.map((note) => `<div class="py-2 ${note === notes[notes.length - 1] ? '' : 'border-b border-slate-100'}"><div class="flex items-start justify-between gap-2 mb-1"><span class="text-[10px] text-slate-400 font-bold">${getFirmaNoteDate(note.text) || 'Tarihsiz'}</span><div class="flex flex-wrap justify-end items-center gap-2">${statusBadge(note.tamamlandi)}${renderManagerNoteActions(note.id)}</div></div><div class="text-[12px] leading-snug font-medium ${note.tamamlandi ? 'text-slate-400 line-through' : 'text-slate-700'}">${formatText(note.text)}</div></div>`).join('');
         return `<div class="manager-notes-pdf-card bg-white border border-slate-200 rounded-lg p-3 shadow-sm" style="break-inside: avoid; page-break-inside: avoid;"><div class="border-b border-slate-100 pb-2"><div class="flex items-start justify-between gap-2"><div><h4 class="font-extrabold text-sm text-slate-800">${label}</h4></div><span class="text-[10px] font-black rounded-md bg-violet-50 text-violet-700 border border-violet-100 px-2 py-1">${completed}/${notes.length} tamamlandı</span></div>${unitMeta}</div>${noteRows}</div>`;
     };
 
@@ -1487,11 +1573,11 @@ function generateManagerNotesReport() {
         const visibleLines = lines
             .map((line, index) => ({ line, index }))
             .filter(({ index }) => !hideCompleted || !states[index]);
-        const lineItems = visibleLines.map(({ line, index }) => `<li class="flex items-start gap-2 ${states[index] ? 'text-slate-400 line-through' : 'text-slate-700'}"><span class="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${states[index] ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}"><i class="fas ${states[index] ? 'fa-check' : 'fa-clock'} text-[8px]"></i></span><span>${escapeNoteHtml(line)}</span></li>`).join('');
+        const lineItems = visibleLines.map(({ line, index }) => `<li class="flex items-start gap-2"><span class="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${states[index] ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}"><i class="fas ${states[index] ? 'fa-check' : 'fa-clock'} text-[8px]"></i></span><span class="flex-1 min-w-0 break-words ${states[index] ? 'text-slate-400 line-through' : 'text-slate-700'}">${escapeNoteHtml(line)}</span>${renderManagerNoteActions(`unit-line-${item.sn}-${index}`)}</li>`).join('');
         const completed = states.filter(Boolean).length;
         return `<div class="manager-notes-pdf-card bg-white border border-slate-200 rounded-lg p-3 shadow-sm" style="break-inside: avoid; page-break-inside: avoid;">
             <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 border-b border-slate-100 pb-2 mb-2"><div><div class="text-[10px] uppercase tracking-wider font-black text-blue-600">${escapeNoteHtml(item.ilce || 'İlçe bilgisi yok')}</div><h4 class="font-extrabold text-sm text-slate-800 mt-0.5">${escapeNoteHtml(item.mahalle || 'Mahalle bilgisi yok')}</h4><div class="flex flex-wrap gap-1.5 text-[10px] font-bold mt-2"><span class="rounded-md bg-blue-50 border border-blue-100 text-blue-700 px-2 py-1"><i class="fas fa-user-tie mr-1"></i>Müh: ${escapeNoteHtml(item.muhendis || 'Atanmadı')}</span><span class="rounded-md bg-purple-50 border border-purple-100 text-purple-700 px-2 py-1"><i class="fas fa-tools mr-1"></i>Tek: ${escapeNoteHtml(item.tekniker || 'Atanmadı')}</span></div></div><div class="flex flex-wrap gap-1.5 text-[10px] font-bold"><span class="rounded-md bg-emerald-50 border border-emerald-100 text-emerald-700 px-2 py-1">22-A: ${item.yirmi_iki_a || 0}</span><span class="rounded-md bg-slate-50 border border-slate-200 text-slate-600 px-2 py-1">${completed}/${lines.length} tamamlandı</span></div></div>
-            <ul class="space-y-1.5 text-[12px] leading-snug font-medium">${lineItems}</ul>
+            <ul class="space-y-1.5 text-[12px] leading-snug font-medium">${lineItems}</ul><button onclick="openManagerNoteForm('birim', ${item.sn})" class="manager-note-controls mt-3 text-xs font-bold text-blue-600 hover:text-blue-800"><i class="fas fa-plus mr-1"></i>Birim notu ekle</button>
         </div>`;
     };
 
@@ -1511,6 +1597,8 @@ async function exportManagerNotesToPDF() {
     const originalHeight = printable.style.height;
     const originalMaxHeight = printable.style.maxHeight;
     const originalOverflow = printable.style.overflow;
+    const editorControls = Array.from(printable.querySelectorAll('.manager-note-controls')).map(element => ({ element, display: element.style.display }));
+    editorControls.forEach(({ element }) => element.style.display = 'none');
     printable.style.height = 'auto';
     printable.style.maxHeight = 'none';
     printable.style.overflow = 'visible';
@@ -1568,6 +1656,7 @@ async function exportManagerNotesToPDF() {
         printable.style.height = originalHeight;
         printable.style.maxHeight = originalMaxHeight;
         printable.style.overflow = originalOverflow;
+        editorControls.forEach(({ element, display }) => element.style.display = display);
     }
 }
 
@@ -1644,6 +1733,7 @@ function renderFirmaAllNotes() {
     const cards = notes.length ? [...generalCards, ...unitCards].join('') : '<div class="rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400">Firma notu bulunmuyor.</div>';
     container.innerHTML = summary + cards;
     renderPlanningModal();
+    refreshManagerNotesReport();
 }
 
 function addFirmaNote() {
@@ -1697,6 +1787,9 @@ function editFirmaNote(id) {
         if (editedText === null) return;
         if (!editedText.trim()) return showToast('Eksik bilgi', 'Not boş bırakılamaz.', 'error');
         note.text = editedText.trim();
+        if (String(id).startsWith('legacy-') && !yatirimData.firmaNotlariSilinen.includes(String(id))) {
+            yatirimData.firmaNotlariSilinen.push(String(id));
+        }
         localStorage.setItem('yatirimData', JSON.stringify(yatirimData));
     }
     setUnsavedState(true);
@@ -3131,6 +3224,7 @@ function renderTable() {
 
     calculateStats(); calculateProgressStats();
     renderPlanningModal();
+    refreshManagerNotesReport();
 }
 
 function renderDeadlineWarnings(items) {
