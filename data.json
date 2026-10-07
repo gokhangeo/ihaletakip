@@ -181,7 +181,11 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-22",
-    "altlik_durum": "Devam Ediyor"
+    "altlik_durum": "Devam Ediyor",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[05.10.2026] Yersel ölçümün daha uygun olacağı belirtildi(Müh.)"
   },
   {
     "sn": 9,
