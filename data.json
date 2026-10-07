@@ -253,7 +253,11 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-27",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[07.10.2026] Meskun yok, kıymetlendirme yok"
   },
   {
     "sn": 12,
