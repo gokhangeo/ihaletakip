@@ -221,7 +221,10 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Yapıldı",
-    "notlar": ""
+    "notlar": "[29.10.2026] Değerlendirme devam ediyor(Tekn.)",
+    "notlar_tamamlandi": [
+      false
+    ]
   },
   {
     "sn": 11,
@@ -606,7 +609,7 @@
       false,
       false
     ],
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Yapıldı"
   },
   {
     "sn": 26,
