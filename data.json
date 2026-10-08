@@ -355,7 +355,7 @@
       false,
       false
     ],
-    "degerlendirme_durum": "Yapıldı"
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 16,
@@ -448,7 +448,7 @@
       false,
       false
     ],
-    "degerlendirme_durum": "Yapıldı"
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 19,
@@ -598,7 +598,7 @@
       false
     ],
     "notlar": "[18.08.2026] Kıymetlendirme geldi. Değerlendirmeye başlanacak.\n[25.08.2026] Tekn. değerlendirme devam ediyor. 27.08 zemin ölçümü ve ykn kontrolü yapılacak\n[03.09.2026] Değerlendirme devam ediyor.(%50 tamam)\n[08.09.2026] Değerlendirme tamam(ormana bakılacak)(Tekn.)\n[25.09.2026] Firmaya teslim edilecek\n[07.10.2026] Ormancı ile bakılıyor 08.10.2026 firmaya teslim edilecek",
-    "degerlendirme_durum": "Yapıldı"
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 25,
@@ -630,7 +630,7 @@
       false,
       false
     ],
-    "degerlendirme_durum": "Yapıldı"
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 26,
@@ -792,9 +792,9 @@
     "genel_durum": "DEĞERLENDİRMEDE",
     "ucus_tarihi": "2026-06-08",
     "altlik_durum": "Yapıldı",
-    "degerlendirme_durum": "Yapıldı",
+    "degerlendirme_durum": "Devam Ediyor",
     "notlar": "[14.07.2026] Değerlendirme devam ediyor.(Tekn.)\n[22.07.2026] Meskun ölçüldü teslim edilmedi. Değerlendirme devam ediyor(Tekn.)\n[06.08.2026] Zemin kontrolü yapılacak\n[18.08.2026] Kıymetlendirme gelmedi. Ortofotoda kayıklık vardı düzeltildi, kontrol tekrar yapılıyor.\n[25.08.2026] 27.08 ykn kontrolü yapılacak\n[03.09.2026] YKN kontrolü yapıldı, kıymetlendirme gelmedi\n[08.09.2026] Kıymetlendirme gelmedi\n[25.09.2026] Değerlendirme devam ediyor.(Tekn.)\n[07.10.2026] 30.09.2026 kıymetlendirme geldi, değerlendirme devam ediyor",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
       false,
@@ -1042,7 +1042,7 @@
       false
     ],
     "notlar": "[23.09.2026] Değerlendirme devam ediyor",
-    "degerlendirme_durum": "Yapıldı"
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 43,
@@ -1189,7 +1189,7 @@
       false
     ],
     "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[30.09.2026] Arazi kontrolü yapılıyor(Tekn.)",
-    "degerlendirme_durum": "Yapıldı"
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 50,
@@ -1235,8 +1235,8 @@
       false
     ],
     "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor\n[23.09.2026] Meskun bekleniyor\n[30.09.2026] Meskun yapıldı.",
-    "ucus_kiymet_durum": "Devam Ediyor",
-    "degerlendirme_durum": "Yapıldı"
+    "ucus_kiymet_durum": "Yapıldı",
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 52,
@@ -1261,7 +1261,7 @@
       false
     ],
     "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)",
-    "degerlendirme_durum": "Yapıldı"
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 53,
