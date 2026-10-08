@@ -598,7 +598,7 @@
       false
     ],
     "notlar": "[18.08.2026] Kıymetlendirme geldi. Değerlendirmeye başlanacak.\n[25.08.2026] Tekn. değerlendirme devam ediyor. 27.08 zemin ölçümü ve ykn kontrolü yapılacak\n[03.09.2026] Değerlendirme devam ediyor.(%50 tamam)\n[08.09.2026] Değerlendirme tamam(ormana bakılacak)(Tekn.)\n[25.09.2026] Firmaya teslim edilecek\n[07.10.2026] Ormancı ile bakılıyor 08.10.2026 firmaya teslim edilecek",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Yapıldı"
   },
   {
     "sn": 25,
@@ -958,7 +958,7 @@
       false
     ],
     "notlar": "[22.07.2026] Değerlendimeye başlanıldı\n[04.08.2026] Değerlendirme devam ediyor. 21.08.2026 tarihine kadar değerlendirmenin yapılarak firmaya teslim edilmesi.\n[26.08.2026] Arazi kontrolü yapılıyor\n[30.09.2026] Değerlendirme devam ediyor.",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Yapıldı"
   },
   {
     "sn": 39,
@@ -1042,7 +1042,7 @@
       false
     ],
     "notlar": "[23.09.2026] Değerlendirme devam ediyor",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Yapıldı"
   },
   {
     "sn": 43,
@@ -1189,7 +1189,7 @@
       false
     ],
     "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[30.09.2026] Arazi kontrolü yapılıyor(Tekn.)",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Yapıldı"
   },
   {
     "sn": 50,
@@ -1236,7 +1236,7 @@
     ],
     "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor\n[23.09.2026] Meskun bekleniyor\n[30.09.2026] Meskun yapıldı.",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Yapıldı"
   },
   {
     "sn": 52,
@@ -1261,7 +1261,7 @@
       false
     ],
     "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Yapıldı"
   },
   {
     "sn": 53,
@@ -1287,7 +1287,7 @@
       false
     ],
     "notlar": "[04.08.2026] Altlık kontrol ediliyor. 13.08.2026 tarihin kadar altlık kont. tamamlanarak değerlendirmeye başlanılması.\n[26.08.2026] Değerlendirme devam ediyor",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Yapıldı"
   },
   {
     "sn": 54,
@@ -1311,7 +1311,7 @@
       false
     ],
     "notlar": "[03.09.2026] Değerlendirme devam ediyor(Kont. Mem.)",
-    "degerlendirme_durum": "Devam Ediyor",
+    "degerlendirme_durum": "Yapıldı",
     "ucus_kiymet_durum": "Devam Ediyor"
   }
 ]
