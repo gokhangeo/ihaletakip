@@ -129,7 +129,7 @@
       "tur": "birim",
       "birimSn": "12",
       "text": "[03.09.2026] Bina ölçümleri teslim edilmedi",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-09-03T09:00:55.606Z"
     },
     {
@@ -137,7 +137,7 @@
       "tur": "birim",
       "birimSn": "25",
       "text": "[03.09.2026] Kıymetlendirme gelmedi",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-09-03T09:02:03.885Z"
     },
     {
@@ -145,7 +145,7 @@
       "tur": "birim",
       "birimSn": "30",
       "text": "[03.09.2026] Lidar teslim edilmedi",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-09-03T09:02:35.373Z"
     },
     {
@@ -153,7 +153,7 @@
       "tur": "birim",
       "birimSn": "15",
       "text": "[03.09.2026] Bina ölçümleri teslim edilmedi",
-      "tamamlandi": false,
+      "tamamlandi": true,
       "createdAt": "2026-09-03T09:18:54.245Z"
     }
   ],
