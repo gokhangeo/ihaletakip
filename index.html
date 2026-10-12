@@ -1593,38 +1593,54 @@ function generateManagerNotesReport() {
 async function exportManagerNotesToPDF() {
     const printable = document.getElementById('managerNotesReportPrintable');
     if (!printable || !printable.innerHTML.trim()) return showToast('Hata', 'Önce yönetici özet raporunu oluşturmalısınız.', 'error');
+    if (document.querySelector('[data-manager-pdf-export]')) return;
     showToast('Hazırlanıyor...', 'Yönetici özet not raporu PDF olarak oluşturuluyor...', 'info');
-    const originalHeight = printable.style.height;
-    const originalMaxHeight = printable.style.maxHeight;
-    const originalOverflow = printable.style.overflow;
-    const editorControls = Array.from(printable.querySelectorAll('.manager-note-controls')).map(element => ({ element, display: element.style.display }));
-    editorControls.forEach(({ element }) => element.style.display = 'none');
-    printable.style.height = 'auto';
-    printable.style.maxHeight = 'none';
-    printable.style.overflow = 'visible';
+    const exportWidth = 1024;
+    const exportHost = document.createElement('div');
+    exportHost.dataset.managerPdfExport = 'true';
+    exportHost.setAttribute('aria-hidden', 'true');
+    exportHost.style.cssText = `position:absolute;left:-100000px;top:0;width:${exportWidth}px;pointer-events:none;`;
     try {
-        const canvas = await html2canvas(printable, { scale: 2, useCORS: true, backgroundColor: '#f8fafc' });
+        // Modalın yükseklik ve kaydırma sınırları PDF içeriğini kesmemeli.
+        const exportContent = printable.cloneNode(true);
+        exportContent.removeAttribute('id');
+        exportContent.querySelectorAll('[id]').forEach(element => element.removeAttribute('id'));
+        exportContent.querySelectorAll('.manager-note-controls').forEach(element => element.remove());
+        Object.assign(exportContent.style, { width: `${exportWidth}px`, height: 'auto', maxHeight: 'none', minHeight: '0', overflow: 'visible', display: 'block', flex: 'none', boxSizing: 'border-box' });
+        // Telefon ve masaüstünde aynı rapor düzenini kullan.
+        exportContent.querySelectorAll('.grid').forEach(grid => {
+            grid.style.gridTemplateColumns = grid.closest('.manager-notes-section') ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))';
+        });
+        exportContent.querySelectorAll('[class]').forEach(element => {
+            if (element.classList.contains('sm:flex-row')) element.style.flexDirection = 'row';
+            if (element.classList.contains('sm:items-start')) element.style.alignItems = 'flex-start';
+        });
+        exportHost.appendChild(exportContent);
+        document.body.appendChild(exportHost);
+        if (document.fonts?.ready) await document.fonts.ready;
+        const reportHeight = Math.ceil(exportContent.getBoundingClientRect().height);
+        const canvas = await html2canvas(exportContent, { scale: 2, useCORS: true, backgroundColor: '#f8fafc', width: exportWidth, height: reportHeight, windowWidth: 1280, windowHeight: Math.max(1024, reportHeight), scrollX: 0, scrollY: 0 });
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         const margin = 8;
         const imageWidth = pdf.internal.pageSize.getWidth() - (margin * 2);
         const usableHeight = pdf.internal.pageSize.getHeight() - (margin * 2);
         const pageHeightOnCanvas = Math.floor(usableHeight * canvas.width / imageWidth);
-        const scale = canvas.width / printable.getBoundingClientRect().width;
-        const printableTop = printable.getBoundingClientRect().top;
-        const protectedCards = Array.from(printable.querySelectorAll('.manager-notes-pdf-card')).map((card) => {
+        const scale = canvas.width / exportWidth;
+        const printableTop = exportContent.getBoundingClientRect().top;
+        const protectedCards = Array.from(exportContent.querySelectorAll('.manager-notes-pdf-card')).map((card) => {
             const rect = card.getBoundingClientRect();
-            return { top: Math.round((rect.top - printableTop + printable.scrollTop) * scale), bottom: Math.round((rect.bottom - printableTop + printable.scrollTop) * scale) };
+            return { top: Math.round((rect.top - printableTop) * scale), bottom: Math.round((rect.bottom - printableTop) * scale) };
         });
-        const protectedSectionStarts = Array.from(printable.querySelectorAll('.manager-notes-section')).map((section) => {
+        const protectedSectionStarts = Array.from(exportContent.querySelectorAll('.manager-notes-section')).map((section) => {
             const heading = section.querySelector('h3');
             const firstCard = section.querySelector('.manager-notes-pdf-card');
             if (!heading || !firstCard) return null;
             const headingRect = heading.getBoundingClientRect();
             const firstCardRect = firstCard.getBoundingClientRect();
             return {
-                top: Math.round((headingRect.top - printableTop + printable.scrollTop) * scale),
-                bottom: Math.round((firstCardRect.bottom - printableTop + printable.scrollTop) * scale)
+                top: Math.round((headingRect.top - printableTop) * scale),
+                bottom: Math.round((firstCardRect.bottom - printableTop) * scale)
             };
         }).filter(Boolean);
         const slices = [];
@@ -1646,6 +1662,9 @@ async function exportManagerNotesToPDF() {
             pageCanvas.height = slice.height;
             pageCanvas.getContext('2d').drawImage(canvas, 0, slice.top, canvas.width, slice.height, 0, 0, canvas.width, slice.height);
             pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin, imageWidth, slice.height * imageWidth / canvas.width);
+            pdf.setFontSize(8);
+            pdf.setTextColor(100, 116, 139);
+            pdf.text(`${index + 1} / ${slices.length}`, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 3, { align: 'center' });
         });
         pdf.save(`Yonetici_Ozet_Not_Raporu_${new Date().toLocaleDateString('tr-TR')}.pdf`);
         showToast('Başarılı', 'Yönetici özet not raporu PDF olarak indirildi.', 'success');
@@ -1653,10 +1672,7 @@ async function exportManagerNotesToPDF() {
         console.error('Yönetici özet not raporu PDF hatası:', err);
         showToast('Hata', 'Yönetici özet not raporu PDF oluşturulamadı.', 'error');
     } finally {
-        printable.style.height = originalHeight;
-        printable.style.maxHeight = originalMaxHeight;
-        printable.style.overflow = originalOverflow;
-        editorControls.forEach(({ element, display }) => element.style.display = display);
+        exportHost.remove();
     }
 }
 
