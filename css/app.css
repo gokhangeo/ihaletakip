@@ -1,0 +1,119 @@
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .table-container { max-height: 60vh; overflow-y: auto; overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+        .sticky-header { position: sticky; top: 0; z-index: 20; }
+        .district-row { border-left: 4px solid transparent; transition: all 0.2s; background: white; }
+        .district-row.dragging { opacity: 0.5; background-color: #e2e8f0; }
+        
+        .district-ANAMUR { border-left-color: #3b82f6; }
+        .district-BOZYAZI { border-left-color: #10b981; }
+        .district-SİLİFKE { border-left-color: #f59e0b; }
+        .district-GÜLNAR { border-left-color: #8b5cf6; }
+        .district-AYDINCIK { border-left-color: #ef4444; }
+        
+        .editable-cell:focus { outline: 2px solid #3b82f6; background-color: #fff; border-radius: 4px; }
+        
+        select, input[type="date"], input[type="text"] { background: transparent; border: none; width: 100%; }
+        select:focus, input[type="date"]:focus, input[type="text"]:focus { outline: none; background: #fff; box-shadow: 0 0 0 2px #3b82f6; border-radius: 4px;}
+        #managerNoteForm select, #managerNoteForm input[type="date"] { background:#f8fafc; border:1px solid #cbd5e1; }
+        
+        .stat-card { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; transition: all 0.2s; cursor: pointer; }
+        .stat-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .stat-card.active-filter { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f1; background-color: #fefce8; }
+        
+        .progress-card { background: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; }
+        #progressSummary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; overflow:visible; }
+        #progressSummary > .progress-card { width:auto; min-width:0; padding:10px; }
+        #progressSummary .progress-card h4 { white-space:normal; line-height:1.25; overflow-wrap:anywhere; }
+        #progressSummary .progress-card button { text-align:left; }
+        @media (min-width:700px) { #progressSummary { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+        @media (min-width:950px) { #progressSummary { grid-template-columns:repeat(5,minmax(0,1fr)); } }
+        @media (min-width:1500px) { #progressSummary { grid-template-columns:repeat(9,minmax(0,1fr)); } }
+        
+        #toast { transition: opacity 0.3s, transform 0.3s; transform: translateY(100%); opacity: 0; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        @keyframes softBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .animate-soft-blink { animation: softBlink 1.5s ease-in-out infinite; }
+        
+        .drag-handle { cursor: grab; color: #cbd5e1; transition: color 0.2s; }
+        .drag-handle:hover { color: #64748b; }
+        .drag-handle:active { cursor: grabbing; }
+
+        /* PDF Yazdırma CSS'i */
+        .print-table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; font-family: sans-serif; table-layout: auto; }
+        .print-table th { background-color: #0f172a; color: white; padding: 12px 6px; border: 1px solid #64748b; text-align: center; font-weight: bold; }
+        .print-table td { padding: 10px 6px; border: 1px solid #cbd5e1; vertical-align: middle; text-align: center; }
+
+        /* Admin Düzenlenebilir Veri Stili */
+        .editable-finance { min-width: 40px; display: inline-block; cursor: text; transition: all 0.2s; border-radius: 4px; border: 1px solid transparent; }
+        .editable-finance:hover { background-color: rgba(255,255,255,0.2); }
+        .editable-finance:focus { background-color: white; color: #1e293b; outline: none; border-color: #3b82f6; padding: 0 4px; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); }
+
+        @media (max-width: 640px) {
+            #mainTable { min-width: 1100px; }
+            #notesReportModal { padding: 8px; }
+            #notesReportModal > div { max-height: 96vh; border-radius: 16px; }
+            #notesReportModal > div > div:first-child { padding: 14px; }
+            #notesReportModal h3 { font-size: 16px; }
+            #notesReportModal h3 + div button { padding: 8px 10px; }
+            #notesReportPrintable { padding: 12px; gap: 14px; }
+            #notesReportSummary { gap: 8px; }
+            #notesReportSummary > div { padding: 10px 6px; }
+            #notesReportSummary .text-2xl { font-size: 20px; }
+            #firmaNotesPreview .text-xs { font-size: 12px; line-height: 1.35; }
+        }
+        #planningModal { position:fixed; inset:0; z-index:75; padding:20px; background:rgba(15,23,42,.65); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; }
+        #planningModal.hidden { display:none; }
+        #toast { z-index:100; }
+        .planning-shell { width:100%; max-width:1600px; max-height:94vh; display:flex; flex-direction:column; overflow:hidden; border-radius:18px; background:#fff; box-shadow:0 24px 70px #0f172a40; }
+        .planning-header { padding:18px 22px; background:#173b62; color:white; display:flex; align-items:center; justify-content:space-between; gap:15px; flex-wrap:wrap; }
+        .planning-header h3 { font-size:20px; font-weight:800; margin:0; }
+        .planning-header p { font-size:12px; margin:5px 0 0; color:#d7e6f7; }
+        .planning-actions { display:flex; gap:8px; align-items:center; }
+        .planning-button { border:1px solid #cbd5e1; border-radius:9px; padding:9px 12px; font-size:12px; font-weight:700; background:white; color:#173b62; cursor:pointer; white-space:nowrap; }
+        .planning-button:hover { background:#f1f5f9; }
+        .planning-button.save { color:white; background:#2563eb; border-color:#2563eb; }
+        .planning-button.excel { color:white; background:#059669; border-color:#059669; }
+        .planning-close { border:0; background:transparent; color:white; font-size:24px; cursor:pointer; padding:4px 8px; }
+        .planning-toolbar { padding:12px 22px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; flex-wrap:wrap; align-items:end; gap:10px; }
+        .planning-toolbar label { display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:700; color:#475569; }
+        .planning-region-tabs { display:flex; flex-wrap:wrap; gap:6px; width:100%; }
+        .planning-region-tabs button { border:1px solid #cbd5e1; background:#fff; color:#475569; border-radius:9px; padding:9px 14px; font-size:12px; font-weight:700; cursor:pointer; }
+        .planning-region-tabs button[aria-pressed="true"] { background:#173b62; border-color:#173b62; color:white; }
+        .planning-toolbar select,.planning-toolbar input { background:white; border:1px solid #cbd5e1; border-radius:8px; padding:8px 10px; min-width:170px; font:inherit; font-size:12px; color:#334155; }
+        .planning-info { flex:1; min-width:220px; font-size:11px; line-height:1.8; color:#475569; }
+        .planning-summary { padding:10px 22px; display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:#475569; border-bottom:1px solid #e2e8f0; }
+        .planning-summary strong { color:#173b62; }
+        .planning-scroll { flex:1; overflow:auto; min-height:160px; }
+        .planning-table { width:100%; min-width:1250px; border-collapse:separate; border-spacing:0; font-size:12px; }
+        .planning-table thead { position:sticky; top:0; z-index:2; }
+        .planning-table th { text-align:left; padding:13px 10px; background:#173b62; color:white; font-weight:700; }
+        .planning-table th.staff { background:#997117; }
+        .planning-table th.manager { background:#356c9c; }
+        .planning-table td { vertical-align:top; padding:10px; border-bottom:1px solid #e2e8f0; background:white; }
+        .planning-table tr:nth-child(even) td { background:#f8fafc; }
+        .planning-table td.staff { background:#fff5d4 !important; }
+        .planning-table td.manager { background:#edf4fd !important; }
+        .planning-table input,.planning-table textarea { display:block; width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; background:#ffffffc9; font:inherit; color:#334155; }
+        .planning-table input { min-width:145px; cursor:pointer; }
+        .planning-table textarea { resize:vertical; min-width:150px; min-height:76px; }
+        .planning-table .planning-late { border-color:#f87171; background:#fee2e2; color:#991b1b; }
+        .planning-late-message { color:#b91c1c; font-size:10px; line-height:1.4; margin-top:5px; }
+        .planning-notes { min-width:270px; max-width:420px; }
+        .planning-notes select { width:100%; margin-bottom:7px; }
+        .planning-notes summary { cursor:pointer; color:#1d4ed8; font-weight:700; padding:5px 0; }
+        .planning-note-row { display:flex; align-items:start; gap:7px; border-top:1px solid #e2e8f0; padding:7px 0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:11px; }
+        .planning-note-row button { flex-shrink:0; padding:3px 6px; border:1px solid #cbd5e1; border-radius:5px; background:#fff; cursor:pointer; }
+        .planning-note-row .done { color:#047857; background:#d1fae5; }
+        .planning-note-text { flex:1; }
+        .planning-note-source { display:block; font-size:9px; color:#64748b; margin-bottom:3px; }
+        .planning-note-preview { color:#64748b; font-size:10px; line-height:1.5; overflow-wrap:anywhere; }
+        .planning-technician { color:#64748b; font-size:10px; margin-top:4px; }
+        .planning-footer { padding:11px 22px; background:#f8fafc; border-top:1px solid #e2e8f0; font-size:11px; color:#64748b; }
+        .planning-delivered { color:#047857; font-size:10px; font-weight:700; margin-top:5px; }
+        @media(max-width:640px) { #planningModal { padding:6px; } .planning-shell { max-height:98vh; border-radius:12px; } .planning-header,.planning-toolbar { padding:12px; } .planning-header h3 { font-size:17px; } .planning-actions { flex-wrap:wrap; } .planning-summary,.planning-footer { padding:10px 12px; } }
