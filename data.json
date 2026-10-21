@@ -401,7 +401,7 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "KOMİSYON YAPILDI",
+    "genel_durum": "KESİN ASKIDA",
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Yapıldı",
     "degerlendirme_durum": "Yapıldı",
@@ -415,7 +415,8 @@
       true
     ],
     "bilgilendirme_tarihi": "2026-09-04",
-    "komisyon_durum": "Yapıldı"
+    "komisyon_durum": "Yapıldı",
+    "kesin_aski_tarihi": "2026-10-22"
   },
   {
     "sn": 18,
