@@ -1085,7 +1085,7 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-08-21",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Yapıldı"
   },
   {
@@ -1125,7 +1125,7 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ BEKLİYOR",
     "ucus_tarihi": "2026-07-09",
-    "ucus_kiymet_durum": "Devam Ediyor",
+    "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Devam Ediyor"
   },
   {
@@ -1315,6 +1315,6 @@
     ],
     "notlar": "[03.09.2026] Değerlendirme devam ediyor(Kont. Mem.)",
     "degerlendirme_durum": "Yapıldı",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "ucus_kiymet_durum": "Yapıldı"
   }
 ]
