@@ -1069,7 +1069,7 @@
     "genel_durum": "VERİLER ELEKTRONİK ORTAMDA HAZIRLANDI",
     "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Yapıldı",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Yapılmadı"
   },
   {
     "sn": 44,
@@ -1306,7 +1306,7 @@
       false
     ],
     "notlar": "[04.08.2026] Altlık kontrol ediliyor. 13.08.2026 tarihin kadar altlık kont. tamamlanarak değerlendirmeye başlanılması.\n[26.08.2026] Değerlendirme devam ediyor\n[22.10.2026] Değerlendirme tamamlama aşamsına geldi.",
-    "degerlendirme_durum": "Yapıldı"
+    "degerlendirme_durum": "Devam Ediyor"
   },
   {
     "sn": 54,
@@ -1330,7 +1330,7 @@
       false
     ],
     "notlar": "[03.09.2026] Değerlendirme devam ediyor(Kont. Mem.)",
-    "degerlendirme_durum": "Yapıldı",
+    "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Yapıldı"
   }
 ]
