@@ -732,7 +732,7 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "MAHMUT GÖK",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "KROKİ/TUTANAK KONTROLÜ",
+    "genel_durum": "BİLGİLENDİRME İLANINDA",
     "ucus_tarihi": "2026-06-07",
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Yapıldı",
@@ -746,7 +746,8 @@
       true,
       true,
       true
-    ]
+    ],
+    "bilgilendirme_tarihi": "2026-10-14"
   },
   {
     "sn": 31,
