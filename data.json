@@ -20,7 +20,8 @@
     "notlar_tamamlandi": [
       false
     ],
-    "notlar": "[26.10.2026] Değerlendirme devam ediyor"
+    "notlar": "[26.10.2026] Değerlendirme devam ediyor",
+    "plan_kesin_hedef": "2026-12-25"
   },
   {
     "sn": 2,
@@ -101,7 +102,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
     "altlik_durum": "Yapıldı",
-    "ucus_tarihi": "2026-07-27"
+    "ucus_tarihi": "2026-07-27",
+    "plan_kesin_hedef": "2027-03-15"
   },
   {
     "sn": 5,
@@ -125,7 +127,8 @@
     "notlar_tamamlandi": [
       false
     ],
-    "notlar": "[06.10.2026] Yersel ölçüm yapılmasının daha uygun olacağı belirtildi(Müh.)"
+    "notlar": "[06.10.2026] Yersel ölçüm yapılmasının daha uygun olacağı belirtildi(Müh.)",
+    "plan_kesin_hedef": "2027-02-19"
   },
   {
     "sn": 6,
@@ -145,7 +148,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-27"
+    "ucus_tarihi": "2026-07-27",
+    "plan_kesin_hedef": "2027-02-15"
   },
   {
     "sn": 7,
@@ -171,7 +175,8 @@
       false
     ],
     "notlar": "[03.09.2026] Kontrole başlanacak\n[25.09.2026] Hüseyin Büyük değerlendime yapılıyor",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "plan_kesin_hedef": "2027-01-15"
   },
   {
     "sn": 8,
@@ -195,7 +200,8 @@
     "notlar_tamamlandi": [
       false
     ],
-    "notlar": "[05.10.2026] Yersel ölçümün daha uygun olacağı belirtildi(Müh.)"
+    "notlar": "[05.10.2026] Yersel ölçümün daha uygun olacağı belirtildi(Müh.)",
+    "plan_kesin_hedef": "2027-01-15"
   },
   {
     "sn": 9,
@@ -214,7 +220,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-08-28",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "plan_kesin_hedef": "2027-05-14"
   },
   {
     "sn": 10,
@@ -239,7 +246,8 @@
     "notlar_tamamlandi": [
       false,
       false
-    ]
+    ],
+    "plan_kesin_hedef": "2026-10-30"
   },
   {
     "sn": 11,
@@ -263,7 +271,8 @@
     "notlar_tamamlandi": [
       false
     ],
-    "notlar": "[07.10.2026] Meskun yok, kıymetlendirme yok. Ortofoto üzerinden değerlendirme yapılıyor(Tekn.)"
+    "notlar": "[07.10.2026] Meskun yok, kıymetlendirme yok. Ortofoto üzerinden değerlendirme yapılıyor(Tekn.)",
+    "plan_kesin_hedef": "2026-11-20"
   },
   {
     "sn": 12,
@@ -294,7 +303,8 @@
       false,
       false
     ],
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "plan_kesin_hedef": "2026-10-30"
   },
   {
     "sn": 13,
@@ -313,7 +323,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
-    "ucus_tarihi": "2026-08-28"
+    "ucus_tarihi": "2026-08-28",
+    "plan_kesin_hedef": "2027-03-30"
   },
   {
     "sn": 14,
@@ -333,7 +344,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-27"
+    "ucus_tarihi": "2026-07-27",
+    "plan_kesin_hedef": "2027-03-15"
   },
   {
     "sn": 15,
@@ -360,7 +372,8 @@
       false,
       false
     ],
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "plan_kesin_hedef": "2026-11-20"
   },
   {
     "sn": 16,
@@ -389,7 +402,8 @@
       false,
       false
     ],
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "plan_kesin_hedef": "2026-11-20"
   },
   {
     "sn": 17,
@@ -454,7 +468,8 @@
       false,
       false
     ],
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "plan_kesin_hedef": "2026-10-26"
   },
   {
     "sn": 19,
@@ -537,7 +552,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-27"
+    "ucus_tarihi": "2026-07-27",
+    "plan_kesin_hedef": "2027-04-22"
   },
   {
     "sn": 22,
@@ -556,7 +572,8 @@
     "tas": "MUSTAFA BICAK",
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_tarihi": "2026-08-28",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "plan_kesin_hedef": "2027-02-25"
   },
   {
     "sn": 23,
@@ -576,7 +593,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-27",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "plan_kesin_hedef": "2027-04-30"
   },
   {
     "sn": 24,
@@ -639,7 +657,8 @@
       false,
       false
     ],
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "plan_kesin_hedef": "2026-11-20"
   },
   {
     "sn": 26,
@@ -660,7 +679,8 @@
     "ucus_kiymet_durum": "Yapıldı",
     "ucus_tarihi": "2026-07-22",
     "altlik_durum": "Yapıldı",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "plan_kesin_hedef": "2026-12-18"
   },
   {
     "sn": 27,
@@ -681,7 +701,8 @@
     "ucus_kiymet_durum": "Yapıldı",
     "ucus_tarihi": "2026-07-22",
     "altlik_durum": "Yapıldı",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Devam Ediyor",
+    "plan_kesin_hedef": "2027-01-18"
   },
   {
     "sn": 28,
@@ -701,7 +722,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "ucus_kiymet_durum": "Devam Ediyor",
-    "ucus_tarihi": "2026-07-27"
+    "ucus_tarihi": "2026-07-27",
+    "plan_kesin_hedef": "2026-12-15"
   },
   {
     "sn": 29,
@@ -721,7 +743,8 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-27",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "plan_kesin_hedef": "2027-01-15"
   },
   {
     "sn": 30,
@@ -817,7 +840,8 @@
       false,
       false,
       false
-    ]
+    ],
+    "plan_kesin_hedef": "2026-11-27"
   },
   {
     "sn": 33,
