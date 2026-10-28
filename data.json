@@ -39,7 +39,7 @@
     "kadastro": "MEHMET AKDENİZ",
     "fen": "",
     "tas": "MUSTAFA BICAK",
-    "genel_durum": "KOMİSYON AŞAMASINDA",
+    "genel_durum": "KESİN ASKIDA",
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-20",
     "degerlendirme_durum": "Yapıldı",
@@ -53,7 +53,8 @@
       true
     ],
     "bilgilendirme_tarihi": "2026-09-09",
-    "komisyon_durum": "Yapıldı"
+    "komisyon_durum": "Yapıldı",
+    "kesin_aski_tarihi": "2026-11-03"
   },
   {
     "sn": 3,
