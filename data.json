@@ -278,9 +278,10 @@
     "ucus_tarihi": "2026-07-27",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[07.10.2026] Meskun yok, kıymetlendirme yok. Ortofoto üzerinden değerlendirme yapılıyor(Tekn.)",
+    "notlar": "[07.10.2026] Meskun yok, kıymetlendirme yok. Ortofoto üzerinden değerlendirme yapılıyor(Tekn.)\n[03.11.2026] Kıymetlendirme ve lidar teslim edildi. Değerlendirme devam ediyor.",
     "plan_kesin_hedef": "2026-11-20",
     "plan_personel_hedef": "2027-01-15"
   },
