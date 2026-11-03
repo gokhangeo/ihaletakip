@@ -416,7 +416,7 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Yapıldı",
-    "notlar": "[18.08.2026] Altlık kontrol ediliyor(Kont. Mem.)\n[25.08.2026] Değerlendirmeye başlanıldı\n[03.09.2026] Değerlendirme devam ediyor\n[08.09.2026] Değerlendirme devam ediyor\n[07.10.2026] Meskun teslim edilmedi\n[03.11.2026] Değerlendirme devam ediyor. Meskun teslim edilmedi",
+    "notlar": "[18.08.2026] Altlık kontrol ediliyor(Kont. Mem.)\n[25.08.2026] Değerlendirmeye başlanıldı\n[03.09.2026] Değerlendirme devam ediyor\n[08.09.2026] Değerlendirme devam ediyor\n[07.10.2026] Meskun teslim edilmedi\n[03.11.2026] Değerlendirme devam ediyor. Meskun teslim edildi(site olan kısım kaldı)",
     "notlar_tamamlandi": [
       true,
       false,
