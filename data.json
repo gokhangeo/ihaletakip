@@ -18,9 +18,10 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[26.10.2026] Değerlendirme devam ediyor",
+    "notlar": "[26.10.2026] Değerlendirme devam ediyor\n[03.11.2026] Kıymetlendirme ve lidar teslim edilmedi.",
     "plan_kesin_hedef": "2026-12-25",
     "plan_personel_hedef": "2027-04-16"
   },
@@ -128,9 +129,10 @@
     "ucus_tarihi": "2026-07-22",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[06.10.2026] Yersel ölçüm yapılmasının daha uygun olacağı belirtildi(Müh.)",
+    "notlar": "[06.10.2026] Yersel ölçüm yapılmasının daha uygun olacağı belirtildi(Müh.)\n[03.11.2026] Yersel ölçüm bekleniyor",
     "plan_kesin_hedef": "2027-02-19",
     "plan_personel_hedef": "2027-03-01"
   },
@@ -177,9 +179,10 @@
     "ucus_kiymet_durum": "Devam Ediyor",
     "notlar_tamamlandi": [
       true,
+      false,
       false
     ],
-    "notlar": "[03.09.2026] Kontrole başlanacak\n[25.09.2026] Hüseyin Büyük değerlendime yapılıyor",
+    "notlar": "[03.09.2026] Kontrole başlanacak\n[25.09.2026] Hüseyin Büyük değerlendime yapılıyor\n[03.11.2026] Kıymetlendirme gelmedi.",
     "degerlendirme_durum": "Devam Ediyor",
     "plan_kesin_hedef": "2027-01-15",
     "plan_personel_hedef": "2027-06-15"
@@ -204,9 +207,10 @@
     "ucus_tarihi": "2026-07-22",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[05.10.2026] Yersel ölçümün daha uygun olacağı belirtildi(Müh.)",
+    "notlar": "[05.10.2026] Yersel ölçümün daha uygun olacağı belirtildi(Müh.)\n[03.11.2026] Yersel ölçüm bekleniyor.",
     "plan_kesin_hedef": "2027-01-15",
     "plan_personel_hedef": "2027-06-15"
   },
@@ -250,8 +254,9 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-06-15",
     "ucus_kiymet_durum": "Yapıldı",
-    "notlar": "[29.09.2026] Değerlendirme devam ediyor(Tekn.)\n[07.10.2026] Değerlendirme tamamlandı.(Tekn.) Bina teslim edilecek.",
+    "notlar": "[29.09.2026] Değerlendirme devam ediyor(Tekn.)\n[07.10.2026] Değerlendirme tamamlandı.(Tekn.) Bina teslim edilecek.\n[03.11.2026] Bina teslim edildi kontrol ediliyor(Tekn.)",
     "notlar_tamamlandi": [
+      false,
       false,
       false
     ],
