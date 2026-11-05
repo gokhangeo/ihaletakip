@@ -1404,9 +1404,10 @@
     "ucus_tarihi": "2026-08-21",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[03.09.2026] Değerlendirme devam ediyor(Kont. Mem.)",
+    "notlar": "[03.09.2026] Değerlendirme devam ediyor(Kont. Mem.)\n[05.11.2026] Yersel ölçüm bekliyor",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Yapıldı"
   }
