@@ -1352,9 +1352,10 @@
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[22.10.2026] Değerlendirme %50 tamamlandı(Tekn.)",
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[22.10.2026] Değerlendirme %50 tamamlandı(Tekn.)\n[05.11.2026] Değerlendirme %70 tamamlandı(Tekn.)",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
