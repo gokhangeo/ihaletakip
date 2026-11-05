@@ -1243,9 +1243,10 @@
     "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[22.10.2026] Değerlendirme tamamlandı(Tekn.) Arazi kontrolü yapılacak"
+    "notlar": "[22.10.2026] Değerlendirme tamamlandı(Tekn.) Arazi kontrolü yapılacak\n[05.11.2026] Müh. kontrolünde. Arazi kontrolü yapılacak"
   },
   {
     "sn": 49,
@@ -1269,9 +1270,10 @@
     "notlar_tamamlandi": [
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[30.09.2026] Arazi kontrolü yapılıyor(Tekn.)\n[22.10.2026] Meskun dışında diğer kısımların Değerlendirmesi tamamlandı.",
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[30.09.2026] Arazi kontrolü yapılıyor(Tekn.)\n[22.10.2026] Meskun dışında diğer kısımların Değerlendirmesi tamamlandı.\n[05.11.2026] Arazi kontrolü yapılacak",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
@@ -1321,9 +1323,10 @@
       false,
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor\n[23.09.2026] Meskun bekleniyor\n[30.09.2026] Meskun yapıldı.\n[22.10.2026] Değerlendirme %80 tamamlandı.(Tekn.)",
+    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor\n[23.09.2026] Meskun bekleniyor\n[30.09.2026] Meskun yapıldı.\n[22.10.2026] Değerlendirme %80 tamamlandı.(Tekn.)\n[05.11.2026] Arazi kontrolü yapılıyor",
     "ucus_kiymet_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor"
   },
