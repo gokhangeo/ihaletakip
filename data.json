@@ -1117,9 +1117,10 @@
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[23.09.2026] Değerlendirme devam ediyor\n[22.10.2026] Değerlendirme tamamlandı(Tekn.) Arazi kontrolü yapılacak",
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor\n[22.10.2026] Değerlendirme tamamlandı(Tekn.) Arazi kontrolü yapılacak\n[5.11.2026] Arazi kontrolü yapılıyor",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
