@@ -1295,9 +1295,10 @@
     "altlik_durum": "Yapıldı",
     "ucus_tarihi": "2026-10-05",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[22.10.2026] Kıymetlendirme bekliyor",
+    "notlar": "[22.10.2026] Kıymetlendirme bekliyor\n[05.11.2026] Kıymetlendirme bekliyor",
     "ucus_kiymet_durum": "Devam Ediyor"
   },
   {
@@ -1380,7 +1381,7 @@
       false,
       false
     ],
-    "notlar": "[04.08.2026] Altlık kontrol ediliyor. 13.08.2026 tarihin kadar altlık kont. tamamlanarak değerlendirmeye başlanılması.\n[26.08.2026] Değerlendirme devam ediyor\n[22.10.2026] Değerlendirme tamamlama aşamsına geldi.",
+    "notlar": "[04.08.2026] Altlık kontrol ediliyor. 13.08.2026 tarihin kadar altlık kont. tamamlanarak değerlendirmeye başlanılması.\n[26.08.2026] Değerlendirme devam ediyor\n[22.10.2026] Değerlendirme tamamlama aşamasına geldi.[05.11.2026] Değerlendirme tamamlandı (4 parsel görüş sorulacak)",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
