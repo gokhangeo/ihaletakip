@@ -1182,7 +1182,11 @@
     "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
     "ucus_kiymet_durum": "Yapıldı",
     "ucus_tarihi": "2026-05-04",
-    "altlik_durum": "Yapıldı"
+    "altlik_durum": "Yapıldı",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[05.11.2026] Kıymetlendirme bekliyor"
   },
   {
     "sn": 46,
