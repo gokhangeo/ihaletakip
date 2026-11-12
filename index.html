@@ -294,7 +294,7 @@
         <div id="planningSummary" class="planning-summary" aria-live="polite"></div>
         <div class="planning-scroll">
             <table class="planning-table">
-                <thead><tr><th>Mühendis / Tekniker</th><th>İlçe</th><th>Birim</th><th>Not / Durum (tarihli)</th><th class="staff">Personel teslim hedefi</th><th class="staff">Personel açıklaması</th><th class="manager">Kesin teslim hedefi</th><th class="manager">Müdür değerlendirmesi</th></tr></thead>
+                <thead><tr><th>Mühendis / Tekniker</th><th>İlçe</th><th>Birim</th><th>Not / Durum (tarihli)</th><th class="staff">Personel teslim hedefi</th><th class="staff">Personel açıklaması</th><th class="manager" aria-sort="none"><button type="button" id="planningKesinSortBtn" class="planning-sort" onclick="togglePlanningKesinSort()" title="Tarihe göre sırala (eskiden yeniye)">Kesin teslim hedefi <i class="fas fa-sort" aria-hidden="true"></i></button></th><th class="manager">Müdür değerlendirmesi</th></tr></thead>
                 <tbody id="planningTableBody"></tbody>
             </table>
         </div>

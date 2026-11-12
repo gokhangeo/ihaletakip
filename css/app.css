@@ -95,6 +95,9 @@
         .planning-table th { text-align:left; padding:13px 10px; background:#173b62; color:white; font-weight:700; }
         .planning-table th.staff { background:#997117; }
         .planning-table th.manager { background:#356c9c; }
+        .planning-table th .planning-sort { display:inline-flex; align-items:center; gap:7px; padding:0; border:0; background:none; color:inherit; font:inherit; font-weight:700; text-align:left; cursor:pointer; }
+        .planning-table th .planning-sort:hover,.planning-table th .planning-sort:focus-visible { text-decoration:underline; }
+        .planning-table th[aria-sort="none"] .planning-sort i { opacity:.55; }
         .planning-table td { vertical-align:top; padding:10px; border-bottom:1px solid #e2e8f0; background:white; }
         .planning-table tr:nth-child(even) td { background:#f8fafc; }
         .planning-table td.staff { background:#fff5d4 !important; }

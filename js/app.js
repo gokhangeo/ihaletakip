@@ -374,6 +374,7 @@ let activePlanningRegion = 'region1';
 const planningFields = ['plan_personel_hedef', 'plan_personel_aciklama', 'plan_kesin_hedef', 'plan_mudur_degerlendirme'];
 let planningInputUpdateInProgress = false;
 let planningShowFirmaNotes = true;
+let planningKesinSort = '';
 
 function getPlanningLimitDate() {
     const date = new Date(planningEndDate + 'T12:00:00Z');
@@ -414,7 +415,31 @@ function getPlanningRows() {
         (!engineer || item.muhendis === engineer) &&
         (scope === 'all' || !hasPlanningAnnouncement(item)) &&
         (!search || `${item.ilce || ''} ${item.mahalle || ''}`.toLocaleLowerCase('tr-TR').includes(search))
-    ).sort((a, b) => String(a.muhendis || '').localeCompare(String(b.muhendis || ''), 'tr') || String(a.ilce || '').localeCompare(String(b.ilce || ''), 'tr') || String(a.mahalle || '').localeCompare(String(b.mahalle || ''), 'tr'));
+    ).sort((a, b) => comparePlanningKesinHedef(a, b) || String(a.muhendis || '').localeCompare(String(b.muhendis || ''), 'tr') || String(a.ilce || '').localeCompare(String(b.ilce || ''), 'tr') || String(a.mahalle || '').localeCompare(String(b.mahalle || ''), 'tr'));
+}
+
+// Kesin teslim hedefi sıralaması: '' (varsayılan) → 'asc' → 'desc'. Tarihi boş olanlar her iki yönde de sonda kalır.
+function comparePlanningKesinHedef(a, b) {
+    if (!planningKesinSort) return 0;
+    const first = a.plan_kesin_hedef || '', second = b.plan_kesin_hedef || '';
+    if (first === second) return 0;
+    if (!first) return 1;
+    if (!second) return -1;
+    return (first < second ? -1 : 1) * (planningKesinSort === 'asc' ? 1 : -1);
+}
+
+function togglePlanningKesinSort() {
+    planningKesinSort = planningKesinSort === '' ? 'asc' : planningKesinSort === 'asc' ? 'desc' : '';
+    renderPlanningModal();
+}
+
+function updatePlanningSortHeader() {
+    const button = document.getElementById('planningKesinSortBtn');
+    if (!button) return;
+    const labels = { '': 'Tarihe göre sırala (eskiden yeniye)', asc: 'Eskiden yeniye sıralı · yeniden eskiye çevir', desc: 'Yeniden eskiye sıralı · sıralamayı kaldır' };
+    button.closest('th').setAttribute('aria-sort', planningKesinSort === 'asc' ? 'ascending' : planningKesinSort === 'desc' ? 'descending' : 'none');
+    button.title = labels[planningKesinSort];
+    button.querySelector('i').className = 'fas ' + (planningKesinSort === 'asc' ? 'fa-sort-up' : planningKesinSort === 'desc' ? 'fa-sort-down' : 'fa-sort');
 }
 
 function getPlanningNoteEntries(item) {
@@ -514,6 +539,7 @@ function renderPlanningModal() {
     const engineers = [...new Set(getPlanningRegionData().map(item => item.muhendis).filter(Boolean))].sort((a,b) => a.localeCompare(b,'tr'));
     selector.innerHTML = '<option value="">Tüm mühendisler</option>' + engineers.map(name => `<option value="${escapeNoteHtml(name)}">${escapeNoteHtml(name)}</option>`).join('');
     selector.value = engineers.includes(selected) ? selected : '';
+    updatePlanningSortHeader();
     const rows = getPlanningRows();
     renderPlanningSummary(rows);
     document.getElementById('planningTableBody').innerHTML = rows.length ? rows.map(item => `<tr data-planning-unit="${item.sn}"><td><strong>${escapeNoteHtml(item.muhendis || 'Atanmadı')}</strong><div class="planning-technician">Tekniker: ${escapeNoteHtml(item.tekniker || 'Atanmadı')}</div></td><td>${escapeNoteHtml(item.ilce)}</td><td><strong>${escapeNoteHtml(item.mahalle)}</strong>${String(item.genel_durum || '').trim() === 'FİRMAYA TESLİM EDİLDİ' ? '<div class="planning-delivered">Firma teslimi yapılmış; ilan bekliyor.</div>' : ''}</td><td>${renderPlanningNotes(item)}</td><td class="staff">${renderPlanningDateInput(item,'plan_personel_hedef','personel teslim hedefi')}</td><td class="staff"><textarea rows="3" aria-label="${escapeNoteHtml(item.mahalle + ' personel açıklaması')}" data-planning-sn="${item.sn}" data-planning-field="plan_personel_aciklama" onchange="updatePlanningValue(${item.sn}, 'plan_personel_aciklama', this.value)">${escapeNoteHtml(item.plan_personel_aciklama || '')}</textarea></td><td class="manager">${renderPlanningDateInput(item,'plan_kesin_hedef','kesin teslim hedefi')}</td><td class="manager"><textarea rows="3" aria-label="${escapeNoteHtml(item.mahalle + ' müdür değerlendirmesi')}" data-planning-sn="${item.sn}" data-planning-field="plan_mudur_degerlendirme" onchange="updatePlanningValue(${item.sn}, 'plan_mudur_degerlendirme', this.value)">${escapeNoteHtml(item.plan_mudur_degerlendirme || '')}</textarea></td></tr>`).join('') : '<tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b">Bu seçime uygun birim bulunamadı.</td></tr>';
