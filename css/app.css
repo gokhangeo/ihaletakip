@@ -120,3 +120,7 @@
         .planning-footer { padding:11px 22px; background:#f8fafc; border-top:1px solid #e2e8f0; font-size:11px; color:#64748b; }
         .planning-delivered { color:#047857; font-size:10px; font-weight:700; margin-top:5px; }
         @media(max-width:640px) { #planningModal { padding:6px; } .planning-shell { max-height:98vh; border-radius:12px; } .planning-header,.planning-toolbar { padding:12px; } .planning-header h3 { font-size:17px; } .planning-actions { flex-wrap:wrap; } .planning-summary,.planning-footer { padding:10px 12px; } }
+        /* "Bu Ay Teslim Bekleyenler" uyarısı için derlenmiş Tailwind'de olmayan renkler */
+        .border-sky-300 { border-color:#7dd3fc; } .bg-sky-200 { background-color:#bae6fd; }
+        .text-sky-500 { color:#0ea5e9; } .text-sky-600 { color:#0284c7; } .text-sky-800 { color:#075985; } .text-sky-900 { color:#0c4a6e; }
+        .bg-emerald-200 { background-color:#a7f3d0; } .text-emerald-900 { color:#064e3b; } .border-red-300 { border-color:#fca5a5; }
