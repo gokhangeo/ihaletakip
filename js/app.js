@@ -2616,7 +2616,11 @@ function renderDeadlineWarnings(items) {
     const monthName = today.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
     const isTeslimEdildi = (item) => String(item.genel_durum || '').trim().toLocaleUpperCase('tr-TR') === 'FİRMAYA TESLİM EDİLDİ' || hasPlanningAnnouncement(item);
     const buAyTeslimHedefleri = items
-        .filter((item) => String(item.plan_kesin_hedef || '').slice(0, 7) === monthKey)
+        .filter((item) => {
+            const target = String(item.plan_kesin_hedef || '').slice(0, 7);
+            // Bu ayın tüm hedefleri + geçmiş aylardan kalıp hâlâ teslim edilmemiş olanlar
+            return target === monthKey || (target && target < monthKey && !isTeslimEdildi(item));
+        })
         .sort((a, b) => Number(isTeslimEdildi(a)) - Number(isTeslimEdildi(b)) || String(a.plan_kesin_hedef).localeCompare(String(b.plan_kesin_hedef)));
     const makeTeslimWarning = (itemsToShow) => {
         if (!itemsToShow.length) return '';
@@ -2632,7 +2636,7 @@ function renderDeadlineWarnings(items) {
             const late = String(item.plan_kesin_hedef).slice(0, 10) < todayKey;
             return `<span class="inline-flex items-center gap-1 rounded-md bg-white/80 border ${late ? 'border-red-300' : 'border-sky-200'} px-2 py-1 text-[10px] font-bold text-slate-700"><i class="fas fa-map-marker-alt ${late ? 'text-red-500' : 'text-sky-500'}"></i>${unitName(item)} <span class="${late ? 'text-red-600' : 'text-slate-400'}">(${date}${late ? ' · gecikti' : ''})</span>${engineer}</span>`;
         }).join('');
-        return `<div class="${waitingCount ? 'animate-soft-blink ' : ''}border border-sky-300 bg-sky-50 rounded-xl px-4 py-3 shadow-sm"><div class="flex flex-col md:flex-row md:items-start gap-2"><div class="flex items-center gap-2 flex-shrink-0 text-sky-800 font-extrabold text-sm"><i class="fas fa-truck text-sky-600"></i>Bu Ay Teslim Bekleyenler<span class="rounded-full bg-sky-200 text-sky-900 px-2 py-0.5 text-[10px]">${waitingCount} bekliyor</span>${doneCount ? `<span class="rounded-full bg-emerald-200 text-emerald-900 px-2 py-0.5 text-[10px]"><i class="fas fa-check"></i> ${doneCount} teslim edildi</span>` : ''}</div><div class="text-[11px] text-sky-800 font-medium">Personel Teslim Planı'nda kesin teslim hedefi ${escapeNoteHtml(monthName)} olan birimler. Firmaya teslim edilen veya ileri aşamaya geçenler yeşil tik ile durumuyla gösterilir.</div></div><div class="flex flex-wrap gap-1.5 mt-2">${unitTags}</div></div>`;
+        return `<div class="${waitingCount ? 'animate-soft-blink ' : ''}border border-sky-300 bg-sky-50 rounded-xl px-4 py-3 shadow-sm"><div class="flex flex-col md:flex-row md:items-start gap-2"><div class="flex items-center gap-2 flex-shrink-0 text-sky-800 font-extrabold text-sm"><i class="fas fa-truck text-sky-600"></i>Bu Ay Teslim Bekleyenler<span class="rounded-full bg-sky-200 text-sky-900 px-2 py-0.5 text-[10px]">${waitingCount} bekliyor</span>${doneCount ? `<span class="rounded-full bg-emerald-200 text-emerald-900 px-2 py-0.5 text-[10px]"><i class="fas fa-check"></i> ${doneCount} teslim edildi</span>` : ''}</div><div class="text-[11px] text-sky-800 font-medium">Personel Teslim Planı'nda kesin teslim hedefi ${escapeNoteHtml(monthName)} olan birimler ile geçmiş aylardan kalıp henüz teslim edilmeyenler. Firmaya teslim edilen veya ileri aşamaya geçenler yeşil tik ile durumuyla gösterilir.</div></div><div class="flex flex-wrap gap-1.5 mt-2">${unitTags}</div></div>`;
     };
     const makeWarning = (itemsToShow, type) => {
         if (!itemsToShow.length) return '';
