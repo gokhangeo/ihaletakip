@@ -2614,7 +2614,9 @@ function renderDeadlineWarnings(items) {
     const monthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
     const todayKey = `${monthKey}-${String(today.getDate()).padStart(2, '0')}`;
     const monthName = today.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
-    const isTeslimEdildi = (item) => String(item.genel_durum || '').trim().toLocaleUpperCase('tr-TR') === 'FİRMAYA TESLİM EDİLDİ' || hasPlanningAnnouncement(item);
+    // Firmaya teslim ve sonrasındaki tüm durumlar (ilan aşamaları hasPlanningAnnouncement ile kapsanır)
+    const teslimSonrasiDurumlar = ['FİRMAYA TESLİM EDİLDİ', 'KROKİ/TUTANAK KONTROLÜ', 'ASKI İLANINA HAZIRLANIYOR'];
+    const isTeslimEdildi = (item) => teslimSonrasiDurumlar.includes(String(item.genel_durum || '').trim().toLocaleUpperCase('tr-TR')) || hasPlanningAnnouncement(item);
     const buAyTeslimHedefleri = items
         .filter((item) => {
             const target = String(item.plan_kesin_hedef || '').slice(0, 7);
