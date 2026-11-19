@@ -124,3 +124,38 @@
         .border-sky-300 { border-color:#7dd3fc; } .bg-sky-200 { background-color:#bae6fd; }
         .text-sky-500 { color:#0ea5e9; } .text-sky-600 { color:#0284c7; } .text-sky-800 { color:#075985; } .text-sky-900 { color:#0c4a6e; }
         .bg-emerald-200 { background-color:#a7f3d0; } .text-emerald-900 { color:#064e3b; } .border-red-300 { border-color:#fca5a5; }
+        /* Personel Teslim Planı · Aylık Takip görünümü */
+        .planning-view-tabs { display:flex; gap:6px; width:100%; }
+        .planning-view-tabs button { border:1px solid #cbd5e1; background:#fff; color:#475569; border-radius:9px; padding:7px 13px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+        .planning-view-tabs button[aria-pressed="true"] { background:#356c9c; border-color:#356c9c; color:white; }
+        .planning-monthly { display:none; flex:1; overflow:auto; min-height:160px; padding:16px 22px; background:#f1f5f9; }
+        #planningModal.planning-monthly-mode .planning-monthly { display:block; }
+        #planningModal.planning-monthly-mode .planning-scroll,
+        #planningModal.planning-monthly-mode .planning-summary,
+        #planningModal.planning-monthly-mode .planning-table-only { display:none; }
+        .planning-month { background:white; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:14px; overflow:hidden; }
+        .planning-month.current { border:2px solid #356c9c; box-shadow:0 4px 14px rgba(53,108,156,.15); }
+        .planning-month header { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; padding:10px 14px; background:#edf4fd; border-bottom:1px solid #dbe7f5; }
+        .planning-month.past header { background:#f8fafc; }
+        .planning-month h4 { margin:0; font-size:14px; font-weight:800; color:#173b62; text-transform:capitalize; display:flex; align-items:center; gap:7px; }
+        .planning-month-now { text-transform:none; font-size:10px; background:#356c9c; color:white; border-radius:999px; padding:2px 8px; }
+        .planning-month-badges { display:flex; flex-wrap:wrap; gap:6px; }
+        .planning-month-badges .badge { font-size:10px; font-weight:800; border-radius:999px; padding:3px 9px; }
+        .planning-month-badges .total { background:#e2e8f0; color:#334155; }
+        .planning-month-badges .done { background:#d1fae5; color:#065f46; }
+        .planning-month-badges .waiting { background:#dbeafe; color:#1e40af; }
+        .planning-month-badges .late { background:#fee2e2; color:#991b1b; }
+        .planning-month-table-wrap { overflow-x:auto; }
+        .planning-month-table { width:100%; min-width:720px; border-collapse:collapse; font-size:12px; }
+        .planning-month-table th { text-align:left; padding:8px 12px; font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:#64748b; background:#fff; border-bottom:1px solid #e2e8f0; }
+        .planning-month-table td { padding:8px 12px; border-bottom:1px solid #f1f5f9; color:#334155; vertical-align:middle; }
+        .planning-month-table tr:last-child td { border-bottom:0; }
+        .planning-month-table tr.done td { background:#f0fdf4; }
+        .planning-month-table tr.late td { background:#fef2f2; }
+        .planning-month-date { font-weight:700; white-space:nowrap; }
+        .planning-month-status { display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:800; border-radius:7px; padding:3px 8px; }
+        .planning-month-status.done { color:#047857; background:#d1fae5; }
+        .planning-month-status.late { color:#b91c1c; background:#fee2e2; }
+        .planning-month-status.waiting { color:#1e40af; background:#dbeafe; }
+        .planning-month-missing,.planning-month-empty { font-size:12px; color:#475569; background:white; border:1px dashed #cbd5e1; border-radius:10px; padding:10px 14px; }
+        .planning-month-missing button { border:0; background:none; color:#1d4ed8; font-weight:700; cursor:pointer; padding:0; text-decoration:underline; }

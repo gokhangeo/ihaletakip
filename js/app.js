@@ -375,6 +375,7 @@ const planningFields = ['plan_personel_hedef', 'plan_personel_aciklama', 'plan_k
 let planningInputUpdateInProgress = false;
 let planningShowFirmaNotes = true;
 let planningKesinSort = '';
+let planningView = 'table'; // 'table' | 'monthly'
 
 function getPlanningLimitDate() {
     const date = new Date(planningEndDate + 'T12:00:00Z');
@@ -392,6 +393,12 @@ function hasPlanningAnnouncement(item) {
         'BİLGİLENDİRME İLANINDA', 'KOMİSYON AŞAMASINDA', 'KOMİSYON YAPILDI', 'KESİN ASKIDA',
         'KESİN ASKIDAN İNDİ. BEKLEMEDE', 'DEVİR YAPILDI', 'TESCİL AŞAMASINDA', 'TESCİLİ BİTTİ', 'İHALEDEN/PROGRAMDAN ÇIKARILDI'
     ].includes(status);
+}
+
+// Firmaya teslim ve sonrasındaki tüm durumlar teslim edilmiş sayılır (ilan aşamaları hasPlanningAnnouncement ile kapsanır)
+const planningDeliveredStatuses = ['FİRMAYA TESLİM EDİLDİ', 'KROKİ/TUTANAK KONTROLÜ', 'ASKI İLANINA HAZIRLANIYOR'];
+function isPlanningDelivered(item) {
+    return planningDeliveredStatuses.includes(String(item.genel_durum || '').trim().toLocaleUpperCase('tr-TR')) || hasPlanningAnnouncement(item);
 }
 
 function getPlanningRegionData() {
@@ -516,6 +523,8 @@ function renderPlanningModal() {
     const firmaToggle = document.getElementById('planningFirmaNotesToggle');
     firmaToggle.textContent = planningShowFirmaNotes ? 'Firma notlarını gizle' : 'Firma notlarını göster';
     firmaToggle.setAttribute('aria-pressed', String(!planningShowFirmaNotes));
+    modal.querySelectorAll('[data-planning-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.planningView === planningView)));
+    modal.classList.toggle('planning-monthly-mode', planningView === 'monthly');
     if (planningInputUpdateInProgress) {
         renderPlanningSummary(getPlanningRows());
         modal.querySelectorAll('input[data-planning-field]').forEach(input => {
@@ -545,7 +554,53 @@ function renderPlanningModal() {
     document.getElementById('planningTableBody').innerHTML = rows.length ? rows.map(item => `<tr data-planning-unit="${item.sn}"><td><strong>${escapeNoteHtml(item.muhendis || 'Atanmadı')}</strong><div class="planning-technician">Tekniker: ${escapeNoteHtml(item.tekniker || 'Atanmadı')}</div></td><td>${escapeNoteHtml(item.ilce)}</td><td><strong>${escapeNoteHtml(item.mahalle)}</strong>${String(item.genel_durum || '').trim() === 'FİRMAYA TESLİM EDİLDİ' ? '<div class="planning-delivered">Firma teslimi yapılmış; ilan bekliyor.</div>' : ''}</td><td>${renderPlanningNotes(item)}</td><td class="staff">${renderPlanningDateInput(item,'plan_personel_hedef','personel teslim hedefi')}</td><td class="staff"><textarea rows="3" aria-label="${escapeNoteHtml(item.mahalle + ' personel açıklaması')}" data-planning-sn="${item.sn}" data-planning-field="plan_personel_aciklama" onchange="updatePlanningValue(${item.sn}, 'plan_personel_aciklama', this.value)">${escapeNoteHtml(item.plan_personel_aciklama || '')}</textarea></td><td class="manager">${renderPlanningDateInput(item,'plan_kesin_hedef','kesin teslim hedefi')}</td><td class="manager"><textarea rows="3" aria-label="${escapeNoteHtml(item.mahalle + ' müdür değerlendirmesi')}" data-planning-sn="${item.sn}" data-planning-field="plan_mudur_degerlendirme" onchange="updatePlanningValue(${item.sn}, 'plan_mudur_degerlendirme', this.value)">${escapeNoteHtml(item.plan_mudur_degerlendirme || '')}</textarea></td></tr>`).join('') : '<tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b">Bu seçime uygun birim bulunamadı.</td></tr>';
     modal.querySelectorAll('tr[data-planning-unit]').forEach(row => { if (openNotes.has(row.dataset.planningUnit)) row.querySelector('details').open = true; });
     scroll.scrollTop = scrollTop; scroll.scrollLeft = scrollLeft;
+    if (planningView === 'monthly') renderPlanningMonthly();
     updatePlanningSaveStatus();
+}
+
+function selectPlanningView(view) {
+    if (!['table', 'monthly'].includes(view) || planningView === view) return;
+    planningView = view;
+    renderPlanningModal();
+}
+
+// Aylık takip: kesin teslim hedefine göre ay ay ilçe, mahalle ve görevli personel
+function renderPlanningMonthly() {
+    const container = document.getElementById('planningMonthly');
+    if (!container) return;
+    const engineer = document.getElementById('planningEngineer')?.value || '';
+    const search = (document.getElementById('planningSearch')?.value || '').trim().toLocaleLowerCase('tr-TR');
+    const units = getPlanningRegionData().filter(item =>
+        (!engineer || item.muhendis === engineer) &&
+        (!search || `${item.ilce || ''} ${item.mahalle || ''}`.toLocaleLowerCase('tr-TR').includes(search)));
+    const withTarget = units.filter(item => /^\d{4}-\d{2}-\d{2}/.test(String(item.plan_kesin_hedef || '')));
+    const withoutTarget = units.length - withTarget.length;
+    const now = new Date();
+    const pad = value => String(value).padStart(2, '0');
+    const currentMonth = `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
+    const todayKey = `${currentMonth}-${pad(now.getDate())}`;
+    const groups = {};
+    withTarget.forEach(item => { (groups[item.plan_kesin_hedef.slice(0, 7)] ||= []).push(item); });
+    const months = Object.keys(groups).sort();
+    const monthLabel = key => new Date(`${key}-01T12:00:00`).toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+    const sections = months.map(key => {
+        const items = groups[key].sort((a, b) => a.plan_kesin_hedef.localeCompare(b.plan_kesin_hedef) || String(a.ilce || '').localeCompare(String(b.ilce || ''), 'tr') || String(a.mahalle || '').localeCompare(String(b.mahalle || ''), 'tr'));
+        const done = items.filter(isPlanningDelivered).length;
+        const late = items.filter(item => !isPlanningDelivered(item) && item.plan_kesin_hedef.slice(0, 10) < todayKey).length;
+        const waiting = items.length - done - late;
+        const rows = items.map(item => {
+            const delivered = isPlanningDelivered(item);
+            const isLate = !delivered && item.plan_kesin_hedef.slice(0, 10) < todayKey;
+            const state = delivered ? 'done' : isLate ? 'late' : 'waiting';
+            const icon = delivered ? 'fa-check-circle' : isLate ? 'fa-exclamation-circle' : 'fa-clock';
+            const statusText = escapeNoteHtml(String(item.genel_durum || '').trim() || 'Durum girilmemiş');
+            return `<tr class="${state}"><td class="planning-month-date">${formatPlanningDate(item.plan_kesin_hedef.slice(0, 10))}</td><td>${escapeNoteHtml(item.ilce || '')}</td><td><strong>${escapeNoteHtml(item.mahalle || '')}</strong></td><td>${escapeNoteHtml(item.muhendis || 'Atanmadı')}</td><td>${escapeNoteHtml(item.tekniker || 'Atanmadı')}</td><td><span class="planning-month-status ${state}"><i class="fas ${icon}"></i>${statusText}${isLate ? ' · gecikti' : ''}</span></td></tr>`;
+        }).join('');
+        const badges = `<span class="badge total">${items.length} birim</span>${done ? `<span class="badge done"><i class="fas fa-check"></i> ${done} teslim edildi</span>` : ''}${waiting ? `<span class="badge waiting">${waiting} bekliyor</span>` : ''}${late ? `<span class="badge late">${late} gecikti</span>` : ''}`;
+        return `<section class="planning-month${key === currentMonth ? ' current' : ''}${key < currentMonth ? ' past' : ''}"><header><h4><i class="fas fa-calendar-alt"></i> ${escapeNoteHtml(monthLabel(key))}${key === currentMonth ? ' <span class="planning-month-now">Bu ay</span>' : ''}</h4><div class="planning-month-badges">${badges}</div></header><div class="planning-month-table-wrap"><table class="planning-month-table"><thead><tr><th>Kesin hedef</th><th>İlçe</th><th>Mahalle</th><th>Mühendis</th><th>Tekniker</th><th>Durum</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+    }).join('');
+    const missing = withoutTarget ? `<div class="planning-month-missing"><i class="fas fa-info-circle"></i> ${withoutTarget} birimin kesin teslim hedefi henüz girilmedi; bu birimler aylık takipte görünmez. Tarih girmek için <button type="button" onclick="selectPlanningView('table')">Tablo</button> görünümüne geçin.</div>` : '';
+    container.innerHTML = (sections || '<div class="planning-month-empty">Seçili bölge ve filtrelerde kesin teslim hedefi girilmiş birim yok.</div>') + missing;
 }
 
 function renderPlanningSummary(rows) {
@@ -2615,8 +2670,7 @@ function renderDeadlineWarnings(items) {
     const todayKey = `${monthKey}-${String(today.getDate()).padStart(2, '0')}`;
     const monthName = today.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
     // Firmaya teslim ve sonrasındaki tüm durumlar (ilan aşamaları hasPlanningAnnouncement ile kapsanır)
-    const teslimSonrasiDurumlar = ['FİRMAYA TESLİM EDİLDİ', 'KROKİ/TUTANAK KONTROLÜ', 'ASKI İLANINA HAZIRLANIYOR'];
-    const isTeslimEdildi = (item) => teslimSonrasiDurumlar.includes(String(item.genel_durum || '').trim().toLocaleUpperCase('tr-TR')) || hasPlanningAnnouncement(item);
+    const isTeslimEdildi = isPlanningDelivered;
     const buAyTeslimHedefleri = items
         .filter((item) => {
             const target = String(item.plan_kesin_hedef || '').slice(0, 7);
