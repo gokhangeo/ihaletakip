@@ -18,7 +18,7 @@
     <!-- Çok Sayfalı (Multi-sheet) Excel Çıktısı İçin SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
-    <link rel="stylesheet" href="css/app.css?v=20261118">
+    <link rel="stylesheet" href="css/app.css?v=20261119">
 </head>
 <body class="text-slate-800 h-screen w-screen overflow-hidden">
 
@@ -285,10 +285,14 @@
                 <button type="button" data-planning-region="region1" aria-pressed="true" onclick="selectPlanningRegion('region1')">Anamur – Bozyazı</button>
                 <button type="button" data-planning-region="region2" aria-pressed="false" onclick="selectPlanningRegion('region2')">Silifke – Gülnar – Aydıncık</button>
             </div>
+            <div class="planning-view-tabs" role="group" aria-label="Planlama görünümü">
+                <button type="button" data-planning-view="table" aria-pressed="true" onclick="selectPlanningView('table')"><i class="fas fa-table"></i> Tablo</button>
+                <button type="button" data-planning-view="monthly" aria-pressed="false" onclick="selectPlanningView('monthly')"><i class="fas fa-calendar-alt"></i> Aylık Takip</button>
+            </div>
             <label>Mühendis<select id="planningEngineer" onchange="renderPlanningModal()"><option value="">Tüm mühendisler</option></select></label>
-            <label>Gösterim<select id="planningScope" onchange="renderPlanningModal()"><option value="pending">Bilgilendirme ilanı çıkmayanlar</option><option value="all">Bölgedeki tüm birimler</option></select></label>
+            <label class="planning-table-only">Gösterim<select id="planningScope" onchange="renderPlanningModal()"><option value="pending">Bilgilendirme ilanı çıkmayanlar</option><option value="all">Bölgedeki tüm birimler</option></select></label>
             <label>Birim ara<input id="planningSearch" type="search" placeholder="İlçe / birim adı" oninput="renderPlanningModal()"></label>
-            <button id="planningFirmaNotesToggle" type="button" class="planning-button" onclick="togglePlanningFirmaNotes()" aria-pressed="false">Firma notlarını gizle</button>
+            <button id="planningFirmaNotesToggle" type="button" class="planning-button planning-table-only" onclick="togglePlanningFirmaNotes()" aria-pressed="false">Firma notlarını gizle</button>
             <div class="planning-info">İhale bitişi: <strong>10.08.2027</strong> · 45 gün önce: <strong id="planningLimitLabel">26.06.2027</strong><br>Sarı: personel girişi · Mavi: müdür girişi · Tarihler takvimden seçilir.</div>
         </div>
         <div id="planningSummary" class="planning-summary" aria-live="polite"></div>
@@ -298,6 +302,7 @@
                 <tbody id="planningTableBody"></tbody>
             </table>
         </div>
+        <div id="planningMonthly" class="planning-monthly" aria-live="polite"></div>
         <div class="planning-footer"><span id="planningSaveStatus" role="status"></span> · Ana tablo ile aynı birim kayıtları kullanılır. Tarihli notlar açılıp düzenlenebilir; Excel, seçili mühendis ve gösterimdeki güncel satırları indirir.</div>
     </div>
 </div>
@@ -561,7 +566,7 @@
     </div>
 </div>
 
-<script src="js/app.js?v=20261118c"></script>
+<script src="js/app.js?v=20261119"></script>
 
 </body>
 </html>
