@@ -564,40 +564,44 @@ function selectPlanningView(view) {
     renderPlanningModal();
 }
 
-// Aylık takip: kesin teslim hedefine göre ay ay ilçe, mahalle ve görevli personel
-function renderPlanningMonthly() {
-    const container = document.getElementById('planningMonthly');
-    if (!container) return;
+// Aylık takip verisi: kesin teslim hedefine göre ay ay gruplanmış birimler (ekran ve Excel ortak kullanır)
+function getPlanningMonthlyData() {
     const engineer = document.getElementById('planningEngineer')?.value || '';
     const search = (document.getElementById('planningSearch')?.value || '').trim().toLocaleLowerCase('tr-TR');
     const units = getPlanningRegionData().filter(item =>
         (!engineer || item.muhendis === engineer) &&
         (!search || `${item.ilce || ''} ${item.mahalle || ''}`.toLocaleLowerCase('tr-TR').includes(search)));
     const withTarget = units.filter(item => /^\d{4}-\d{2}-\d{2}/.test(String(item.plan_kesin_hedef || '')));
-    const withoutTarget = units.length - withTarget.length;
     const now = new Date();
     const pad = value => String(value).padStart(2, '0');
     const currentMonth = `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
     const todayKey = `${currentMonth}-${pad(now.getDate())}`;
+    const stateOf = item => isPlanningDelivered(item) ? 'done' : item.plan_kesin_hedef.slice(0, 10) < todayKey ? 'late' : 'waiting';
     const groups = {};
     withTarget.forEach(item => { (groups[item.plan_kesin_hedef.slice(0, 7)] ||= []).push(item); });
-    const months = Object.keys(groups).sort();
-    const monthLabel = key => new Date(`${key}-01T12:00:00`).toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
-    const sections = months.map(key => {
+    const months = Object.keys(groups).sort().map(key => {
         const items = groups[key].sort((a, b) => a.plan_kesin_hedef.localeCompare(b.plan_kesin_hedef) || String(a.ilce || '').localeCompare(String(b.ilce || ''), 'tr') || String(a.mahalle || '').localeCompare(String(b.mahalle || ''), 'tr'));
-        const done = items.filter(isPlanningDelivered).length;
-        const late = items.filter(item => !isPlanningDelivered(item) && item.plan_kesin_hedef.slice(0, 10) < todayKey).length;
-        const waiting = items.length - done - late;
+        const count = state => items.filter(item => stateOf(item) === state).length;
+        return { key, label: new Date(`${key}-01T12:00:00`).toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' }), items, done: count('done'), late: count('late'), waiting: count('waiting') };
+    });
+    return { months, withoutTarget: units.length - withTarget.length, currentMonth, stateOf };
+}
+
+// Aylık takip: kesin teslim hedefine göre ay ay ilçe, mahalle ve görevli personel
+function renderPlanningMonthly() {
+    const container = document.getElementById('planningMonthly');
+    if (!container) return;
+    const { months, withoutTarget, currentMonth, stateOf } = getPlanningMonthlyData();
+    const sections = months.map(({ key, label, items, done, late, waiting }) => {
         const rows = items.map(item => {
-            const delivered = isPlanningDelivered(item);
-            const isLate = !delivered && item.plan_kesin_hedef.slice(0, 10) < todayKey;
-            const state = delivered ? 'done' : isLate ? 'late' : 'waiting';
+            const state = stateOf(item);
+            const delivered = state === 'done', isLate = state === 'late';
             const icon = delivered ? 'fa-check-circle' : isLate ? 'fa-exclamation-circle' : 'fa-clock';
             const statusText = escapeNoteHtml(String(item.genel_durum || '').trim() || 'Durum girilmemiş');
             return `<tr class="${state}"><td class="planning-month-date">${formatPlanningDate(item.plan_kesin_hedef.slice(0, 10))}</td><td>${escapeNoteHtml(item.ilce || '')}</td><td><strong>${escapeNoteHtml(item.mahalle || '')}</strong></td><td>${escapeNoteHtml(item.muhendis || 'Atanmadı')}</td><td>${escapeNoteHtml(item.tekniker || 'Atanmadı')}</td><td><span class="planning-month-status ${state}"><i class="fas ${icon}"></i>${statusText}${isLate ? ' · gecikti' : ''}</span></td></tr>`;
         }).join('');
         const badges = `<span class="badge total">${items.length} birim</span>${done ? `<span class="badge done"><i class="fas fa-check"></i> ${done} teslim edildi</span>` : ''}${waiting ? `<span class="badge waiting">${waiting} bekliyor</span>` : ''}${late ? `<span class="badge late">${late} gecikti</span>` : ''}`;
-        return `<section class="planning-month${key === currentMonth ? ' current' : ''}${key < currentMonth ? ' past' : ''}"><header><h4><i class="fas fa-calendar-alt"></i> ${escapeNoteHtml(monthLabel(key))}${key === currentMonth ? ' <span class="planning-month-now">Bu ay</span>' : ''}</h4><div class="planning-month-badges">${badges}</div></header><div class="planning-month-table-wrap"><table class="planning-month-table"><thead><tr><th>Kesin hedef</th><th>İlçe</th><th>Mahalle</th><th>Mühendis</th><th>Tekniker</th><th>Durum</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+        return `<section class="planning-month${key === currentMonth ? ' current' : ''}${key < currentMonth ? ' past' : ''}"><header><h4><i class="fas fa-calendar-alt"></i> ${escapeNoteHtml(label)}${key === currentMonth ? ' <span class="planning-month-now">Bu ay</span>' : ''}</h4><div class="planning-month-badges">${badges}</div></header><div class="planning-month-table-wrap"><table class="planning-month-table"><thead><tr><th>Kesin hedef</th><th>İlçe</th><th>Mahalle</th><th>Mühendis</th><th>Tekniker</th><th>Durum</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
     }).join('');
     const missing = withoutTarget ? `<div class="planning-month-missing"><i class="fas fa-info-circle"></i> ${withoutTarget} birimin kesin teslim hedefi henüz girilmedi; bu birimler aylık takipte görünmez. Tarih girmek için <button type="button" onclick="selectPlanningView('table')">Tablo</button> görünümüne geçin.</div>` : '';
     container.innerHTML = (sections || '<div class="planning-month-empty">Seçili bölge ve filtrelerde kesin teslim hedefi girilmiş birim yok.</div>') + missing;
@@ -642,6 +646,7 @@ function addPlanningNote(sn) {
 
 function exportPlanningToExcel() {
     if (typeof XLSX === 'undefined') return showToast('Excel hazırlanamadı', 'Excel bileşeni yüklenemedi. Sayfayı yenileyip tekrar deneyin.', 'error');
+    if (planningView === 'monthly') return exportPlanningMonthlyToExcel();
     normalizeFirmaNoteData();
     const rows = getPlanningRows();
     const engineer = document.getElementById('planningEngineer').value || 'Tüm mühendisler';
@@ -685,6 +690,63 @@ function exportPlanningToExcel() {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook,sheet,'Personel Teslim Planı');
     XLSX.writeFile(workbook,`MRS_ANM_II_Planlama_${planningRegions[activePlanningRegion].exportName}_${new Date().toLocaleDateString('tr-TR').replace(/\./g,'-')}.xlsx`);
+}
+
+// Aylık Takip görünümünün Excel çıktısı: her ay için başlık + birim satırları
+function exportPlanningMonthlyToExcel() {
+    const { months, withoutTarget, currentMonth, stateOf } = getPlanningMonthlyData();
+    if (!months.length) return showToast('Excel hazırlanamadı', 'Seçili bölge ve filtrelerde kesin teslim hedefi girilmiş birim yok.', 'error');
+    const engineer = document.getElementById('planningEngineer').value || 'Tüm mühendisler';
+    const statusLabel = item => {
+        const status = String(item.genel_durum || '').trim() || 'Durum girilmemiş';
+        return stateOf(item) === 'done' ? `✓ ${status}` : stateOf(item) === 'late' ? `${status} · GECİKTİ` : status;
+    };
+    const content = [
+        ['MRS-ANM II · Personel Teslim Planı · Aylık Takip'],
+        [`${planningRegions[activePlanningRegion].label} | ${engineer} | ${new Date().toLocaleDateString('tr-TR')}`],
+        [`Kesin teslim hedefine göre gruplanmıştır. Yeşil: firmaya teslim edildi veya ileri aşamada · Kırmızı: hedef tarihi geçti${withoutTarget ? ` · Kesin hedefi girilmemiş ${withoutTarget} birim listede yoktur.` : ''}`],
+        []
+    ];
+    const rowKinds = ['title', 'subtitle', 'subtitle', 'blank'];
+    months.forEach(month => {
+        const counts = [`${month.items.length} birim`, month.done && `${month.done} teslim edildi`, month.waiting && `${month.waiting} bekliyor`, month.late && `${month.late} gecikti`].filter(Boolean).join(' · ');
+        content.push([`${month.label.toLocaleUpperCase('tr-TR')}${month.key === currentMonth ? ' (BU AY)' : ''}  —  ${counts}`]); rowKinds.push('month');
+        content.push(['Kesin hedef', 'İlçe', 'Mahalle', 'Mühendis', 'Tekniker', 'Durum']); rowKinds.push('header');
+        month.items.forEach(item => {
+            content.push([new Date(item.plan_kesin_hedef.slice(0, 10) + 'T00:00:00'), item.ilce || '', item.mahalle || '', item.muhendis || 'Atanmadı', item.tekniker || 'Atanmadı', statusLabel(item)]);
+            rowKinds.push(stateOf(item));
+        });
+        content.push([]); rowKinds.push('blank');
+    });
+    const sheet = XLSX.utils.aoa_to_sheet(content, {cellDates:true,dateNF:'dd/mm/yyyy'});
+    sheet['!cols'] = [14,14,24,24,24,40].map(wch => ({wch}));
+    sheet['!merges'] = [];
+    sheet['!rows'] = [];
+    const fill = rgb => ({patternType:'solid', fgColor:{rgb}});
+    const rowFills = { done:'ECFDF5', late:'FEF2F2', waiting:'FFFFFF' };
+    const statusColors = { done:'047857', late:'B91C1C', waiting:'1E40AF' };
+    content.forEach((row, r) => {
+        const kind = rowKinds[r];
+        if (['title','subtitle','month'].includes(kind)) sheet['!merges'].push({s:{r,c:0},e:{r,c:5}});
+        sheet['!rows'][r] = {hpt: kind === 'title' ? 28 : kind === 'month' ? 24 : kind === 'blank' ? 10 : 20};
+        for (let c = 0; c < 6; c++) {
+            const ref = XLSX.utils.encode_cell({r,c});
+            const cell = sheet[ref];
+            if (!cell) continue;
+            const base = {font:{name:'Aptos',sz:10,color:{rgb:'334155'}},alignment:{vertical:'center',wrapText:true},border:{bottom:{style:'thin',color:{rgb:'E2E8F0'}}}};
+            if (kind === 'title') cell.s = {...base, fill:fill('173B62'), font:{name:'Aptos',sz:16,bold:true,color:{rgb:'FFFFFF'}}};
+            else if (kind === 'subtitle') cell.s = {...base, fill:fill('173B62'), font:{name:'Aptos',sz:10,color:{rgb:'FFFFFF'}}};
+            else if (kind === 'month') cell.s = {...base, fill:fill('356C9C'), font:{name:'Aptos',sz:12,bold:true,color:{rgb:'FFFFFF'}}};
+            else if (kind === 'header') cell.s = {...base, fill:fill('EDF4FD'), font:{name:'Aptos',sz:10,bold:true,color:{rgb:'173B62'}}};
+            else if (rowFills[kind]) {
+                cell.s = {...base, fill:fill(rowFills[kind]), font:{name:'Aptos',sz:10,bold:c === 2 || c === 5,color:{rgb:c === 5 ? statusColors[kind] : '334155'}}};
+                if (c === 0 && cell.t === 'd') cell.z = 'dd.mm.yyyy';
+            }
+        }
+    });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook,sheet,'Aylık Takip');
+    XLSX.writeFile(workbook,`MRS_ANM_II_Aylik_Takip_${planningRegions[activePlanningRegion].exportName}_${new Date().toLocaleDateString('tr-TR').replace(/\./g,'-')}.xlsx`);
 }
 
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !document.getElementById('planningModal').classList.contains('hidden')) closePlanningModal(); });
