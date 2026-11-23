@@ -495,7 +495,8 @@
     ],
     "degerlendirme_durum": "Devam Ediyor",
     "plan_kesin_hedef": "2026-10-26",
-    "plan_personel_hedef": "2026-10-23"
+    "plan_personel_hedef": "2026-10-23",
+    "bilgilendirme_tarihi": "2026-11-19"
   },
   {
     "sn": 19,
@@ -811,7 +812,8 @@
       true,
       true
     ],
-    "bilgilendirme_tarihi": "2026-10-14"
+    "bilgilendirme_tarihi": "2026-10-14",
+    "kesin_aski_tarihi": "2026-11-19"
   },
   {
     "sn": 31,
