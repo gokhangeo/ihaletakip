@@ -1147,9 +1147,10 @@
     "notlar_tamamlandi": [
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[23.09.2026] Değerlendirme devam ediyor\n[22.10.2026] Değerlendirme tamamlandı(Tekn.) Arazi kontrolü yapılacak\n[5.11.2026] Arazi kontrolü yapılıyor",
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor\n[22.10.2026] Değerlendirme tamamlandı(Tekn.) Arazi kontrolü yapılacak\n[5.11.2026] Arazi kontrolü yapılıyor\n[26.11.2026] Kontrol yapılıyor(Kont. Mem.)",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
@@ -1213,9 +1214,10 @@
     "ucus_tarihi": "2026-05-04",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
+      false,
       false
     ],
-    "notlar": "[05.11.2026] Kıymetlendirme bekliyor"
+    "notlar": "[05.11.2026] Kıymetlendirme bekliyor\n[26.11.2026] Değerlendirme devam ediyor.(Tekn.)"
   },
   {
     "sn": 46,
