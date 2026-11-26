@@ -182,9 +182,10 @@
     "notlar_tamamlandi": [
       true,
       false,
+      false,
       false
     ],
-    "notlar": "[03.09.2026] Kontrole başlanacak\n[25.09.2026] Hüseyin Büyük değerlendime yapılıyor\n[03.11.2026] Kıymetlendirme gelmedi.",
+    "notlar": "[03.09.2026] Kontrole başlanacak\n[25.09.2026] Hüseyin Büyük değerlendime yapılıyor\n[03.11.2026] Kıymetlendirme gelmedi.\n[26.11.2026] 400 parsel kontrol edildi değerlendirme devam ediyor",
     "degerlendirme_durum": "Devam Ediyor",
     "plan_kesin_hedef": "2027-01-15",
     "plan_personel_hedef": "2027-06-15"
