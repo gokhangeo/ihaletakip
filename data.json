@@ -604,7 +604,11 @@
     "ucus_tarihi": "2026-08-28",
     "altlik_durum": "Yapıldı",
     "plan_kesin_hedef": "2027-02-25",
-    "plan_personel_hedef": "2027-05-15"
+    "plan_personel_hedef": "2027-05-15",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[26.11.2026] Ortofoto geldi, kıymetlendirme teslim edilmedi."
   },
   {
     "sn": 23,
