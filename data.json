@@ -131,9 +131,10 @@
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[06.10.2026] Yersel ölçüm yapılmasının daha uygun olacağı belirtildi(Müh.)\n[03.11.2026] Yersel ölçüm bekleniyor",
+    "notlar": "[06.10.2026] Yersel ölçüm yapılmasının daha uygun olacağı belirtildi(Müh.)\n[03.11.2026] Yersel ölçüm bekleniyor\n[26.11.2026] Altlık kontrol ediliyor",
     "plan_kesin_hedef": "2027-02-19",
     "plan_personel_hedef": "2027-03-01"
   },
@@ -769,7 +770,11 @@
     "ucus_kiymet_durum": "Devam Ediyor",
     "ucus_tarihi": "2026-07-27",
     "plan_kesin_hedef": "2026-12-15",
-    "plan_personel_hedef": "2026-12-15"
+    "plan_personel_hedef": "2026-12-15",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[26.11.2026] Kıymetlendirme ve lidar teslim edilmedi."
   },
   {
     "sn": 29,
