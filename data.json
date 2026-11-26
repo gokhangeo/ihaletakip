@@ -1308,9 +1308,10 @@
       false,
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[30.09.2026] Arazi kontrolü yapılıyor(Tekn.)\n[22.10.2026] Meskun dışında diğer kısımların Değerlendirmesi tamamlandı.\n[05.11.2026] Arazi kontrolü yapılacak",
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[30.09.2026] Arazi kontrolü yapılıyor(Tekn.)\n[22.10.2026] Meskun dışında diğer kısımların Değerlendirmesi tamamlandı.\n[05.11.2026] Arazi kontrolü yapılacak\n[26.11.2026] Geçici-8 kısımlarına bakılacak",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
