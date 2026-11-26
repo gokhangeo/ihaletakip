@@ -19,9 +19,10 @@
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[26.10.2026] Değerlendirme devam ediyor\n[03.11.2026] Kıymetlendirme ve lidar teslim edilmedi.",
+    "notlar": "[26.10.2026] Değerlendirme devam ediyor\n[03.11.2026] Kıymetlendirme ve lidar teslim edilmedi.\n[26.11.2026] Kıymetlendirme ve lidar teslim edilmedi.",
     "plan_kesin_hedef": "2026-12-25",
     "plan_personel_hedef": "2027-04-16"
   },
@@ -284,9 +285,10 @@
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[07.10.2026] Meskun yok, kıymetlendirme yok. Ortofoto üzerinden değerlendirme yapılıyor(Tekn.)\n[03.11.2026] Kıymetlendirme ve lidar teslim edildi. Değerlendirme devam ediyor.",
+    "notlar": "[07.10.2026] Meskun yok, kıymetlendirme yok. Ortofoto üzerinden değerlendirme yapılıyor(Tekn.)\n[03.11.2026] Kıymetlendirme ve lidar teslim edildi. Değerlendirme devam ediyor.\n[26.11.2026] 04.12.2026 müh. teslim edilecek",
     "plan_kesin_hedef": "2026-11-20",
     "plan_personel_hedef": "2027-01-15"
   },
