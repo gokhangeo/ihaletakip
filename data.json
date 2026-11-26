@@ -1273,14 +1273,15 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "UÇUŞ KIYM. BEKLİYOR",
+    "genel_durum": "FİRMAYA TESLİM EDİLDİ",
     "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[22.10.2026] Değerlendirme tamamlandı(Tekn.) Arazi kontrolü yapılacak\n[05.11.2026] Müh. kontrolünde. Arazi kontrolü yapılacak"
+    "notlar": "[22.10.2026] Değerlendirme tamamlandı(Tekn.) Arazi kontrolü yapılacak\n[05.11.2026] Müh. kontrolünde. Arazi kontrolü yapılacak\n[26.11.2026] Firmaya teslim edildi"
   },
   {
     "sn": 49,
@@ -1359,9 +1360,10 @@
       false,
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor\n[23.09.2026] Meskun bekleniyor\n[30.09.2026] Meskun yapıldı.\n[22.10.2026] Değerlendirme %80 tamamlandı.(Tekn.)\n[05.11.2026] Arazi kontrolü yapılıyor",
+    "notlar": "[26.08.2026] Değerlendirmeye başlanıldı(Kont. Mem.)\n[03.09.2026] Değerlendirme tamam meskun kaldı arazi bekleniyor\n[23.09.2026] Meskun bekleniyor\n[30.09.2026] Meskun yapıldı.\n[22.10.2026] Değerlendirme %80 tamamlandı.(Tekn.)\n[05.11.2026] Arazi kontrolü yapılıyor\n[26.11.2026] Değerlendirme tamam tekn. son kontrolü yapıyor",
     "ucus_kiymet_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor"
   },
@@ -1387,9 +1389,10 @@
     "notlar_tamamlandi": [
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[22.10.2026] Değerlendirme %50 tamamlandı(Tekn.)\n[05.11.2026] Değerlendirme %70 tamamlandı(Tekn.)",
+    "notlar": "[23.09.2026] Değerlendirme devam ediyor(Tekn.)\n[22.10.2026] Değerlendirme %50 tamamlandı(Tekn.)\n[05.11.2026] Değerlendirme %70 tamamlandı(Tekn.)\n[26.11.2026] Arazi kontrolü yapıacak(Tekn.)",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
@@ -1408,15 +1411,16 @@
     "fen": "MÜMİN AKDOĞAN",
     "tas": "MUSTAFA BICAK",
     "ucus_tarihi": "2026-05-04",
-    "genel_durum": "DEĞERLENDİRMEDE",
+    "genel_durum": "FİRMAYA TESLİM EDİLDİ",
     "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
       false,
+      false,
       false
     ],
-    "notlar": "[04.08.2026] Altlık kontrol ediliyor. 13.08.2026 tarihin kadar altlık kont. tamamlanarak değerlendirmeye başlanılması.\n[26.08.2026] Değerlendirme devam ediyor\n[22.10.2026] Değerlendirme tamamlama aşamasına geldi.[05.11.2026] Değerlendirme tamamlandı (4 parsel görüş sorulacak)",
+    "notlar": "[04.08.2026] Altlık kontrol ediliyor. 13.08.2026 tarihin kadar altlık kont. tamamlanarak değerlendirmeye başlanılması.\n[26.08.2026] Değerlendirme devam ediyor\n[22.10.2026] Değerlendirme tamamlama aşamasına geldi.[05.11.2026] Değerlendirme tamamlandı (4 parsel görüş sorulacak)\n[26.11.2026] Firmaya teslim edildi",
     "degerlendirme_durum": "Devam Ediyor"
   },
   {
@@ -1439,9 +1443,10 @@
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[03.09.2026] Değerlendirme devam ediyor(Kont. Mem.)\n[05.11.2026] Yersel ölçüm bekliyor",
+    "notlar": "[03.09.2026] Değerlendirme devam ediyor(Kont. Mem.)\n[05.11.2026] Yersel ölçüm bekliyor\n[26.11.2026] Yersel ölçüm bekliyor",
     "degerlendirme_durum": "Devam Ediyor",
     "ucus_kiymet_durum": "Yapıldı"
   }
