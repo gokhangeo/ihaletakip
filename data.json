@@ -1331,10 +1331,11 @@
     "ucus_tarihi": "2026-10-05",
     "notlar_tamamlandi": [
       false,
+      false,
       false
     ],
-    "notlar": "[22.10.2026] Kıymetlendirme bekliyor\n[05.11.2026] Kıymetlendirme bekliyor",
-    "ucus_kiymet_durum": "Devam Ediyor"
+    "notlar": "[22.10.2026] Kıymetlendirme bekliyor\n[05.11.2026] Kıymetlendirme bekliyor\n[26.11.2026] Kıymetlendirme geldi",
+    "ucus_kiymet_durum": "Yapıldı"
   },
   {
     "sn": 51,
