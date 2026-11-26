@@ -726,7 +726,11 @@
     "altlik_durum": "Yapıldı",
     "degerlendirme_durum": "Devam Ediyor",
     "plan_kesin_hedef": "2026-12-18",
-    "plan_personel_hedef": "2027-05-19"
+    "plan_personel_hedef": "2027-05-19",
+    "notlar_tamamlandi": [
+      false
+    ],
+    "notlar": "[26.11.2026] Değerlendirme devam ediliyor(Tekn.)"
   },
   {
     "sn": 27,
