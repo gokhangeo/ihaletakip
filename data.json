@@ -327,7 +327,7 @@
       false,
       false
     ],
-    "degerlendirme_durum": "Devam Ediyor",
+    "degerlendirme_durum": "Yapıldı",
     "plan_kesin_hedef": "2026-10-30",
     "plan_personel_hedef": "2026-11-15"
   },
@@ -505,7 +505,7 @@
       true,
       true
     ],
-    "degerlendirme_durum": "Devam Ediyor",
+    "degerlendirme_durum": "Yapıldı",
     "plan_kesin_hedef": "2026-10-26",
     "plan_personel_hedef": "2026-10-23",
     "bilgilendirme_tarihi": "2026-11-19"
@@ -892,7 +892,7 @@
     "genel_durum": "FİRMAYA TESLİM EDİLDİ",
     "ucus_tarihi": "2026-06-08",
     "altlik_durum": "Yapıldı",
-    "degerlendirme_durum": "Devam Ediyor",
+    "degerlendirme_durum": "Yapıldı",
     "notlar": "[14.07.2026] Değerlendirme devam ediyor.(Tekn.)\n[22.07.2026] Meskun ölçüldü teslim edilmedi. Değerlendirme devam ediyor(Tekn.)\n[06.08.2026] Zemin kontrolü yapılacak\n[18.08.2026] Kıymetlendirme gelmedi. Ortofotoda kayıklık vardı düzeltildi, kontrol tekrar yapılıyor.\n[25.08.2026] 27.08 ykn kontrolü yapılacak\n[03.09.2026] YKN kontrolü yapıldı, kıymetlendirme gelmedi\n[08.09.2026] Kıymetlendirme gelmedi\n[25.09.2026] Değerlendirme devam ediyor.(Tekn.)\n[07.10.2026] 30.09.2026 kıymetlendirme geldi, değerlendirme devam ediyor\n[03.11.2026] 06.11 firmaya teslim edilecek",
     "ucus_kiymet_durum": "Yapıldı",
     "notlar_tamamlandi": [
@@ -1426,7 +1426,7 @@
       false
     ],
     "notlar": "[04.08.2026] Altlık kontrol ediliyor. 13.08.2026 tarihin kadar altlık kont. tamamlanarak değerlendirmeye başlanılması.\n[26.08.2026] Değerlendirme devam ediyor\n[22.10.2026] Değerlendirme tamamlama aşamasına geldi.[05.11.2026] Değerlendirme tamamlandı (4 parsel görüş sorulacak)\n[26.11.2026] Firmaya teslim edildi",
-    "degerlendirme_durum": "Devam Ediyor"
+    "degerlendirme_durum": "Yapıldı"
   },
   {
     "sn": 54,
