@@ -494,16 +494,16 @@
     "ucus_kiymet_durum": "Yapıldı",
     "notlar": "[09.07.2026] Değerlendirme devam ediyor\n[22.07.2026] Değerlendirme devam ediyor(Kont. Mem.)\n[06.08.2026] Değerlendirme tamam, kıymetlendirme bekliyor.\n[18.08.2026] Zeminde kontrol yapılacak.\n[25.08.2026] 27-28.08 arazi kontrolü yapılacak\n[03.09.2026] Arazi kontrolü yapılacak. 07-09 arzi kontrolü yapılacak\n[08.09.2026] Arazi kont. yapılıyor(Müh.)\n[25.09.2026] Alan karşılaştırması yapılıyor\n[07.10.2026] 14.10.2026 firmaya teslim edilecek\n[03.11.2026] 24.10 Firmaya teslim edildi",
     "notlar_tamamlandi": [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
     ],
     "degerlendirme_durum": "Devam Ediyor",
     "plan_kesin_hedef": "2026-10-26",
@@ -662,13 +662,13 @@
     "ucus_tarihi": "2026-07-22",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
     ],
     "notlar": "[18.08.2026] Kıymetlendirme geldi. Değerlendirmeye başlanacak.\n[25.08.2026] Tekn. değerlendirme devam ediyor. 27.08 zemin ölçümü ve ykn kontrolü yapılacak\n[03.09.2026] Değerlendirme devam ediyor.(%50 tamam)\n[08.09.2026] Değerlendirme tamam(ormana bakılacak)(Tekn.)\n[25.09.2026] Firmaya teslim edilecek\n[07.10.2026] Ormancı ile bakılıyor 08.10.2026 firmaya teslim edilecek\n[20.10.2026] Askı ilanına hazırlanıyor",
     "degerlendirme_durum": "Yapıldı",
@@ -1027,11 +1027,11 @@
     "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
-      false,
-      false,
-      false,
-      false,
-      false
+      true,
+      true,
+      true,
+      true,
+      true
     ],
     "notlar": "[22.07.2026] Altlık kontrolü devam ediyor\n[04.08.2026] Altlık kontrolü devam ediyor. 07.08.2026 tarihine kadar altlık kont. tamamlanması, 28.08.2026 tarihine kadar değerlendirmenin tamamlanarak firmaya teslim edilmesi.\n[23.09.2026] 25.09 firmaya teslim edilecek\n[30.09.2026] Firmaya teslim edildi. 05.10.2026 tutanaklar hazır edilecek\n[22.10.2026] Askı ilanına hazırlanıyor",
     "degerlendirme_durum": "Yapıldı",
@@ -1057,11 +1057,11 @@
     "ucus_kiymet_durum": "Yapıldı",
     "altlik_durum": "Yapıldı",
     "notlar_tamamlandi": [
-      false,
-      false,
-      false,
-      false,
-      false
+      true,
+      true,
+      true,
+      true,
+      true
     ],
     "notlar": "[22.07.2026] Değerlendimeye başlanıldı\n[04.08.2026] Değerlendirme devam ediyor. 21.08.2026 tarihine kadar değerlendirmenin yapılarak firmaya teslim edilmesi.\n[26.08.2026] Arazi kontrolü yapılıyor\n[30.09.2026] Değerlendirme devam ediyor.\n[22.10.2026] Askı ilanına hazırlanıyor",
     "degerlendirme_durum": "Yapıldı",
